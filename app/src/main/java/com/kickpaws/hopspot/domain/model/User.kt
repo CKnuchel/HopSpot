@@ -1,7 +1,7 @@
 package com.kickpaws.hopspot.domain.model
 
 data class User(
-    val id: String,
+    val id: Int,
     val email: String,
     val displayName: String,
     val role: String,
