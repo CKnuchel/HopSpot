@@ -1,6 +1,8 @@
 package com.kickpaws.hopspot.di
 
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
+import com.kickpaws.hopspot.data.remote.interceptor.AuthInterceptor
+import com.kickpaws.hopspot.data.remote.interceptor.AuthAuthenticator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,11 +31,14 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        loggingInterceptor: HttpLoggingInterceptor
-        // TODO: AuthInterceptor später hinzufügen
+        loggingInterceptor: HttpLoggingInterceptor,
+        authInterceptor: AuthInterceptor,
+        authAuthenticator: AuthAuthenticator
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(authInterceptor)
+            .authenticator(authAuthenticator)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
