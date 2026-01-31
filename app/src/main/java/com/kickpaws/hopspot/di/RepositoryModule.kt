@@ -15,6 +15,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAuthRepository(
+        // Defines the object to inject for the called interface
         authRepositoryImpl: AuthRepositoryImpl
     ): AuthRepository
 }
