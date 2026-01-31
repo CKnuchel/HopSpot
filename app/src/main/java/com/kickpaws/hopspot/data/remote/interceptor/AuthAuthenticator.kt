@@ -33,7 +33,7 @@ class AuthAuthenticator @Inject constructor(
                 // save new token
                 tokenManager.saveTokens(result.token, result.refreshToken)
 
-                // Retry request with new toen
+                // Retry request with new token
                 response.request.newBuilder()
                     .header("Authorization", "Bearer ${result.token}")
                     .header("Authorization-Retry", "true")
