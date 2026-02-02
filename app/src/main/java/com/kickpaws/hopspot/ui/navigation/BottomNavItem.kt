@@ -21,7 +21,7 @@ sealed class BottomNavItem(
     object BenchList : BottomNavItem(
         route = Route.BenchList.route,
         icon = Icons.AutoMirrored.Filled.List,
-        label = "Bänke"
+        label = "Bänkli"
     )
 
     object Visits : BottomNavItem(

@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.navigation.compose)
 
     // Retrofit (API)
     implementation(libs.retrofit)
@@ -77,7 +78,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
 
-    // Room (Lokale Datenbank)
+    // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
@@ -85,7 +86,7 @@ dependencies {
     // DataStore (Settings)
     implementation(libs.datastore.preferences)
 
-    // Coil (Bilder laden)
+    // Coil (Loading Pictures)
     implementation(libs.coil.compose)
 
     // Google Maps

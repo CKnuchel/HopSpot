@@ -8,6 +8,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.kickpaws.hopspot.ui.screens.auth.LoginScreen
+import com.kickpaws.hopspot.ui.screens.auth.RegisterScreen
+import com.kickpaws.hopspot.ui.screens.benchcreate.BenchCreateScreen
+import com.kickpaws.hopspot.ui.screens.benchdetail.BenchDetailScreen
+import com.kickpaws.hopspot.ui.screens.benchlist.BenchListScreen
+import com.kickpaws.hopspot.ui.screens.profile.ProfileScreen
 
 @Composable
 fun HopSpotNavGraph(
@@ -20,27 +26,63 @@ fun HopSpotNavGraph(
         startDestination = startDestination,
         modifier = modifier
     ){
-        composable(route = Route.Login.route){
-            Text("Login Screen")
+        composable(Route.Login.route) {
+            LoginScreen(
+                onLoginSuccess = {
+                    navController.navigate(Route.Map.route) {
+                        popUpTo(Route.Login.route) { inclusive = true }
+                    }
+                },
+                onNavigateToRegister = {
+                    navController.navigate(Route.Register.route)
+                }
+            )
         }
 
-        composable(route = Route.Register.route){
-            Text("Register Screen")
+        composable(Route.Register.route) {
+            RegisterScreen(
+                onRegisterSuccess = {
+                    navController.navigate(Route.Map.route) {
+                        popUpTo(Route.Login.route) { inclusive = true }
+                    }
+                },
+                onNavigateToLogin = {
+                    navController.popBackStack()
+                }
+            )
         }
 
-        composable(route = Route.BenchList.route){
-            Text("Bench List Screen")
+        composable(route = Route.BenchList.route) {
+            BenchListScreen(
+                onBenchClick = { benchId ->
+                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+                },
+                onCreateBenchClick = {
+                    navController.navigate(Route.BenchCreate.route)
+                }
+            )
         }
 
-        composable(route = Route.BenchDetail.route,
-            arguments = listOf(navArgument("benchId") {type = NavType.StringType})
-        ){ backStackEntry ->
-            val benchId = backStackEntry.arguments?.getString("benchId") ?: ""
-            Text("Bench Detail: $benchId")
+        composable(
+            route = Route.BenchDetail.route,
+            arguments = listOf(navArgument("benchId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val benchId = backStackEntry.arguments?.getInt("benchId") ?: return@composable
+            BenchDetailScreen(
+                benchId = benchId,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
 
-        composable(route = Route.BenchCreate.route){
-            Text("Bench Create Screen")
+        composable(route = Route.BenchCreate.route) {
+            BenchCreateScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onBenchCreated = { benchId ->
+                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString())) {
+                        popUpTo(Route.BenchCreate.route) { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable(route = Route.BenchEdit.route,
@@ -58,8 +100,15 @@ fun HopSpotNavGraph(
             Text("Visits Screen")
         }
 
-        composable(route = Route.Profile.route){
-            Text("Profile Screen")
+        composable(Route.Profile.route) {
+            ProfileScreen(
+                onLoggedOut = {
+                    navController.navigate(Route.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
+
     }
 }

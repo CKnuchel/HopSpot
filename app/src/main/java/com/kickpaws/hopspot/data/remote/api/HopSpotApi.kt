@@ -2,6 +2,7 @@ package com.kickpaws.hopspot.data.remote.api
 
 import com.kickpaws.hopspot.data.remote.dto.*
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface HopSpotApi {
@@ -60,23 +61,23 @@ interface HopSpotApi {
         @Query("lat") lat: Double? = null,
         @Query("lon") lon: Double? = null,
         @Query("radius") radius: Int? = null
-    ): PaginatedBenchesDto
+    ): ApiResponse<PaginatedBenchesDto>
 
     @GET("api/v1/benches/{id}")
     suspend fun getBench(
         @Path("id") id: Int
-    ): BenchDto
+    ): ApiResponse<BenchDto>
 
     @POST("api/v1/benches")
     suspend fun createBench(
         @Body request: CreateBenchRequest
-    ): BenchDto
+    ): ApiResponse<BenchDto>
 
     @PATCH("api/v1/benches/{id}")
     suspend fun updateBench(
         @Path("id") id: Int,
         @Body request: UpdateBenchRequest
-    ): BenchDto
+    ): ApiResponse<BenchDto>
 
     @DELETE("api/v1/benches/{id}")
     suspend fun deleteBench(
@@ -94,7 +95,7 @@ interface HopSpotApi {
     suspend fun uploadPhoto(
         @Path("id") benchId: Int,
         @Part photo: MultipartBody.Part,
-        @Part("is_main") isMain: Boolean = false
+        @Part("is_main") isMain: RequestBody
     ): PhotoDto
 
     @DELETE("api/v1/photos/{id}")
