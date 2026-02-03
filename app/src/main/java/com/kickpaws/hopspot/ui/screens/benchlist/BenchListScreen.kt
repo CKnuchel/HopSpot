@@ -22,7 +22,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import androidx.compose.ui.res.painterResource
+import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.Bench
+import com.kickpaws.hopspot.ui.components.BenchListSkeleton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -106,10 +111,7 @@ fun BenchListScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = colorScheme.primary
-                    )
+                    BenchListSkeleton()
                 }
 
                 uiState.errorMessage != null && uiState.benches.isEmpty() -> {
@@ -274,7 +276,7 @@ private fun BenchListItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Thumbnail placeholder
+            // Thumbnail with Coil
             Box(
                 modifier = Modifier
                     .size(64.dp)
@@ -282,10 +284,24 @@ private fun BenchListItem(
                     .background(colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "🪑",
-                    fontSize = 28.sp
-                )
+                if (bench.mainPhotoUrl != null) {
+                    AsyncImage(
+                        model = bench.mainPhotoUrl,
+                        contentDescription = bench.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        placeholder = painterResource(R.drawable.placeholder_bench),
+                        error = painterResource(R.drawable.placeholder_bench)
+                    )
+                } else {
+                    // Fallback wenn kein Bild
+                    Icon(
+                        imageVector = Icons.Default.Chair,
+                        contentDescription = null,
+                        tint = colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(16.dp))

@@ -12,6 +12,7 @@ import com.kickpaws.hopspot.ui.screens.auth.LoginScreen
 import com.kickpaws.hopspot.ui.screens.auth.RegisterScreen
 import com.kickpaws.hopspot.ui.screens.benchcreate.BenchCreateScreen
 import com.kickpaws.hopspot.ui.screens.benchdetail.BenchDetailScreen
+import com.kickpaws.hopspot.ui.screens.benchedit.BenchEditScreen
 import com.kickpaws.hopspot.ui.screens.benchlist.BenchListScreen
 import com.kickpaws.hopspot.ui.screens.profile.ProfileScreen
 
@@ -70,7 +71,10 @@ fun HopSpotNavGraph(
             val benchId = backStackEntry.arguments?.getInt("benchId") ?: return@composable
             BenchDetailScreen(
                 benchId = benchId,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onEditClick = { id ->
+                    navController.navigate(Route.BenchEdit.createRoute(id.toString()))
+                }
             )
         }
 
@@ -85,11 +89,20 @@ fun HopSpotNavGraph(
             )
         }
 
-        composable(route = Route.BenchEdit.route,
-            arguments = listOf(navArgument("benchId") {type = NavType.StringType})
-        ){ backStackEntry ->
-            val benchId = backStackEntry.arguments?.getString("benchId") ?: ""
-            Text("Bench Edit: $benchId")
+        composable(
+            route = Route.BenchEdit.route,
+            arguments = listOf(navArgument("benchId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val benchId = backStackEntry.arguments?.getInt("benchId") ?: return@composable
+            BenchEditScreen(
+                benchId = benchId,
+                onNavigateBack = { navController.popBackStack() },
+                onDeleted = {
+                    navController.navigate(Route.BenchList.route) {
+                        popUpTo(Route.BenchList.route) { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable(route = Route.Map.route){

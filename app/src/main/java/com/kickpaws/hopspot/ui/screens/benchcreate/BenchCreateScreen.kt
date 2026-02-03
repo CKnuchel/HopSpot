@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.kickpaws.hopspot.ui.components.LocationPickerCard
+import com.kickpaws.hopspot.ui.components.PhotoPickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,12 +42,16 @@ fun BenchCreateScreen(
     val uiState by viewModel.uiState.collectAsState()
     val colorScheme = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
+    var showPhotoPickerDialog by remember { mutableStateOf(false) }
 
-    // Photo Picker
-    val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? ->
-        viewModel.onPhotoSelected(uri)
+    // Photo Picker Dialog
+    if (showPhotoPickerDialog) {
+        PhotoPickerDialog(
+            onDismiss = { showPhotoPickerDialog = false },
+            onPhotoSelected = { uri ->
+                viewModel.onPhotoSelected(uri)
+            }
+        )
     }
 
     // Navigate when bench created
@@ -105,11 +111,7 @@ fun BenchCreateScreen(
             PhotoCard(
                 photoUri = uiState.photoUri,
                 isUploading = uiState.isUploadingPhoto,
-                onSelectPhoto = {
-                    photoPickerLauncher.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    )
-                },
+                onSelectPhoto = { showPhotoPickerDialog = true },
                 onRemovePhoto = viewModel::removePhoto
             )
 
@@ -139,10 +141,12 @@ fun BenchCreateScreen(
             )
 
             // Location Card
-            LocationCard(
+            LocationPickerCard(
                 locationText = uiState.locationText,
                 hasLocation = uiState.latitude != null,
-                onSetLocation = viewModel::setManualLocation
+                latitude = uiState.latitude,
+                longitude = uiState.longitude,
+                onLocationSet = { lat, lon -> viewModel.setLocation(lat, lon) }
             )
 
             // Description
