@@ -40,4 +40,8 @@ sealed interface  Route {
     object Profile : Route{
         override val route = "profile"
     }
+
+    object Admin : Route{
+        override val route = "admin"
+    }
 }

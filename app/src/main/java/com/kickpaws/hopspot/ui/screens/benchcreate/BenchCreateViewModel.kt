@@ -1,26 +1,64 @@
 package com.kickpaws.hopspot.ui.screens.benchcreate
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Application
+import android.content.pm.PackageManager
 import android.net.Uri
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.domain.repository.BenchRepository
 import com.kickpaws.hopspot.domain.repository.PhotoRepository
+import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
 class BenchCreateViewModel @Inject constructor(
     private val benchRepository: BenchRepository,
-    private val photoRepository: PhotoRepository
+    private val photoRepository: PhotoRepository,
+    private val application: Application
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BenchCreateUiState())
     val uiState: StateFlow<BenchCreateUiState> = _uiState.asStateFlow()
+
+    init {
+        loadInitialLocation()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun loadInitialLocation() {
+        viewModelScope.launch {
+            try {
+                val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
+
+                val hasFinePermission = ContextCompat.checkSelfPermission(
+                    application, Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+
+                val hasCoarsePermission = ContextCompat.checkSelfPermission(
+                    application, Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+
+                if (hasFinePermission || hasCoarsePermission) {
+                    val location = fusedLocationClient.lastLocation.await()
+                    if (location != null) {
+                        setLocation(location.latitude, location.longitude)
+                    }
+                }
+            } catch (e: Exception) {
+                // Ignore - user can set location manually via GPS button
+            }
+        }
+    }
 
     fun onNameChange(name: String) {
         _uiState.update { it.copy(name = name, errorMessage = null) }
@@ -53,7 +91,6 @@ class BenchCreateViewModel @Inject constructor(
         }
     }
 
-    // Temporär: Manuelle Koordinaten-Eingabe
     fun setManualLocation(latStr: String, lonStr: String) {
         val lat = latStr.toDoubleOrNull()
         val lon = lonStr.toDoubleOrNull()
@@ -65,7 +102,6 @@ class BenchCreateViewModel @Inject constructor(
         }
     }
 
-    // Photo
     fun onPhotoSelected(uri: Uri?) {
         _uiState.update { it.copy(photoUri = uri, errorMessage = null) }
     }
@@ -77,7 +113,6 @@ class BenchCreateViewModel @Inject constructor(
     fun saveBench() {
         val state = _uiState.value
 
-        // Validierung
         if (state.name.isBlank()) {
             _uiState.update { it.copy(errorMessage = "Name darf nicht leer sein") }
             return
@@ -91,7 +126,6 @@ class BenchCreateViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
 
-            // 1. Create Bench
             val result = benchRepository.createBench(
                 name = state.name.trim(),
                 latitude = state.latitude,
@@ -104,7 +138,6 @@ class BenchCreateViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = { bench ->
-                    // 2. Upload Photo if selected
                     if (state.photoUri != null) {
                         _uiState.update { it.copy(isUploadingPhoto = true) }
 
@@ -125,8 +158,6 @@ class BenchCreateViewModel @Inject constructor(
                                 }
                             },
                             onFailure = { photoError ->
-                                // Bank wurde erstellt, aber Photo fehlgeschlagen
-                                // Trotzdem zur Detail-Seite navigieren
                                 _uiState.update {
                                     it.copy(
                                         isSaving = false,
@@ -138,7 +169,6 @@ class BenchCreateViewModel @Inject constructor(
                             }
                         )
                     } else {
-                        // Keine Photo, direkt fertig
                         _uiState.update {
                             it.copy(
                                 isSaving = false,

@@ -9,6 +9,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
@@ -20,6 +22,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -45,37 +49,14 @@ fun LocationPickerCard(
 
     var isLoadingLocation by remember { mutableStateOf(false) }
     var locationError by remember { mutableStateOf<String?>(null) }
+    var showFullscreenMap by remember { mutableStateOf(false) }
 
     // Default position (Switzerland center) or current location
     val defaultPosition = LatLng(47.3769, 8.5417)
-    val initialPosition = if (latitude != null && longitude != null) {
+    val currentPosition = if (latitude != null && longitude != null) {
         LatLng(latitude, longitude)
     } else {
         defaultPosition
-    }
-
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(initialPosition, 15f)
-    }
-
-    // Update position when camera stops moving
-    LaunchedEffect(cameraPositionState.isMoving) {
-        if (!cameraPositionState.isMoving) {
-            val center = cameraPositionState.position.target
-            onLocationSet(center.latitude, center.longitude)
-        }
-    }
-
-    // Sync camera with external position changes (e.g., GPS button)
-    var shouldAnimateToPosition by remember { mutableStateOf(false) }
-    var targetPosition by remember { mutableStateOf<LatLng?>(null) }
-
-    LaunchedEffect(latitude, longitude) {
-        if (latitude != null && longitude != null && shouldAnimateToPosition) {
-            val newPos = LatLng(latitude, longitude)
-            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(newPos, 15f))
-            shouldAnimateToPosition = false
-        }
     }
 
     // Permission launcher
@@ -92,14 +73,7 @@ fun LocationPickerCard(
                 try {
                     val location = getCurrentLocation(context)
                     if (location != null) {
-                        shouldAnimateToPosition = true
                         onLocationSet(location.first, location.second)
-                        // Animate camera to new position
-                        cameraPositionState.animate(
-                            CameraUpdateFactory.newLatLngZoom(
-                                LatLng(location.first, location.second), 15f
-                            )
-                        )
                     } else {
                         locationError = "Standort konnte nicht ermittelt werden"
                     }
@@ -131,11 +105,6 @@ fun LocationPickerCard(
                     val location = getCurrentLocation(context)
                     if (location != null) {
                         onLocationSet(location.first, location.second)
-                        cameraPositionState.animate(
-                            CameraUpdateFactory.newLatLngZoom(
-                                LatLng(location.first, location.second), 15f
-                            )
-                        )
                     } else {
                         locationError = "Standort konnte nicht ermittelt werden"
                     }
@@ -153,6 +122,20 @@ fun LocationPickerCard(
                 )
             )
         }
+    }
+
+    // Fullscreen Map Dialog
+    if (showFullscreenMap) {
+        FullscreenMapDialog(
+            initialPosition = currentPosition,
+            onDismiss = { showFullscreenMap = false },
+            onLocationSelected = { lat, lon ->
+                onLocationSet(lat, lon)
+                showFullscreenMap = false
+            },
+            onRequestGps = { requestLocation() },
+            isLoadingGps = isLoadingLocation
+        )
     }
 
     Card(
@@ -217,46 +200,67 @@ fun LocationPickerCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Mini Map with fixed center marker
+            // Mini Map Preview (clickable to open fullscreen)
+            val previewCameraState = rememberCameraPositionState {
+                position = CameraPosition.fromLatLngZoom(currentPosition, 17f)
+            }
+
+            // Update preview when position changes
+            LaunchedEffect(currentPosition) {
+                previewCameraState.animate(CameraUpdateFactory.newLatLngZoom(currentPosition, 17f))
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(150.dp)
                     .clip(RoundedCornerShape(8.dp))
             ) {
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
-                    cameraPositionState = cameraPositionState,
+                    cameraPositionState = previewCameraState,
                     uiSettings = MapUiSettings(
                         zoomControlsEnabled = false,
                         mapToolbarEnabled = false,
                         myLocationButtonEnabled = false,
-                        scrollGesturesEnabled = true,
-                        zoomGesturesEnabled = true,
+                        scrollGesturesEnabled = false,
+                        zoomGesturesEnabled = false,
                         rotationGesturesEnabled = false,
-                        tiltGesturesEnabled = false
+                        tiltGesturesEnabled = false,
+                        scrollGesturesEnabledDuringRotateOrZoom = false
                     ),
-                    properties = MapProperties(
-                        mapType = MapType.NORMAL
+                    properties = MapProperties(mapType = MapType.NORMAL),
+                    onMapClick = { showFullscreenMap = true }
+                ) {
+                    Marker(
+                        state = MarkerState(position = currentPosition)
                     )
-                )
+                }
 
-                // Fixed center marker overlay
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = "Marker",
-                    tint = colorScheme.primary,
+                // Fullscreen button overlay
+                FilledIconButton(
+                    onClick = { showFullscreenMap = true },
                     modifier = Modifier
-                        .size(40.dp)
-                        .align(Alignment.Center)
-                        .offset(y = (-20).dp) // Offset so pin points to center
-                )
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .size(36.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = colorScheme.surface.copy(alpha = 0.9f)
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Fullscreen,
+                        contentDescription = "Vollbild",
+                        tint = colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "📍 Bewege die Karte um den Standort anzupassen",
+                text = "📍 Tippe auf die Karte um den Standort anzupassen",
                 fontSize = 12.sp,
                 color = colorScheme.onSurfaceVariant
             )
@@ -269,6 +273,135 @@ fun LocationPickerCard(
                     fontSize = 12.sp,
                     color = colorScheme.error
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FullscreenMapDialog(
+    initialPosition: LatLng,
+    onDismiss: () -> Unit,
+    onLocationSelected: (Double, Double) -> Unit,
+    onRequestGps: () -> Unit,
+    isLoadingGps: Boolean
+) {
+    val colorScheme = MaterialTheme.colorScheme
+
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(initialPosition, 17f)
+    }
+
+    // Track current center position
+    var currentCenter by remember { mutableStateOf(initialPosition) }
+
+    LaunchedEffect(cameraPositionState.isMoving) {
+        if (!cameraPositionState.isMoving) {
+            currentCenter = cameraPositionState.position.target
+        }
+    }
+
+    // Sync with GPS updates
+    LaunchedEffect(initialPosition) {
+        if (initialPosition != currentCenter) {
+            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(initialPosition, 17f))
+            currentCenter = initialPosition
+        }
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = colorScheme.background
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                // Fullscreen Map
+                GoogleMap(
+                    modifier = Modifier.fillMaxSize(),
+                    cameraPositionState = cameraPositionState,
+                    uiSettings = MapUiSettings(
+                        zoomControlsEnabled = true,
+                        mapToolbarEnabled = false,
+                        myLocationButtonEnabled = false,
+                        scrollGesturesEnabled = true,
+                        zoomGesturesEnabled = true,
+                        rotationGesturesEnabled = false,
+                        tiltGesturesEnabled = false
+                    ),
+                    properties = MapProperties(mapType = MapType.NORMAL)
+                )
+
+                // Fixed center marker
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "Marker",
+                    tint = colorScheme.primary,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .align(Alignment.Center)
+                        .offset(y = (-24).dp)
+                )
+
+                // Top bar with close button
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.TopCenter),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FilledIconButton(
+                        onClick = onDismiss,
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = colorScheme.surface
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Schliessen"
+                        )
+                    }
+
+                    // GPS Button
+                    FilledIconButton(
+                        onClick = onRequestGps,
+                        enabled = !isLoadingGps,
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = colorScheme.surface
+                        )
+                    ) {
+                        if (isLoadingGps) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.MyLocation,
+                                contentDescription = "GPS"
+                            )
+                        }
+                    }
+                }
+
+                // Confirm button
+                Button(
+                    onClick = { onLocationSelected(currentCenter.latitude, currentCenter.longitude) },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(24.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "Standort bestätigen",
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
             }
         }
     }

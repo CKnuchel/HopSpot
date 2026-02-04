@@ -97,19 +97,23 @@ class BenchEditViewModel @Inject constructor(
         _uiState.update { it.copy(hasTrashBin = hasTrashBin) }
     }
 
+    fun setLocation(latitude: Double, longitude: Double) {
+        _uiState.update {
+            it.copy(
+                latitude = latitude,
+                longitude = longitude,
+                locationText = "%.5f, %.5f".format(latitude, longitude),
+                errorMessage = null
+            )
+        }
+    }
+
     fun setManualLocation(latStr: String, lonStr: String) {
         val lat = latStr.toDoubleOrNull()
         val lon = lonStr.toDoubleOrNull()
 
         if (lat != null && lon != null && lat in -90.0..90.0 && lon in -180.0..180.0) {
-            _uiState.update {
-                it.copy(
-                    latitude = lat,
-                    longitude = lon,
-                    locationText = "%.5f, %.5f".format(lat, lon),
-                    errorMessage = null
-                )
-            }
+            setLocation(lat, lon)
         } else {
             _uiState.update { it.copy(errorMessage = "Ungültige Koordinaten") }
         }
@@ -202,6 +206,8 @@ class BenchEditViewModel @Inject constructor(
                     id = benchId,
                     request = UpdateBenchRequest(
                         name = state.name.trim(),
+                        latitude = state.latitude,
+                        longitude = state.longitude,
                         description = state.description.takeIf { it.isNotBlank() },
                         rating = state.rating,
                         hasToilet = state.hasToilet,

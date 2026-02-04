@@ -57,6 +57,8 @@ data class CreateBenchRequest(
 
 data class UpdateBenchRequest(
     val name: String?,
+    val latitude: Double?,
+    val longitude: Double?,
     val description: String?,
     val rating: Int?,
     @SerializedName("has_toilet")

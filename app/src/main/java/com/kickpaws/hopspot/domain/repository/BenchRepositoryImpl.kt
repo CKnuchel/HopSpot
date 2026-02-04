@@ -1,7 +1,6 @@
 package com.kickpaws.hopspot.data.repository
 
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
-import com.kickpaws.hopspot.data.remote.dto.ApiResponse
 import com.kickpaws.hopspot.data.remote.dto.CreateBenchRequest
 import com.kickpaws.hopspot.data.remote.dto.UpdateBenchRequest
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
@@ -91,6 +90,8 @@ class BenchRepositoryImpl @Inject constructor(
         return try {
             val request = UpdateBenchRequest(
                 name = updates["name"] as? String,
+                latitude = updates["latitude"] as? Double,
+                longitude = updates["longitude"] as? Double,
                 description = updates["description"] as? String,
                 rating = updates["rating"] as? Int,
                 hasToilet = updates["hasToilet"] as? Boolean,

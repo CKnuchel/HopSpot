@@ -44,6 +44,8 @@ data class UserDto(
     @SerializedName("display_name")
     val displayName: String,
     val role: String,
+    @SerializedName("is_active")
+    val isActive: Boolean = true,
     @SerializedName("created_at")
     val createdAt: String
 )

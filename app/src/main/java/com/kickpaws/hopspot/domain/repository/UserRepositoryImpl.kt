@@ -1,5 +1,6 @@
 package com.kickpaws.hopspot.domain.repository
 
+import com.kickpaws.hopspot.data.local.CurrentUserManager
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
 import com.kickpaws.hopspot.data.remote.dto.UpdateProfileRequest
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
@@ -9,13 +10,16 @@ import javax.inject.Singleton
 
 @Singleton
 class UserRepositoryImpl @Inject constructor(
-    private val api: HopSpotApi
+    private val api: HopSpotApi,
+    private val currentUserManager: CurrentUserManager  // NEU
 ) : UserRepository {
 
     override suspend fun getMe(): Result<User> {
         return try {
             val response = api.getMe()
-            Result.success(response.toDomain())
+            val user = response.toDomain()
+            currentUserManager.setUser(user)  // NEU: Cache user
+            Result.success(user)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -24,7 +28,9 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun updateProfile(displayName: String): Result<User> {
         return try {
             val response = api.updateProfile(UpdateProfileRequest(displayName = displayName))
-            Result.success(response.toDomain())
+            val user = response.toDomain()
+            currentUserManager.setUser(user)  // NEU: Update cache
+            Result.success(user)
         } catch (e: Exception) {
             Result.failure(e)
         }

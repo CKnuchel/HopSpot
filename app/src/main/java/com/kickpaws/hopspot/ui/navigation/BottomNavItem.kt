@@ -2,6 +2,7 @@ package com.kickpaws.hopspot.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
@@ -34,5 +35,11 @@ sealed class BottomNavItem(
         route = Route.Profile.route,
         icon = Icons.Default.Person,
         label = "Profil"
+    )
+
+    object Admin : BottomNavItem(
+        route = Route.Admin.route,
+        icon = Icons.Default.AdminPanelSettings,
+        label = "Admin"
     )
 }

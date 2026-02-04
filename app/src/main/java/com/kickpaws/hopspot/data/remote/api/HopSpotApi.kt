@@ -3,6 +3,7 @@ package com.kickpaws.hopspot.data.remote.api
 import com.kickpaws.hopspot.data.remote.dto.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Response
 import retrofit2.http.*
 
 interface HopSpotApi {
@@ -172,4 +173,7 @@ interface HopSpotApi {
     suspend fun createInvitationCode(
         @Body request: CreateInvitationCodeRequest
     ): InvitationCodeDto
+
+    @DELETE("api/v1/admin/invitation-codes/{id}")
+    suspend fun deleteInvitationCode(@Path("id") id: Int): Response<Unit>
 }

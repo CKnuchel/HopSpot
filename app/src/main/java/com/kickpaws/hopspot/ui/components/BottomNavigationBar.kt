@@ -14,14 +14,18 @@ import com.kickpaws.hopspot.ui.navigation.BottomNavItem
 @Composable
 fun BottomNavigationBar(
     navController: NavHostController,
+    isAdmin: Boolean = false,
     modifier: Modifier = Modifier
 ){
-    val items = listOf(
-        BottomNavItem.Map,
-        BottomNavItem.BenchList,
-        BottomNavItem.Visits,
-        BottomNavItem.Profile
-    )
+    val items = buildList {
+        add(BottomNavItem.Map)
+        add(BottomNavItem.BenchList)
+        add(BottomNavItem.Visits)
+        add(BottomNavItem.Profile)
+        if (isAdmin) {
+            add(BottomNavItem.Admin)  // Nur für Admins!
+        }
+    }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route

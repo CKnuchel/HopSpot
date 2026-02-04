@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.kickpaws.hopspot.ui.screens.admin.AdminScreen
 import com.kickpaws.hopspot.ui.screens.auth.LoginScreen
 import com.kickpaws.hopspot.ui.screens.auth.RegisterScreen
 import com.kickpaws.hopspot.ui.screens.benchcreate.BenchCreateScreen
@@ -123,5 +124,8 @@ fun HopSpotNavGraph(
             )
         }
 
+        composable(Route.Admin.route) {
+            AdminScreen()
+        }
     }
 }

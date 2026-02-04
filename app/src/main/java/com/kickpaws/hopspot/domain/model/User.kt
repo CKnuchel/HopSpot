@@ -5,5 +5,6 @@ data class User(
     val email: String,
     val displayName: String,
     val role: String,
+    val isActive: Boolean = true,
     val createdAt: String
 )

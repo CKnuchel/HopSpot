@@ -28,6 +28,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.*
 import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.Photo
 import com.kickpaws.hopspot.ui.components.BenchListItemSkeleton
@@ -266,45 +269,17 @@ fun BenchDetailScreen(
                             HorizontalDivider()
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Location
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.LocationOn,
-                                    contentDescription = null,
-                                    tint = colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = "Standort",
-                                        fontWeight = FontWeight.Medium,
-                                        color = colorScheme.onBackground
-                                    )
-                                    Text(
-                                        text = "${bench.latitude.format(5)}, ${bench.longitude.format(5)}",
-                                        fontSize = 14.sp,
-                                        color = colorScheme.onSurfaceVariant
-                                    )
+                            // Location with Mini Map
+                            LocationSection(
+                                latitude = bench.latitude,
+                                longitude = bench.longitude,
+                                benchName = bench.name,
+                                onOpenInMaps = {
+                                    val uri = Uri.parse("geo:${bench.latitude},${bench.longitude}?q=${bench.latitude},${bench.longitude}(${Uri.encode(bench.name)})")
+                                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                                    context.startActivity(intent)
                                 }
-                                FilledTonalButton(
-                                    onClick = {
-                                        val uri = Uri.parse("geo:${bench.latitude},${bench.longitude}?q=${bench.latitude},${bench.longitude}(${bench.name})")
-                                        val intent = Intent(Intent.ACTION_VIEW, uri)
-                                        context.startActivity(intent)
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Map,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Karte")
-                                }
-                            }
+                            )
 
                             Spacer(modifier = Modifier.height(16.dp))
                             HorizontalDivider()
@@ -396,6 +371,84 @@ fun BenchDetailScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun LocationSection(
+    latitude: Double,
+    longitude: Double,
+    benchName: String,
+    onOpenInMaps: () -> Unit
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val position = LatLng(latitude, longitude)
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = null,
+                tint = colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Standort",
+                fontWeight = FontWeight.Medium,
+                color = colorScheme.onBackground
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Mini Map
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .clip(RoundedCornerShape(12.dp))
+        ) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = rememberCameraPositionState {
+                    this.position = CameraPosition.fromLatLngZoom(position, 15f)
+                },
+                uiSettings = MapUiSettings(
+                    zoomControlsEnabled = false,
+                    mapToolbarEnabled = false,
+                    myLocationButtonEnabled = false,
+                    scrollGesturesEnabled = false,
+                    zoomGesturesEnabled = false,
+                    rotationGesturesEnabled = false,
+                    tiltGesturesEnabled = false
+                ),
+                properties = MapProperties(mapType = MapType.NORMAL)
+            ) {
+                Marker(state = MarkerState(position = position), title = benchName)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Open in Google Maps Button
+        OutlinedButton(
+            onClick = onOpenInMaps,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.OpenInNew,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("In Google Maps öffnen")
         }
     }
 }
@@ -547,6 +600,3 @@ private fun AmenityChip(
         }
     }
 }
-
-// Extension function for formatting doubles
-private fun Double.format(decimals: Int): String = "%.${decimals}f".format(this)

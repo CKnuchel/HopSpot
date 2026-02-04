@@ -9,6 +9,7 @@ fun UserDto.toDomain(): User {
         email = email,
         displayName = displayName,
         role = role,
+        isActive = isActive,
         createdAt = createdAt
     )
 }

@@ -329,7 +329,7 @@ fun BenchEditScreen(
                             latitude = uiState.latitude,
                             longitude = uiState.longitude,
                             onLocationSet = { lat, lon ->
-                                viewModel.setManualLocation(lat.toString(), lon.toString())
+                                viewModel.setLocation(lat, lon)
                             }
                         )
 
