@@ -1,7 +1,7 @@
 package com.kickpaws.hopspot.ui.navigation
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -25,7 +25,14 @@ fun HopSpotNavGraph(
     modifier: Modifier = Modifier,
     navController : NavHostController,
     startDestination : String = Route.Splash.route,
+    deepLinkBenchId: Int? = null
 ){
+    LaunchedEffect(deepLinkBenchId) {
+        deepLinkBenchId?.let { benchId ->
+            navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = startDestination,

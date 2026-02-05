@@ -29,7 +29,7 @@ interface HopSpotApi {
         @Body request: LogoutRequest
     )
 
-    @POST("auth/refresh-fcm-token")
+    @POST("api/v1/auth/refresh-fcm-token")
     suspend fun refreshFcmToken(
         @Body request: RefreshFCMTokenRequest
     )

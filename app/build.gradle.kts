@@ -5,6 +5,9 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     //alias(libs.plugins.google.services)
+
+    // Gemäss Google Docs
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -99,8 +102,8 @@ dependencies {
     implementation(libs.play.services.location)
 
     // Firebase
-    //implementation(platform(libs.firebase.bom))
-    //implementation(libs.firebase.messaging)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
     // Testing
     testImplementation(libs.junit)

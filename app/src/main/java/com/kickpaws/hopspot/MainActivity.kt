@@ -33,6 +33,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val benchIdFromNotification = intent.extras?.getInt("bench_id")?.takeIf { it > 0 }
+
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Brown700.toArgb()),
             navigationBarStyle = SystemBarStyle.dark(Brown700.toArgb())
@@ -44,7 +46,6 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
-                // NEU: Observe current user
                 val currentUser by currentUserManager.currentUser.collectAsState()
                 val isAdmin = currentUser?.role == "admin"
 
@@ -69,7 +70,8 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     HopSpotNavGraph(
                         navController = navController,
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        deepLinkBenchId = benchIdFromNotification
                     )
                 }
             }
