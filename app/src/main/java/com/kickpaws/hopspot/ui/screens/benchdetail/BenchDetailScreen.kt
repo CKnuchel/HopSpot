@@ -4,10 +4,15 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -18,6 +23,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.material3.ColorScheme
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -26,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.google.android.gms.maps.model.CameraPosition
@@ -34,6 +44,7 @@ import com.google.maps.android.compose.*
 import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.Photo
 import com.kickpaws.hopspot.ui.components.BenchListItemSkeleton
+import com.kickpaws.hopspot.ui.components.WeatherIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,8 +59,8 @@ fun BenchDetailScreen(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    // Fullscreen image viewer
-    var selectedPhotoUrl by remember { mutableStateOf<String?>(null) }
+    // Fullscreen image viewer - track index for swipe support
+    var selectedPhotoIndex by remember { mutableIntStateOf(-1) }
 
     // Load bench on first composition
     LaunchedEffect(benchId) {
@@ -63,25 +74,13 @@ fun BenchDetailScreen(
         }
     }
 
-    // Fullscreen Photo Dialog
-    if (selectedPhotoUrl != null) {
-        Dialog(onDismissRequest = { selectedPhotoUrl = null }) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable { selectedPhotoUrl = null },
-                contentAlignment = Alignment.Center
-            ) {
-                AsyncImage(
-                    model = selectedPhotoUrl,
-                    contentDescription = "Foto gross",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Fit
-                )
-            }
-        }
+    // Fullscreen Photo Dialog with Zoom & Swipe
+    if (selectedPhotoIndex >= 0 && uiState.photos.isNotEmpty()) {
+        FullscreenImageViewer(
+            photos = uiState.photos,
+            initialIndex = selectedPhotoIndex,
+            onDismiss = { selectedPhotoIndex = -1 }
+        )
     }
 
     Scaffold(
@@ -173,8 +172,8 @@ fun BenchDetailScreen(
                         if (uiState.photos.isNotEmpty()) {
                             PhotoGallery(
                                 photos = uiState.photos,
-                                onPhotoClick = { photo ->
-                                    selectedPhotoUrl = photo.urlMedium ?: photo.urlOriginal
+                                onPhotoClick = { index ->
+                                    selectedPhotoIndex = index
                                 }
                             )
                         } else if (!uiState.isLoadingPhotos) {
@@ -296,6 +295,17 @@ fun BenchDetailScreen(
                                 Text(
                                     text = bench.description,
                                     color = colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                HorizontalDivider()
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+
+                            // Weather Section
+                            if (uiState.weather != null || uiState.isLoadingWeather) {
+                                WeatherCard(
+                                    weather = uiState.weather,
+                                    isLoading = uiState.isLoadingWeather
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 HorizontalDivider()
@@ -456,11 +466,11 @@ private fun LocationSection(
 @Composable
 private fun PhotoGallery(
     photos: List<Photo>,
-    onPhotoClick: (Photo) -> Unit
+    onPhotoClick: (Int) -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val mainPhoto = photos.find { it.isMain }
-    val otherPhotos = photos.filter { !it.isMain }
+    val mainPhotoIndex = photos.indexOfFirst { it.isMain }.takeIf { it >= 0 } ?: 0
 
     Column(
         modifier = Modifier
@@ -474,7 +484,7 @@ private fun PhotoGallery(
                     .fillMaxWidth()
                     .height(250.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .clickable { onPhotoClick(mainPhoto) }
+                    .clickable { onPhotoClick(mainPhotoIndex) }
             ) {
                 AsyncImage(
                     model = mainPhoto.urlMedium ?: mainPhoto.urlThumbnail,
@@ -515,7 +525,10 @@ private fun PhotoGallery(
         }
 
         // Other photos (horizontal scroll)
-        if (otherPhotos.isNotEmpty()) {
+        val otherPhotosWithIndex = photos.mapIndexed { index, photo -> index to photo }
+            .filter { !it.second.isMain }
+
+        if (otherPhotosWithIndex.isNotEmpty()) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
@@ -530,14 +543,15 @@ private fun PhotoGallery(
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(otherPhotos) { photo ->
+                items(otherPhotosWithIndex.size) { i ->
+                    val (index, photo) = otherPhotosWithIndex[i]
                     AsyncImage(
                         model = photo.urlThumbnail ?: photo.urlMedium,
                         contentDescription = "Foto",
                         modifier = Modifier
                             .size(80.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .clickable { onPhotoClick(photo) },
+                            .clickable { onPhotoClick(index) },
                         contentScale = ContentScale.Crop,
                         placeholder = painterResource(R.drawable.placeholder_bench),
                         error = painterResource(R.drawable.placeholder_bench)
@@ -598,5 +612,336 @@ private fun AmenityChip(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun FullscreenImageViewer(
+    photos: List<Photo>,
+    initialIndex: Int,
+    onDismiss: () -> Unit
+) {
+    val pagerState = rememberPagerState(
+        initialPage = initialIndex,
+        pageCount = { photos.size }
+    )
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.95f))
+        ) {
+            // Pager for swiping between images
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                ZoomableImage(
+                    imageUrl = photos[page].urlOriginal ?: photos[page].urlMedium ?: "",
+                    onTap = onDismiss
+                )
+            }
+
+            // Close button (top right)
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+                    .size(48.dp)
+                    .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Schliessen",
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+
+            // Page indicator (bottom center)
+            if (photos.size > 1) {
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 32.dp)
+                        .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    repeat(photos.size) { index ->
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(
+                                    color = if (index == pagerState.currentPage) {
+                                        Color.White
+                                    } else {
+                                        Color.White.copy(alpha = 0.4f)
+                                    },
+                                    shape = CircleShape
+                                )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ZoomableImage(
+    imageUrl: String,
+    onTap: () -> Unit
+) {
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
+
+    val transformableState = rememberTransformableState { zoomChange, panChange, _ ->
+        scale = (scale * zoomChange).coerceIn(1f, 5f)
+
+        // Only allow panning when zoomed in
+        if (scale > 1f) {
+            offset += panChange
+        } else {
+            offset = Offset.Zero
+        }
+    }
+
+    // Reset zoom on double tap or when switching pages
+    LaunchedEffect(imageUrl) {
+        scale = 1f
+        offset = Offset.Zero
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                indication = null
+            ) {
+                // Tap to close only when not zoomed
+                if (scale <= 1f) {
+                    onTap()
+                } else {
+                    // Reset zoom on tap when zoomed
+                    scale = 1f
+                    offset = Offset.Zero
+                }
+            }
+            .transformable(state = transformableState),
+        contentAlignment = Alignment.Center
+    ) {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = "Foto Vollbild",
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    translationX = offset.x,
+                    translationY = offset.y
+                ),
+            contentScale = ContentScale.Fit
+        )
+    }
+}
+
+@Composable
+private fun WeatherCard(
+    weather: WeatherInfo?,
+    isLoading: Boolean
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val weatherIconFont = WeatherIcons.fontFamily
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.WbSunny,
+                contentDescription = null,
+                tint = colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Aktuelles Wetter",
+                fontWeight = FontWeight.Medium,
+                color = colorScheme.onBackground
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (isLoading) {
+            // Loading skeleton
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                repeat(3) {
+                    Box(
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(colorScheme.surfaceVariant)
+                    )
+                }
+            }
+        } else if (weather != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = colorScheme.primaryContainer.copy(alpha = 0.3f)
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Weather Icon & Condition
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = WeatherIcons.getIconForCode(weather.weathercode).toString(),
+                            fontFamily = weatherIconFont,
+                            fontSize = 42.sp,
+                            color = getWeatherColor(weather.weathercode, colorScheme)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = getWeatherDescription(weather.weathercode),
+                            fontSize = 12.sp,
+                            color = colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    // Temperature
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Text(
+                                text = "${weather.temperature.toInt()}",
+                                fontSize = 32.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colorScheme.onBackground
+                            )
+                            Text(
+                                text = "°C",
+                                fontSize = 16.sp,
+                                color = colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Text(
+                            text = "Temperatur",
+                            fontSize = 12.sp,
+                            color = colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    // Wind
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = WeatherIcons.getWindDirectionIcon(weather.winddirection).toString(),
+                                fontFamily = weatherIconFont,
+                                fontSize = 24.sp,
+                                color = colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "${weather.windspeed.toInt()}",
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = colorScheme.onBackground
+                            )
+                            Text(
+                                text = "km/h",
+                                fontSize = 12.sp,
+                                color = colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Text(
+                            text = "Wind ${getWindDirectionText(weather.winddirection)}",
+                            fontSize = 12.sp,
+                            color = colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun getWeatherColor(code: Int, colorScheme: ColorScheme): Color {
+    return when (code) {
+        0, 1 -> Color(0xFFFFB300)         // Sunny - amber/gold
+        2, 3 -> Color(0xFF78909C)          // Cloudy - blue grey
+        45, 48 -> Color(0xFF90A4AE)        // Fog - light grey
+        51, 53, 55, 61, 63, 65, 80, 81, 82 -> Color(0xFF42A5F5)  // Rain - blue
+        56, 57, 66, 67 -> Color(0xFF4FC3F7) // Freezing rain - light blue
+        71, 73, 75, 77, 85, 86 -> Color(0xFF81D4FA) // Snow - very light blue
+        95, 96, 99 -> Color(0xFFFFCA28)    // Thunderstorm - yellow
+        else -> colorScheme.primary
+    }
+}
+
+private fun getWeatherDescription(code: Int): String {
+    return when (code) {
+        0 -> "Klar"
+        1 -> "Heiter"
+        2 -> "Teilweise bewölkt"
+        3 -> "Bewölkt"
+        45, 48 -> "Nebel"
+        51, 53, 55 -> "Nieselregen"
+        56, 57 -> "Gefrierender Niesel"
+        61, 63, 65 -> "Regen"
+        66, 67 -> "Gefrierender Regen"
+        71, 73, 75 -> "Schneefall"
+        77 -> "Schneekörner"
+        80, 81, 82 -> "Regenschauer"
+        85, 86 -> "Schneeschauer"
+        95 -> "Gewitter"
+        96, 99 -> "Gewitter mit Hagel"
+        else -> "Unbekannt"
+    }
+}
+
+private fun getWindDirectionText(degrees: Int): String {
+    return when ((degrees + 22) % 360 / 45) {
+        0 -> "N"
+        1 -> "NO"
+        2 -> "O"
+        3 -> "SO"
+        4 -> "S"
+        5 -> "SW"
+        6 -> "W"
+        7 -> "NW"
+        else -> ""
     }
 }

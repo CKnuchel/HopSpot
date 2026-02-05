@@ -164,6 +164,11 @@ class BenchListViewModel @Inject constructor(
         _uiState.update { it.copy(sortBy = option) }
     }
 
+    fun setUserLocation(lat: Double, lon: Double) {
+        _uiState.update { it.copy(userLat = lat, userLon = lon) }
+        loadBenches()
+    }
+
     fun applyFilters() {
         closeFilterSheet()
         loadBenches()
@@ -227,11 +232,17 @@ class BenchListViewModel @Inject constructor(
             page = page,
             limit = 20,
             sortBy = state.sortBy.apiValue,
-            sortOrder = if (state.sortBy == SortOption.NAME) "asc" else "desc",
+            sortOrder = when (state.sortBy) {
+                SortOption.NAME -> "asc"
+                SortOption.DISTANCE -> "asc"
+                else -> "desc"
+            },
             hasToilet = state.filterHasToilet,
             hasTrashBin = state.filterHasTrashBin,
             minRating = state.filterMinRating,
-            search = state.searchQuery.takeIf { it.isNotBlank() }
+            search = state.searchQuery.takeIf { it.isNotBlank() },
+            lat = state.userLat,
+            lon = state.userLon
         )
     }
 }

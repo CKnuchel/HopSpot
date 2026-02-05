@@ -8,6 +8,7 @@ fun VisitDto.toDomain(): Visit {
         id = id,
         benchId = bench.id,
         benchName = bench.name,
+        benchPhotoUrl = bench.mainPhotoUrl,
         comment = comment,
         visitedAt = visitedAt,
         createdAt = createdAt

@@ -15,19 +15,37 @@ import com.kickpaws.hopspot.ui.screens.benchcreate.BenchCreateScreen
 import com.kickpaws.hopspot.ui.screens.benchdetail.BenchDetailScreen
 import com.kickpaws.hopspot.ui.screens.benchedit.BenchEditScreen
 import com.kickpaws.hopspot.ui.screens.benchlist.BenchListScreen
+import com.kickpaws.hopspot.ui.screens.map.MapScreen
 import com.kickpaws.hopspot.ui.screens.profile.ProfileScreen
+import com.kickpaws.hopspot.ui.screens.splash.SplashScreen
+import com.kickpaws.hopspot.ui.screens.visits.VisitsScreen
 
 @Composable
 fun HopSpotNavGraph(
     modifier: Modifier = Modifier,
     navController : NavHostController,
-    startDestination : String = Route.Login.route,
+    startDestination : String = Route.Splash.route,
 ){
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
     ){
+        composable(Route.Splash.route) {
+            SplashScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Route.Login.route) {
+                        popUpTo(Route.Splash.route) { inclusive = true }
+                    }
+                },
+                onNavigateToHome = {
+                    navController.navigate(Route.Map.route) {
+                        popUpTo(Route.Splash.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable(Route.Login.route) {
             LoginScreen(
                 onLoginSuccess = {
@@ -107,11 +125,22 @@ fun HopSpotNavGraph(
         }
 
         composable(route = Route.Map.route){
-            Text("Map Screen")
+            MapScreen(
+                onBenchClick = { benchId ->
+                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+                },
+                onCreateBenchClick = {
+                    navController.navigate(Route.BenchCreate.route)
+                }
+            )
         }
 
-        composable(route = Route.Visits.route){
-            Text("Visits Screen")
+        composable(route = Route.Visits.route) {
+            VisitsScreen(
+                onBenchClick = { benchId ->
+                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+                }
+            )
         }
 
         composable(Route.Profile.route) {

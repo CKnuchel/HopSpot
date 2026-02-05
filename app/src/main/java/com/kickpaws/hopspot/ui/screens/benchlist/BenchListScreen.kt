@@ -1,5 +1,11 @@
 package com.kickpaws.hopspot.ui.screens.benchlist
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -16,18 +22,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import androidx.compose.ui.res.painterResource
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.Bench
 import com.kickpaws.hopspot.ui.components.BenchListSkeleton
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +52,49 @@ fun BenchListScreen(
     val uiState by viewModel.uiState.collectAsState()
     val colorScheme = MaterialTheme.colorScheme
     val listState = rememberLazyListState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    // Location Permission
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            scope.launch {
+                val location = getCurrentLocation(context)
+                if (location != null) {
+                    viewModel.setUserLocation(location.first, location.second)
+                }
+            }
+        }
+    }
+
+    // Request location on first load
+    LaunchedEffect(Unit) {
+        val hasFinePermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val hasCoarsePermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasFinePermission || hasCoarsePermission) {
+            val location = getCurrentLocation(context)
+            if (location != null) {
+                viewModel.setUserLocation(location.first, location.second)
+            }
+        } else {
+            permissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
 
     // Load more when reaching end of list
     val shouldLoadMore = remember {
@@ -388,6 +444,27 @@ private fun BenchListItem(
                             )
                         }
                     }
+
+                    // Distance
+                    if (bench.distance != null) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.NearMe,
+                                contentDescription = "Entfernung",
+                                tint = colorScheme.secondary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Text(
+                                text = formatDistance(bench.distance),
+                                fontSize = 12.sp,
+                                color = colorScheme.secondary,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
                 }
             }
 
@@ -715,5 +792,38 @@ private fun EmptyView(
             color = colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
+    }
+}
+
+private fun formatDistance(distanceMeters: Double): String {
+    return when {
+        distanceMeters < 1000 -> "${distanceMeters.toInt()}m"
+        else -> String.format("%.1fkm", distanceMeters / 1000)
+    }
+}
+
+@SuppressLint("MissingPermission")
+private suspend fun getCurrentLocation(context: Context): Pair<Double, Double>? {
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    val cancellationTokenSource = CancellationTokenSource()
+
+    return try {
+        val location = fusedLocationClient.getCurrentLocation(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            cancellationTokenSource.token
+        ).await()
+
+        if (location != null) {
+            Pair(location.latitude, location.longitude)
+        } else {
+            val lastLocation = fusedLocationClient.lastLocation.await()
+            if (lastLocation != null) {
+                Pair(lastLocation.latitude, lastLocation.longitude)
+            } else {
+                null
+            }
+        }
+    } catch (e: Exception) {
+        null
     }
 }

@@ -25,6 +25,10 @@ data class BenchListUiState(
     val filterMinRating: Int? = null,
     val sortBy: SortOption = SortOption.NEWEST,
 
+    // Location
+    val userLat: Double? = null,
+    val userLon: Double? = null,
+
     // Delete
     val benchToDelete: Bench? = null,
     val isDeleting: Boolean = false
@@ -34,5 +38,5 @@ enum class SortOption(val apiValue: String, val displayName: String) {
     NEWEST("created_at", "Neueste"),
     NAME("name", "Name"),
     RATING("rating", "Bewertung"),
-    // DISTANCE("distance", "Entfernung")  // Später mit GPS
+    DISTANCE("distance", "Entfernung")
 }

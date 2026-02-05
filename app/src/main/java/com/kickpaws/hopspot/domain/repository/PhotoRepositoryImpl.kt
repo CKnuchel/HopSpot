@@ -1,7 +1,11 @@
 package com.kickpaws.hopspot.data.repository
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
+import androidx.exifinterface.media.ExifInterface
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
 import com.kickpaws.hopspot.domain.repository.PhotoRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,12 +26,9 @@ class PhotoRepositoryImpl @Inject constructor(
 
     override suspend fun uploadPhoto(benchId: Int, photoUri: Uri, isMain: Boolean): Result<Unit> {
         return try {
-            val file = uriToFile(photoUri)
+            val file = uriToFileWithCorrectOrientation(photoUri)
 
-            // MIME-Type ermitteln
-            val mimeType = context.contentResolver.getType(photoUri) ?: "image/jpeg"
-
-            val requestBody = file.asRequestBody(mimeType.toMediaTypeOrNull())
+            val requestBody = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
             val photoPart = MultipartBody.Part.createFormData("photo", file.name, requestBody)
             val isMainBody = isMain.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
@@ -49,17 +50,55 @@ class PhotoRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun uriToFile(uri: Uri): File {
+    private fun uriToFileWithCorrectOrientation(uri: Uri): File {
         val inputStream = context.contentResolver.openInputStream(uri)
             ?: throw IllegalArgumentException("Cannot open URI: $uri")
 
-        val tempFile = File.createTempFile("photo_", ".jpg", context.cacheDir)
-
+        // Erst in temporaere Datei kopieren um EXIF lesen zu koennen
+        val tempFile = File.createTempFile("photo_temp_", ".jpg", context.cacheDir)
         FileOutputStream(tempFile).use { outputStream ->
             inputStream.copyTo(outputStream)
         }
         inputStream.close()
 
-        return tempFile
+        // EXIF Orientation auslesen
+        val exif = ExifInterface(tempFile.absolutePath)
+        val orientation = exif.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )
+
+        // Rotation bestimmen
+        val rotationDegrees = when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+            else -> 0f
+        }
+
+        // Wenn keine Rotation noetig, Original zurueckgeben
+        if (rotationDegrees == 0f) {
+            return tempFile
+        }
+
+        // Bitmap laden, rotieren und speichern
+        val bitmap = BitmapFactory.decodeFile(tempFile.absolutePath)
+        val matrix = Matrix().apply { postRotate(rotationDegrees) }
+        val rotatedBitmap = Bitmap.createBitmap(
+            bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
+        )
+
+        // Rotiertes Bild in neue Datei speichern
+        val outputFile = File.createTempFile("photo_rotated_", ".jpg", context.cacheDir)
+        FileOutputStream(outputFile).use { outputStream ->
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+        }
+
+        // Aufraeumen
+        bitmap.recycle()
+        rotatedBitmap.recycle()
+        tempFile.delete()
+
+        return outputFile
     }
 }

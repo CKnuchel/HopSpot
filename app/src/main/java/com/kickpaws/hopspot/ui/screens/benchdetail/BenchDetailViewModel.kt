@@ -15,12 +15,21 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class WeatherInfo(
+    val temperature: Double,
+    val windspeed: Double,
+    val winddirection: Int,
+    val weathercode: Int
+)
+
 data class BenchDetailUiState(
     val bench: Bench? = null,
     val photos: List<Photo> = emptyList(),
     val visitCount: Long = 0,
+    val weather: WeatherInfo? = null,
     val isLoading: Boolean = true,
     val isLoadingPhotos: Boolean = true,
+    val isLoadingWeather: Boolean = false,
     val isAddingVisit: Boolean = false,
     val errorMessage: String? = null,
     val visitAdded: Boolean = false
@@ -51,6 +60,7 @@ class BenchDetailViewModel @Inject constructor(
 
                 loadPhotos(benchId)
                 loadVisitCount(benchId)
+                loadWeather(bench.latitude, bench.longitude)
 
             } catch (e: Exception) {
                 _uiState.update {
@@ -88,6 +98,30 @@ class BenchDetailViewModel @Inject constructor(
                 _uiState.update { it.copy(visitCount = response.count) }
             } catch (e: Exception) {
                 // Ignore - visit count is optional
+            }
+        }
+    }
+
+    private fun loadWeather(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingWeather = true) }
+
+            try {
+                val response = api.getWeather(lat, lon)
+                val weather = WeatherInfo(
+                    temperature = response.currentWeather.temperature,
+                    windspeed = response.currentWeather.windspeed,
+                    winddirection = response.currentWeather.winddirection,
+                    weathercode = response.currentWeather.weathercode
+                )
+                _uiState.update {
+                    it.copy(
+                        weather = weather,
+                        isLoadingWeather = false
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoadingWeather = false) }
             }
         }
     }

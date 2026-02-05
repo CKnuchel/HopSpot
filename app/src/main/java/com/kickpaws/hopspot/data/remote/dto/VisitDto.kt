@@ -14,7 +14,9 @@ data class VisitDto(
 
 data class VisitBenchDto(
     val id: Int,
-    val name: String
+    val name: String,
+    @SerializedName("main_photo_url")
+    val mainPhotoUrl: String?
 )
 
 data class PaginatedVisitsDto(

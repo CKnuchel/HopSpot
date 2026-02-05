@@ -135,7 +135,7 @@ interface HopSpotApi {
     ): VisitCountDto
 
     // Weather Endpoints
-    @GET("weather")
+    @GET("api/v1/weather")
     suspend fun getWeather(
         @Query("lat") lat: Double,
         @Query("lon") lon: Double

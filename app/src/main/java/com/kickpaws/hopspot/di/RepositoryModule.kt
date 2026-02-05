@@ -3,6 +3,7 @@ package com.kickpaws.hopspot.di
 import com.kickpaws.hopspot.data.repository.AdminRepositoryImpl
 import com.kickpaws.hopspot.data.repository.BenchRepositoryImpl
 import com.kickpaws.hopspot.data.repository.PhotoRepositoryImpl
+import com.kickpaws.hopspot.data.repository.VisitRepositoryImpl
 import com.kickpaws.hopspot.domain.repository.AdminRepository
 import com.kickpaws.hopspot.domain.repository.AuthRepository
 import com.kickpaws.hopspot.domain.repository.AuthRepositoryImpl
@@ -10,6 +11,7 @@ import com.kickpaws.hopspot.domain.repository.BenchRepository
 import com.kickpaws.hopspot.domain.repository.PhotoRepository
 import com.kickpaws.hopspot.domain.repository.UserRepository
 import com.kickpaws.hopspot.domain.repository.UserRepositoryImpl
+import com.kickpaws.hopspot.domain.repository.VisitRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -50,4 +52,10 @@ abstract class RepositoryModule {
     abstract fun bindAdminRepository(
         adminRepositoryImpl: AdminRepositoryImpl
     ): AdminRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVisitRepository(
+        visitRepositoryImpl: VisitRepositoryImpl
+    ): VisitRepository
 }

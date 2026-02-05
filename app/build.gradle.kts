@@ -90,6 +90,9 @@ dependencies {
     // Coil (Loading Pictures)
     implementation(libs.coil.compose)
 
+    // ExifInterface (Bild-Rotation)
+    implementation(libs.exifinterface)
+
     // Google Maps
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)

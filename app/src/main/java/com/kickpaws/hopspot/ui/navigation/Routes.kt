@@ -4,6 +4,10 @@ sealed interface  Route {
     val route: String
 
     // Screens
+    object Splash : Route {
+        override val route = "splash"
+    }
+
     object Login : Route{
         override val route = "login"
     }
