@@ -294,4 +294,12 @@
     <string name="wind_w">W</string>
     <string name="wind_nw">NW</string>
     <string name="wind_format">Wind %1$s</string>
+
+    <!-- Widget -->
+    <string name="widget_name">Nearest HopSpot</string>
+    <string name="widget_description">Shows the nearest HopSpot with weather</string>
+    <string name="widget_loading">Loading...</string>
+    <string name="widget_no_location">Location unavailable</string>
+    <string name="widget_no_spots">No spots nearby</string>
+    <string name="widget_away">away</string>
 </resources>

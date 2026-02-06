@@ -47,6 +47,14 @@ class MainActivity : ComponentActivity() {
 
         val spotIdFromNotification = intent.extras?.getInt("spot_id")?.takeIf { it > 0 }
 
+        // Handle widget deep link
+        val navigateTo = intent.getStringExtra("navigate_to")
+        val spotIdFromWidget = if (navigateTo == "spot_detail") {
+            intent.getIntExtra("spot_id", -1).takeIf { it > 0 }
+        } else null
+
+        val deepLinkSpotId = spotIdFromNotification ?: spotIdFromWidget
+
         // Track notification opened event
         if (spotIdFromNotification != null) {
             analyticsManager.logNotificationOpened(spotIdFromNotification)
@@ -106,7 +114,7 @@ class MainActivity : ComponentActivity() {
                     HopSpotNavGraph(
                         navController = navController,
                         modifier = Modifier.padding(innerPadding),
-                        deepLinkSpotId = spotIdFromNotification
+                        deepLinkSpotId = deepLinkSpotId
                     )
                 }
             }

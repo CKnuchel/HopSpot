@@ -56,6 +56,18 @@
             </intent-filter>
         </service>
 
+        <!-- Widget Receiver -->
+        <receiver
+            android:name=".widget.NearestSpotWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nearest_spot_widget_info" />
+        </receiver>
+
     </application>
 
 </manifest>
