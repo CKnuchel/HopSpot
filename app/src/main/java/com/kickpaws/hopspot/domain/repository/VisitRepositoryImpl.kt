@@ -40,10 +40,10 @@ class VisitRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createVisit(benchId: Int): Result<Visit> {
+    override suspend fun createVisit(spotId: Int): Result<Visit> {
         return try {
             val request = CreateVisitRequest(
-                benchId = benchId,
+                spotId = spotId,
                 visitedAt = null,
                 comment = null
             )
@@ -63,9 +63,9 @@ class VisitRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getVisitCount(benchId: Int): Result<Long> {
+    override suspend fun getVisitCount(spotId: Int): Result<Long> {
         return try {
-            val response = api.getVisitCount(benchId)
+            val response = api.getVisitCount(spotId)
             Result.success(response.count)
         } catch (e: Exception) {
             Result.failure(ApiErrorParser.parse(e))

@@ -1,11 +1,11 @@
-package com.kickpaws.hopspot.ui.screens.benchcreate
+package com.kickpaws.hopspot.ui.screens.spotcreate
 
 import android.net.Uri
 
 /**
- * UI State for the Bench Create Screen
+ * UI State for the Spot Create Screen
  */
-data class BenchCreateUiState(
+data class SpotCreateUiState(
     val name: String = "",
     val description: String = "",
     val rating: Int? = null,
@@ -25,5 +25,5 @@ data class BenchCreateUiState(
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
-    val createdBenchId: Int? = null
+    val createdSpotId: Int? = null
 )

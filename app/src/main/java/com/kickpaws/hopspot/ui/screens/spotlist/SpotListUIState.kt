@@ -1,15 +1,15 @@
-package com.kickpaws.hopspot.ui.screens.benchlist
+package com.kickpaws.hopspot.ui.screens.spotlist
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.kickpaws.hopspot.R
-import com.kickpaws.hopspot.domain.model.Bench
+import com.kickpaws.hopspot.domain.model.Spot
 
 /**
- * UI State for the Bench List Screen
+ * UI State for the Spot List Screen
  */
-data class BenchListUiState(
-    val benches: List<Bench> = emptyList(),
+data class SpotListUiState(
+    val spots: List<Spot> = emptyList(),
     val isLoading: Boolean = true,
     val isRefreshing: Boolean = false,
     val errorMessage: String? = null,
@@ -33,11 +33,11 @@ data class BenchListUiState(
     val userLon: Double? = null,
 
     // Delete
-    val benchToDelete: Bench? = null,
+    val spotToDelete: Spot? = null,
     val isDeleting: Boolean = false,
 
-    // Random Bench
-    val randomBenchId: Int? = null,
+    // Random Spot
+    val randomSpotId: Int? = null,
     val isLoadingRandom: Boolean = false
 )
 

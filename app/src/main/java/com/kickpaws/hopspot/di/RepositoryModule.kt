@@ -3,16 +3,16 @@ package com.kickpaws.hopspot.di
 import com.kickpaws.hopspot.data.repository.ActivityRepositoryImpl
 import com.kickpaws.hopspot.data.repository.AdminRepositoryImpl
 import com.kickpaws.hopspot.data.repository.FavoriteRepositoryImpl
-import com.kickpaws.hopspot.data.repository.OfflineFirstBenchRepository
+import com.kickpaws.hopspot.data.repository.OfflineFirstSpotRepository
 import com.kickpaws.hopspot.data.repository.OfflineFirstVisitRepository
 import com.kickpaws.hopspot.data.repository.PhotoRepositoryImpl
 import com.kickpaws.hopspot.domain.repository.ActivityRepository
 import com.kickpaws.hopspot.domain.repository.AdminRepository
 import com.kickpaws.hopspot.domain.repository.AuthRepository
 import com.kickpaws.hopspot.domain.repository.AuthRepositoryImpl
-import com.kickpaws.hopspot.domain.repository.BenchRepository
 import com.kickpaws.hopspot.domain.repository.FavoriteRepository
 import com.kickpaws.hopspot.domain.repository.PhotoRepository
+import com.kickpaws.hopspot.domain.repository.SpotRepository
 import com.kickpaws.hopspot.domain.repository.UserRepository
 import com.kickpaws.hopspot.domain.repository.UserRepositoryImpl
 import com.kickpaws.hopspot.domain.repository.VisitRepository
@@ -40,9 +40,9 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindBenchRepository(
-        offlineFirstBenchRepository: OfflineFirstBenchRepository
-    ): BenchRepository
+    abstract fun bindSpotRepository(
+        offlineFirstSpotRepository: OfflineFirstSpotRepository
+    ): SpotRepository
 
     @Binds
     @Singleton

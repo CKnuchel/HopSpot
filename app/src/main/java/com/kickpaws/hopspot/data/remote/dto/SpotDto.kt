@@ -2,7 +2,7 @@ package com.kickpaws.hopspot.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class BenchDto(
+data class SpotDto(
     val id: Int,
     val name: String,
     val latitude: Double,
@@ -23,7 +23,7 @@ data class BenchDto(
     val updatedAt: String
 )
 
-data class BenchListItemDto(
+data class SpotListItemDto(
     val id: Int,
     val name: String,
     val latitude: Double,
@@ -38,12 +38,12 @@ data class BenchListItemDto(
     val distance: Double?
 )
 
-data class PaginatedBenchesDto(
-    val benches: List<BenchListItemDto>,
+data class PaginatedSpotsDto(
+    val spots: List<SpotListItemDto>,
     val pagination: PaginationDto
 )
 
-data class CreateBenchRequest(
+data class CreateSpotRequest(
     val name: String,
     val latitude: Double,
     val longitude: Double,
@@ -55,7 +55,7 @@ data class CreateBenchRequest(
     val hasTrashBin: Boolean
 )
 
-data class UpdateBenchRequest(
+data class UpdateSpotRequest(
     val name: String?,
     val latitude: Double?,
     val longitude: Double?,

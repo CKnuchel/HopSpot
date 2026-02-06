@@ -1,4 +1,4 @@
-package com.kickpaws.hopspot.ui.screens.benchedit
+package com.kickpaws.hopspot.ui.screens.spotedit
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -49,11 +49,11 @@ import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BenchEditScreen(
-    benchId: Int,
+fun SpotEditScreen(
+    spotId: Int,
     onNavigateBack: () -> Unit,
     onDeleted: () -> Unit,
-    viewModel: BenchEditViewModel = hiltViewModel()
+    viewModel: SpotEditViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colorScheme = MaterialTheme.colorScheme
@@ -71,9 +71,9 @@ fun BenchEditScreen(
     // Photo to delete confirmation
     var photoToDelete by remember { mutableStateOf<Photo?>(null) }
 
-    // Load bench on first composition
-    LaunchedEffect(benchId) {
-        viewModel.loadBench(benchId)
+    // Load spot on first composition
+    LaunchedEffect(spotId) {
+        viewModel.loadSpot(spotId)
     }
 
     // Handle save success
@@ -121,7 +121,7 @@ fun BenchEditScreen(
         }
     }
 
-    // Delete Bench Confirmation Dialog
+    // Delete Spot Confirmation Dialog
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
@@ -132,15 +132,15 @@ fun BenchEditScreen(
                     tint = colorScheme.error
                 )
             },
-            title = { Text(stringResource(R.string.dialog_delete_bench_title)) },
+            title = { Text(stringResource(R.string.dialog_delete_spot_title)) },
             text = {
-                Text(stringResource(R.string.dialog_delete_bench_message, uiState.name))
+                Text(stringResource(R.string.dialog_delete_spot_message, uiState.name))
             },
             confirmButton = {
                 Button(
                     onClick = {
                         showDeleteDialog = false
-                        viewModel.deleteBench()
+                        viewModel.deleteSpot()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorScheme.error
@@ -194,7 +194,7 @@ fun BenchEditScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.bench_edit_title)) },
+                title = { Text(stringResource(R.string.spot_edit_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -205,7 +205,7 @@ fun BenchEditScreen(
                 },
                 actions = {
                     TextButton(
-                        onClick = viewModel::saveBench,
+                        onClick = viewModel::saveSpot,
                         enabled = !uiState.isSaving && !uiState.isUploadingPhoto
                     ) {
                         if (uiState.isSaving) {
@@ -264,10 +264,10 @@ fun BenchEditScreen(
                     }
                 }
 
-                uiState.errorMessage != null && uiState.bench == null -> {
+                uiState.errorMessage != null && uiState.spot == null -> {
                     HopSpotErrorView(
                         message = uiState.errorMessage!!,
-                        onRetry = { viewModel.loadBench(benchId) },
+                        onRetry = { viewModel.loadSpot(spotId) },
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -410,7 +410,7 @@ fun BenchEditScreen(
                                     contentDescription = null
                                 )
                                 Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
-                                Text(stringResource(R.string.btn_delete_bench))
+                                Text(stringResource(R.string.btn_delete_spot))
                             }
                         }
 
@@ -468,8 +468,8 @@ private fun PhotoSection(
                         contentDescription = stringResource(R.string.cd_main_image),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        placeholder = painterResource(R.drawable.placeholder_bench),
-                        error = painterResource(R.drawable.placeholder_bench)
+                        placeholder = painterResource(R.drawable.placeholder_spot),
+                        error = painterResource(R.drawable.placeholder_spot)
                     )
 
                     // Main badge
@@ -492,7 +492,7 @@ private fun PhotoSection(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = stringResource(R.string.bench_detail_main_image),
+                                text = stringResource(R.string.spot_detail_main_image),
                                 fontSize = 12.sp,
                                 color = colorScheme.onPrimary
                             )
@@ -563,7 +563,7 @@ private fun PhotoSection(
                         color = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
-                    Text(stringResource(R.string.bench_form_uploading), color = colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.spot_form_uploading), color = colorScheme.onSurfaceVariant)
                 }
             }
 
@@ -571,7 +571,7 @@ private fun PhotoSection(
 
             // Other photos (horizontal scroll)
             Text(
-                text = stringResource(R.string.bench_detail_more_photos),
+                text = stringResource(R.string.spot_detail_more_photos),
                 fontSize = 14.sp,
                 color = colorScheme.onSurfaceVariant
             )
@@ -618,7 +618,7 @@ private fun PhotoSection(
             Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
 
             Text(
-                text = stringResource(R.string.bench_form_set_main_hint),
+                text = stringResource(R.string.spot_form_set_main_hint),
                 fontSize = 12.sp,
                 color = colorScheme.onSurfaceVariant
             )
@@ -647,8 +647,8 @@ private fun PhotoThumbnail(
             contentDescription = stringResource(R.string.cd_photo),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            placeholder = painterResource(R.drawable.placeholder_bench),
-            error = painterResource(R.drawable.placeholder_bench)
+            placeholder = painterResource(R.drawable.placeholder_spot),
+            error = painterResource(R.drawable.placeholder_spot)
         )
 
         // Action buttons overlay
@@ -688,121 +688,6 @@ private fun PhotoThumbnail(
             }
         }
     }
-}
-
-@Composable
-private fun LocationCard(
-    locationText: String,
-    hasLocation: Boolean,
-    onSetLocation: (String, String) -> Unit
-) {
-    val colorScheme = MaterialTheme.colorScheme
-    var showDialog by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = HopSpotShapes.card,
-        colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(HopSpotDimensions.Spacing.md)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        tint = if (hasLocation) colorScheme.primary else colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
-                    Column {
-                        Text(
-                            text = stringResource(R.string.label_location_required),
-                            fontWeight = FontWeight.Medium,
-                            color = colorScheme.onSurface
-                        )
-                        Text(
-                            text = locationText,
-                            fontSize = 14.sp,
-                            color = colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                Button(
-                    onClick = { showDialog = true },
-                    shape = HopSpotShapes.button
-                ) {
-                    Text(stringResource(R.string.common_change))
-                }
-            }
-        }
-    }
-
-    if (showDialog) {
-        ManualLocationDialog(
-            onDismiss = { showDialog = false },
-            onConfirm = { lat, lon ->
-                onSetLocation(lat, lon)
-                showDialog = false
-            }
-        )
-    }
-}
-
-@Composable
-private fun ManualLocationDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (String, String) -> Unit
-) {
-    var latitude by remember { mutableStateOf("") }
-    var longitude by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.dialog_enter_coordinates_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = latitude,
-                    onValueChange = { latitude = it },
-                    label = { Text(stringResource(R.string.label_latitude)) },
-                    placeholder = { Text(stringResource(R.string.hint_latitude)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = longitude,
-                    onValueChange = { longitude = it },
-                    label = { Text(stringResource(R.string.label_longitude)) },
-                    placeholder = { Text(stringResource(R.string.hint_longitude)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirm(latitude, longitude) },
-                enabled = latitude.isNotBlank() && longitude.isNotBlank()
-            ) {
-                Text(stringResource(R.string.common_ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.common_cancel))
-            }
-        }
-    )
 }
 
 @Composable
@@ -855,7 +740,7 @@ private fun RatingSelector(
             }
             if (rating != null) {
                 Text(
-                    text = stringResource(R.string.bench_form_rating_format, rating),
+                    text = stringResource(R.string.spot_form_rating_format, rating),
                     fontSize = 14.sp,
                     color = colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth(),
@@ -886,7 +771,7 @@ private fun AmenitiesCard(
                 .padding(HopSpotDimensions.Spacing.md)
         ) {
             Text(
-                text = stringResource(R.string.bench_form_amenities),
+                text = stringResource(R.string.spot_form_amenities),
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface
             )
@@ -904,7 +789,7 @@ private fun AmenitiesCard(
                         tint = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
-                    Text(stringResource(R.string.bench_form_toilet_nearby))
+                    Text(stringResource(R.string.spot_form_toilet_nearby))
                 }
                 Switch(
                     checked = hasToilet,
@@ -926,7 +811,7 @@ private fun AmenitiesCard(
                         tint = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
-                    Text(stringResource(R.string.bench_form_trash_nearby))
+                    Text(stringResource(R.string.spot_form_trash_nearby))
                 }
                 Switch(
                     checked = hasTrashBin,

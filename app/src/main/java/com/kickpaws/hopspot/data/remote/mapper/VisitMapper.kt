@@ -6,9 +6,9 @@ import com.kickpaws.hopspot.domain.model.Visit
 fun VisitDto.toDomain(): Visit {
     return Visit(
         id = id,
-        benchId = bench.id,
-        benchName = bench.name,
-        benchPhotoUrl = bench.mainPhotoUrl,
+        spotId = spot.id,
+        spotName = spot.name,
+        spotPhotoUrl = spot.mainPhotoUrl,
         comment = comment,
         visitedAt = visitedAt,
         createdAt = createdAt

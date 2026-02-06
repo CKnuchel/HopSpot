@@ -4,12 +4,12 @@ import com.google.gson.annotations.SerializedName
 
 data class FavoriteDto(
     val id: Int,
-    val bench: FavoriteBenchDto,
+    val spot: FavoriteSpotDto,
     @SerializedName("created_at")
     val createdAt: String
 )
 
-data class FavoriteBenchDto(
+data class FavoriteSpotDto(
     val id: Int,
     val name: String,
     val latitude: Double,

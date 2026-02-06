@@ -50,12 +50,12 @@ class HopSpotMessagingService : FirebaseMessagingService() {
     }
 
     private fun showNotification(title: String, body: String, data: Map<String, String>) {
-        val channelId = "hopspot_benches"
-        val benchId = data["bench_id"]?.toIntOrNull()
+        val channelId = "hopspot_spots"
+        val spotId = data["spot_id"]?.toIntOrNull()
 
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            benchId?.let { putExtra("bench_id", it) }
+            spotId?.let { putExtra("spot_id", it) }
         }
 
         val pendingIntent = PendingIntent.getActivity(

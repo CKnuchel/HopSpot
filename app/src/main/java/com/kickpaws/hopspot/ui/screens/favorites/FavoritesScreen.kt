@@ -39,7 +39,7 @@ import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
-    onBenchClick: (Int) -> Unit,
+    onSpotClick: (Int) -> Unit,
     viewModel: FavoritesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -62,7 +62,7 @@ fun FavoritesScreen(
     if (uiState.favoriteToRemove != null) {
         HopSpotConfirmationDialog(
             title = stringResource(R.string.dialog_remove_favorite_title),
-            message = stringResource(R.string.dialog_remove_favorite_message, uiState.favoriteToRemove!!.benchName),
+            message = stringResource(R.string.dialog_remove_favorite_message, uiState.favoriteToRemove!!.spotName),
             confirmText = stringResource(R.string.common_remove),
             onConfirm = { viewModel.confirmRemove() },
             onDismiss = { viewModel.dismissRemoveDialog() },
@@ -126,7 +126,7 @@ fun FavoritesScreen(
                             ) { favorite ->
                                 SwipeableFavoriteItem(
                                     favorite = favorite,
-                                    onClick = { onBenchClick(favorite.benchId) },
+                                    onClick = { onSpotClick(favorite.spotId) },
                                     onRemove = { viewModel.showRemoveDialog(favorite) }
                                 )
                             }
@@ -232,10 +232,10 @@ private fun FavoriteListItem(
                     .background(colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
-                if (favorite.benchPhotoUrl != null) {
+                if (favorite.spotPhotoUrl != null) {
                     AsyncImage(
-                        model = favorite.benchPhotoUrl,
-                        contentDescription = favorite.benchName,
+                        model = favorite.spotPhotoUrl,
+                        contentDescription = favorite.spotName,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                         placeholder = painterResource(R.drawable.ic_beer_marker),
@@ -255,7 +255,7 @@ private fun FavoriteListItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = favorite.benchName,
+                    text = favorite.spotName,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = colorScheme.onSurface,
@@ -266,7 +266,7 @@ private fun FavoriteListItem(
                 Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xxs))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (favorite.benchRating != null) {
+                    if (favorite.spotRating != null) {
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = null,
@@ -275,14 +275,14 @@ private fun FavoriteListItem(
                         )
                         Spacer(modifier = Modifier.width(2.dp))
                         Text(
-                            text = "${favorite.benchRating}/5",
+                            text = "${favorite.spotRating}/5",
                             fontSize = 12.sp,
                             color = colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
                     }
 
-                    if (favorite.benchHasToilet) {
+                    if (favorite.spotHasToilet) {
                         Icon(
                             imageVector = Icons.Default.Wc,
                             contentDescription = stringResource(R.string.cd_toilet),
@@ -291,7 +291,7 @@ private fun FavoriteListItem(
                         )
                         Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xxs))
                     }
-                    if (favorite.benchHasTrashBin) {
+                    if (favorite.spotHasTrashBin) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = stringResource(R.string.cd_trash_bin),

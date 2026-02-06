@@ -1,11 +1,11 @@
 package com.kickpaws.hopspot.data.remote.mapper
 
-import com.kickpaws.hopspot.data.remote.dto.BenchDto
-import com.kickpaws.hopspot.data.remote.dto.BenchListItemDto
-import com.kickpaws.hopspot.domain.model.Bench
+import com.kickpaws.hopspot.data.remote.dto.SpotDto
+import com.kickpaws.hopspot.data.remote.dto.SpotListItemDto
+import com.kickpaws.hopspot.domain.model.Spot
 
-fun BenchDto.toDomain(): Bench {
-    return Bench(
+fun SpotDto.toDomain(): Spot {
+    return Spot(
         id = id,
         name = name,
         latitude = latitude,
@@ -23,8 +23,8 @@ fun BenchDto.toDomain(): Bench {
     )
 }
 
-fun BenchListItemDto.toDomain(): Bench {
-    return Bench(
+fun SpotListItemDto.toDomain(): Spot {
+    return Spot(
         id = id,
         name = name,
         latitude = latitude,

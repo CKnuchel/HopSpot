@@ -20,10 +20,10 @@ sealed class BottomNavItem(
         label = "Karte"
     )
 
-    object BenchList : BottomNavItem(
-        route = Route.BenchList.route,
+    object SpotList : BottomNavItem(
+        route = Route.SpotList.route,
         icon = Icons.AutoMirrored.Filled.List,
-        label = "Bänkli"
+        label = "HopSpots"
     )
 
     object Visits : BottomNavItem(

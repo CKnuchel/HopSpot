@@ -3,8 +3,8 @@ package com.kickpaws.hopspot.di
 import android.content.Context
 import androidx.room.Room
 import com.kickpaws.hopspot.data.local.HopSpotDatabase
-import com.kickpaws.hopspot.data.local.dao.BenchDao
 import com.kickpaws.hopspot.data.local.dao.PendingPhotoDao
+import com.kickpaws.hopspot.data.local.dao.SpotDao
 import com.kickpaws.hopspot.data.local.dao.UserDao
 import com.kickpaws.hopspot.data.local.dao.VisitDao
 import dagger.Module
@@ -27,13 +27,14 @@ object DatabaseModule {
             context,
             HopSpotDatabase::class.java,
             "hopspot_database"
-        ).build()
+        ).fallbackToDestructiveMigration()
+        .build()
     }
 
     @Provides
     @Singleton
-    fun provideBenchDao(database: HopSpotDatabase): BenchDao {
-        return database.benchDao()
+    fun provideSpotDao(database: HopSpotDatabase): SpotDao {
+        return database.spotDao()
     }
 
     @Provides

@@ -26,13 +26,13 @@
     <string name="error_invitation_not_found">Invitation code not found.</string>
     <string name="error_invitation_cannot_delete_redeemed">Redeemed codes cannot be deleted.</string>
 
-    <!-- Bench Errors (BENCH_*) -->
-    <string name="error_bench_not_found">The bench was not found.</string>
-    <string name="error_bench_forbidden">No permission for this bench.</string>
+    <!-- Spot Errors (SPOT_*) -->
+    <string name="error_spot_not_found">The spot was not found.</string>
+    <string name="error_spot_forbidden">No permission for this spot.</string>
 
     <!-- Photo Errors (PHOTO_*) -->
     <string name="error_photo_not_found">Photo not found.</string>
-    <string name="error_photo_max_reached">Maximum 10 photos per bench allowed.</string>
+    <string name="error_photo_max_reached">Maximum 10 photos per spot allowed.</string>
     <string name="error_photo_file_too_large">File is too large (max. 10 MB).</string>
     <string name="error_photo_invalid_type">Only JPEG, PNG and WebP allowed.</string>
     <string name="error_photo_forbidden">No permission for this photo.</string>
@@ -100,15 +100,15 @@
     <string name="btn_open_in_maps">Open in Google Maps</string>
     <string name="btn_add_photo">Add photo</string>
     <string name="btn_choose_other_photo">Choose different photo</string>
-    <string name="btn_delete_bench">Delete bench</string>
+    <string name="btn_delete_spot">Delete spot</string>
 
     <!-- Hints / Placeholders -->
     <string name="hint_search">Search…</string>
-    <string name="hint_bench_name">e.g. Beautiful forest bench</string>
-    <string name="hint_bench_description">What makes this bench special?</string>
+    <string name="hint_spot_name">e.g. Beautiful viewpoint</string>
+    <string name="hint_spot_description">What makes this spot special?</string>
     <string name="hint_latitude">e.g. 47.3769</string>
     <string name="hint_longitude">e.g. 8.5417</string>
-    <string name="hint_comment_example">e.g. \"For Max\"</string>
+    <string name="hint_comment_example">e.g. "For Max"</string>
 
     <!-- Content Descriptions -->
     <string name="cd_back">Back</string>
@@ -117,8 +117,8 @@
     <string name="cd_close">Close</string>
     <string name="cd_clear_search">Clear search</string>
     <string name="cd_filter">Filter</string>
-    <string name="cd_random_bench">Random bench</string>
-    <string name="cd_add_bench">Add bench</string>
+    <string name="cd_random_spot">Random spot</string>
+    <string name="cd_add_spot">Add spot</string>
     <string name="cd_add_photo">Add photo</string>
     <string name="cd_remove_photo">Remove photo</string>
     <string name="cd_remove_from_favorites">Remove from favorites</string>
@@ -126,7 +126,7 @@
     <string name="cd_show_password">Show password</string>
     <string name="cd_hide_password">Hide password</string>
     <string name="cd_my_location">My location</string>
-    <string name="cd_new_bench">New bench</string>
+    <string name="cd_new_spot">New spot</string>
     <string name="cd_details">Details</string>
     <string name="cd_toilet">Toilet</string>
     <string name="cd_trash_bin">Trash bin</string>
@@ -147,38 +147,38 @@
     <string name="cd_stars" formatted="false">%d stars</string>
 
     <!-- Dialog Titles -->
-    <string name="dialog_delete_bench_title">Delete bench?</string>
-    <string name="dialog_delete_bench_message">Do you really want to delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="dialog_delete_spot_title">Delete spot?</string>
+    <string name="dialog_delete_spot_message">Do you really want to delete "%1$s"? This action cannot be undone.</string>
     <string name="dialog_delete_photo_title">Delete photo?</string>
     <string name="dialog_delete_photo_message">Do you really want to delete this photo?</string>
     <string name="dialog_delete_visit_title">Delete visit?</string>
-    <string name="dialog_delete_visit_message">Do you really want to delete the visit at \"%1$s\"?</string>
+    <string name="dialog_delete_visit_message">Do you really want to delete the visit at "%1$s"?</string>
     <string name="dialog_remove_favorite_title">Remove favorite?</string>
-    <string name="dialog_remove_favorite_message">Do you really want to remove \"%1$s\" from your favorites?</string>
+    <string name="dialog_remove_favorite_message">Do you really want to remove "%1$s" from your favorites?</string>
     <string name="dialog_delete_code_title">Delete code?</string>
-    <string name="dialog_delete_code_message">Do you really want to delete the code \"%1$s\"?</string>
+    <string name="dialog_delete_code_message">Do you really want to delete the code "%1$s"?</string>
     <string name="dialog_delete_user_title">Delete user?</string>
     <string name="dialog_delete_user_message">Do you really want to delete %1$s? This action cannot be undone.</string>
     <string name="dialog_edit_name_title">Change name</string>
     <string name="dialog_enter_coordinates_title">Enter coordinates</string>
     <string name="dialog_enter_coordinates_hint">Enter the GPS coordinates (e.g. from Google Maps)</string>
     <string name="dialog_create_code_title">Create new code</string>
-    <string name="dialog_create_code_hint">Optionally add a comment (e.g. \"For Max\"):</string>
+    <string name="dialog_create_code_hint">Optionally add a comment (e.g. "For Max"):</string>
 
     <!-- Empty States -->
-    <string name="empty_benches_title">No benches yet</string>
-    <string name="empty_benches_subtitle">Add the first bench!</string>
+    <string name="empty_spots_title">No spots yet</string>
+    <string name="empty_spots_subtitle">Add the first spot!</string>
     <string name="empty_visits_title">No visits yet</string>
-    <string name="empty_visits_subtitle">Visit a bench and mark your visit!</string>
+    <string name="empty_visits_subtitle">Visit a spot and mark your visit!</string>
     <string name="empty_favorites_title">No favorites yet</string>
-    <string name="empty_favorites_subtitle">Tap the heart on a bench to add it to your favorites!</string>
+    <string name="empty_favorites_subtitle">Tap the heart on a spot to add it to your favorites!</string>
     <string name="empty_codes_title">No invitation codes</string>
     <string name="empty_codes_subtitle">Create one with the + button</string>
     <string name="empty_users_title">No users</string>
     <string name="empty_photos_title">No photos</string>
 
     <!-- Auth Screens -->
-    <string name="auth_slogan">Find your favorite bench</string>
+    <string name="auth_slogan">Find your favorite spot</string>
     <string name="auth_welcome">Welcome!</string>
     <string name="auth_join_community">Join the HopSpot Community</string>
     <string name="auth_no_account">Don\'t have an account? Register</string>
@@ -189,38 +189,38 @@
     <string name="profile_role_admin">Administrator</string>
     <string name="profile_role_user">User</string>
 
-    <!-- Bench List Screen -->
-    <string name="bench_list_filter_title">Filter &amp; Sort</string>
-    <string name="bench_list_sort_by">Sort by</string>
-    <string name="bench_list_filter_toilet">Only with toilet</string>
-    <string name="bench_list_filter_trash">Only with trash bin</string>
-    <string name="bench_list_filter_min_rating">Minimum rating</string>
-    <string name="bench_list_filter_all">All</string>
+    <!-- Spot List Screen -->
+    <string name="spot_list_filter_title">Filter &amp; Sort</string>
+    <string name="spot_list_sort_by">Sort by</string>
+    <string name="spot_list_filter_toilet">Only with toilet</string>
+    <string name="spot_list_filter_trash">Only with trash bin</string>
+    <string name="spot_list_filter_min_rating">Minimum rating</string>
+    <string name="spot_list_filter_all">All</string>
 
-    <!-- Bench Detail Screen -->
-    <string name="bench_detail_title">Bench Details</string>
-    <string name="bench_detail_no_photos">No photos</string>
-    <string name="bench_detail_main_image">Main image</string>
-    <string name="bench_detail_more_photos">More photos</string>
-    <string name="bench_detail_location">Location</string>
-    <string name="bench_detail_visits">Visits</string>
-    <string name="bench_detail_visits_count">%1$d visits total</string>
-    <string name="bench_detail_visit_saved">Visit saved!</string>
-    <string name="bench_detail_current_weather">Current weather</string>
-    <string name="bench_detail_temperature">Temperature</string>
-    <string name="bench_detail_rating_format">%1$d/5</string>
+    <!-- Spot Detail Screen -->
+    <string name="spot_detail_title">Spot Details</string>
+    <string name="spot_detail_no_photos">No photos</string>
+    <string name="spot_detail_main_image">Main image</string>
+    <string name="spot_detail_more_photos">More photos</string>
+    <string name="spot_detail_location">Location</string>
+    <string name="spot_detail_visits">Visits</string>
+    <string name="spot_detail_visits_count">%1$d visits total</string>
+    <string name="spot_detail_visit_saved">Visit saved!</string>
+    <string name="spot_detail_current_weather">Current weather</string>
+    <string name="spot_detail_temperature">Temperature</string>
+    <string name="spot_detail_rating_format">%1$d/5</string>
 
-    <!-- Bench Create/Edit Screen -->
-    <string name="bench_create_title">New Bench</string>
-    <string name="bench_edit_title">Edit</string>
-    <string name="bench_form_amenities">Amenities</string>
-    <string name="bench_form_toilet_nearby">Toilet nearby</string>
-    <string name="bench_form_trash_nearby">Trash bin available</string>
-    <string name="bench_form_location_not_set">Not set yet</string>
-    <string name="bench_form_location_hint">GPS feature coming soon! For now, enter coordinates manually.</string>
-    <string name="bench_form_rating_format">%1$d of 5 stars</string>
-    <string name="bench_form_uploading">Uploading…</string>
-    <string name="bench_form_set_main_hint">Tap ☆ to set a photo as main image</string>
+    <!-- Spot Create/Edit Screen -->
+    <string name="spot_create_title">New Spot</string>
+    <string name="spot_edit_title">Edit</string>
+    <string name="spot_form_amenities">Amenities</string>
+    <string name="spot_form_toilet_nearby">Toilet nearby</string>
+    <string name="spot_form_trash_nearby">Trash bin available</string>
+    <string name="spot_form_location_not_set">Not set yet</string>
+    <string name="spot_form_location_hint">GPS feature coming soon! For now, enter coordinates manually.</string>
+    <string name="spot_form_rating_format">%1$d of 5 stars</string>
+    <string name="spot_form_uploading">Uploading…</string>
+    <string name="spot_form_set_main_hint">Tap ☆ to set a photo as main image</string>
 
     <!-- Visits Screen -->
     <string name="visits_title">My Visits</string>
@@ -243,7 +243,13 @@
     <string name="admin_user_deactivated">Deactivated</string>
 
     <!-- Map Screen -->
-    <string name="map_benches_count">%1$d benches</string>
+    <string name="map_spots_count">%1$d spots</string>
+
+    <!-- Activity Feed Screen -->
+    <string name="activity_feed_title">Activities</string>
+    <string name="empty_activity_feed_title">No activities yet</string>
+    <string name="empty_activity_feed_subtitle">When someone adds or visits a spot, it will appear here!</string>
+    <string name="cd_activity_feed">Activities</string>
 
     <!-- Offline Banner -->
     <string name="offline_banner_message">Offline mode - Changes will be synced</string>

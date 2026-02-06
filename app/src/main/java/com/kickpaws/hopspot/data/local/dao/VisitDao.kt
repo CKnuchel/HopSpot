@@ -30,8 +30,8 @@ interface VisitDao {
     @Query("SELECT * FROM visits WHERE id = :id")
     suspend fun getVisitById(id: Int): VisitEntity?
 
-    @Query("SELECT COUNT(*) FROM visits WHERE benchId = :benchId AND syncStatus != :deleted")
-    suspend fun getVisitCountForBench(benchId: Int, deleted: SyncStatus = SyncStatus.PENDING_DELETE): Long
+    @Query("SELECT COUNT(*) FROM visits WHERE spotId = :spotId AND syncStatus != :deleted")
+    suspend fun getVisitCountForSpot(spotId: Int, deleted: SyncStatus = SyncStatus.PENDING_DELETE): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(visit: VisitEntity)

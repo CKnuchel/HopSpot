@@ -1,4 +1,4 @@
-package com.kickpaws.hopspot.ui.screens.benchcreate
+package com.kickpaws.hopspot.ui.screens.spotcreate
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -40,10 +40,10 @@ import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BenchCreateScreen(
+fun SpotCreateScreen(
     onNavigateBack: () -> Unit,
-    onBenchCreated: (Int) -> Unit,
-    viewModel: BenchCreateViewModel = hiltViewModel()
+    onSpotCreated: (Int) -> Unit,
+    viewModel: SpotCreateViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colorScheme = MaterialTheme.colorScheme
@@ -60,17 +60,17 @@ fun BenchCreateScreen(
         )
     }
 
-    // Navigate when bench created
-    LaunchedEffect(uiState.createdBenchId) {
-        uiState.createdBenchId?.let { benchId ->
-            onBenchCreated(benchId)
+    // Navigate when spot created
+    LaunchedEffect(uiState.createdSpotId) {
+        uiState.createdSpotId?.let { spotId ->
+            onSpotCreated(spotId)
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.bench_create_title)) },
+                title = { Text(stringResource(R.string.spot_create_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -81,7 +81,7 @@ fun BenchCreateScreen(
                 },
                 actions = {
                     TextButton(
-                        onClick = viewModel::saveBench,
+                        onClick = viewModel::saveSpot,
                         enabled = !uiState.isSaving && !uiState.isUploadingPhoto
                     ) {
                         if (uiState.isSaving || uiState.isUploadingPhoto) {
@@ -126,7 +126,7 @@ fun BenchCreateScreen(
                 value = uiState.name,
                 onValueChange = viewModel::onNameChange,
                 label = { Text(stringResource(R.string.label_name_required)) },
-                placeholder = { Text(stringResource(R.string.hint_bench_name)) },
+                placeholder = { Text(stringResource(R.string.hint_spot_name)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Chair,
@@ -160,7 +160,7 @@ fun BenchCreateScreen(
                 value = uiState.description,
                 onValueChange = viewModel::onDescriptionChange,
                 label = { Text(stringResource(R.string.label_description)) },
-                placeholder = { Text(stringResource(R.string.hint_bench_description)) },
+                placeholder = { Text(stringResource(R.string.hint_spot_description)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Description,
@@ -293,7 +293,7 @@ private fun PhotoCard(
                                 )
                                 Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
                                 Text(
-                                    text = stringResource(R.string.bench_form_uploading),
+                                    text = stringResource(R.string.spot_form_uploading),
                                     color = colorScheme.onSurface
                                 )
                             }
@@ -373,147 +373,6 @@ private fun PhotoCard(
 }
 
 @Composable
-private fun LocationCard(
-    locationText: String,
-    hasLocation: Boolean,
-    onSetLocation: (String, String) -> Unit
-) {
-    val colorScheme = MaterialTheme.colorScheme
-    var showDialog by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = HopSpotShapes.card,
-        colors = CardDefaults.cardColors(
-            containerColor = colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(HopSpotDimensions.Spacing.md)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        tint = if (hasLocation) colorScheme.primary else colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
-                    Column {
-                        Text(
-                            text = stringResource(R.string.label_location_required),
-                            fontWeight = FontWeight.Medium,
-                            color = colorScheme.onSurface
-                        )
-                        Text(
-                            text = locationText,
-                            fontSize = 14.sp,
-                            color = colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                Button(
-                    onClick = { showDialog = true },
-                    shape = HopSpotShapes.button,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorScheme.primary
-                    )
-                ) {
-                    Text(stringResource(R.string.common_set))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
-
-            Text(
-                text = stringResource(R.string.bench_form_location_hint),
-                fontSize = 12.sp,
-                color = colorScheme.onSurfaceVariant
-            )
-        }
-    }
-
-    // Manual Location Dialog
-    if (showDialog) {
-        ManualLocationDialog(
-            onDismiss = { showDialog = false },
-            onConfirm = { lat, lon ->
-                onSetLocation(lat, lon)
-                showDialog = false
-            }
-        )
-    }
-}
-
-@Composable
-private fun ManualLocationDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (String, String) -> Unit
-) {
-    val colorScheme = MaterialTheme.colorScheme
-    var latitude by remember { mutableStateOf("") }
-    var longitude by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.dialog_enter_coordinates_title)) },
-        text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.dialog_enter_coordinates_hint),
-                    fontSize = 14.sp,
-                    color = colorScheme.onSurfaceVariant
-                )
-
-                OutlinedTextField(
-                    value = latitude,
-                    onValueChange = { latitude = it },
-                    label = { Text(stringResource(R.string.label_latitude)) },
-                    placeholder = { Text(stringResource(R.string.hint_latitude)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = longitude,
-                    onValueChange = { longitude = it },
-                    label = { Text(stringResource(R.string.label_longitude)) },
-                    placeholder = { Text(stringResource(R.string.hint_longitude)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirm(latitude, longitude) },
-                enabled = latitude.isNotBlank() && longitude.isNotBlank()
-            ) {
-                Text(stringResource(R.string.common_ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.common_cancel))
-            }
-        }
-    )
-}
-
-@Composable
 private fun RatingSelector(
     rating: Int?,
     onRatingChange: (Int?) -> Unit
@@ -570,7 +429,7 @@ private fun RatingSelector(
 
             if (rating != null) {
                 Text(
-                    text = stringResource(R.string.bench_form_rating_format, rating),
+                    text = stringResource(R.string.spot_form_rating_format, rating),
                     fontSize = 14.sp,
                     color = colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth(),
@@ -603,7 +462,7 @@ private fun AmenitiesCard(
                 .padding(HopSpotDimensions.Spacing.md)
         ) {
             Text(
-                text = stringResource(R.string.bench_form_amenities),
+                text = stringResource(R.string.spot_form_amenities),
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface
             )
@@ -625,7 +484,7 @@ private fun AmenitiesCard(
                         tint = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
-                    Text(stringResource(R.string.bench_form_toilet_nearby))
+                    Text(stringResource(R.string.spot_form_toilet_nearby))
                 }
 
                 Switch(
@@ -658,7 +517,7 @@ private fun AmenitiesCard(
                         tint = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
-                    Text(stringResource(R.string.bench_form_trash_nearby))
+                    Text(stringResource(R.string.spot_form_trash_nearby))
                 }
 
                 Switch(

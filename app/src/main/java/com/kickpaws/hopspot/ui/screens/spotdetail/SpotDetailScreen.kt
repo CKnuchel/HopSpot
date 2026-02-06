@@ -1,4 +1,4 @@
-package com.kickpaws.hopspot.ui.screens.benchdetail
+package com.kickpaws.hopspot.ui.screens.spotdetail
 
 import android.content.Intent
 import android.net.Uri
@@ -43,7 +43,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.Photo
-import com.kickpaws.hopspot.ui.components.BenchListItemSkeleton
+import com.kickpaws.hopspot.ui.components.SpotListItemSkeleton
 import com.kickpaws.hopspot.ui.components.WeatherIcons
 import com.kickpaws.hopspot.ui.components.common.HopSpotErrorView
 import com.kickpaws.hopspot.ui.components.common.HopSpotLoadingIndicator
@@ -53,11 +53,11 @@ import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BenchDetailScreen(
-    benchId: Int,
+fun SpotDetailScreen(
+    spotId: Int,
     onNavigateBack: () -> Unit,
     onEditClick: (Int) -> Unit,
-    viewModel: BenchDetailViewModel = hiltViewModel()
+    viewModel: SpotDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colorScheme = MaterialTheme.colorScheme
@@ -66,8 +66,8 @@ fun BenchDetailScreen(
 
     var selectedPhotoIndex by remember { mutableIntStateOf(-1) }
 
-    LaunchedEffect(benchId) {
-        viewModel.loadBench(benchId)
+    LaunchedEffect(spotId) {
+        viewModel.loadSpot(spotId)
     }
 
     LaunchedEffect(uiState.visitAdded) {
@@ -87,7 +87,7 @@ fun BenchDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(uiState.bench?.name ?: stringResource(R.string.bench_detail_title)) },
+                title = { Text(uiState.spot?.name ?: stringResource(R.string.spot_detail_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -97,9 +97,9 @@ fun BenchDetailScreen(
                     }
                 },
                 actions = {
-                    if (uiState.bench != null) {
+                    if (uiState.spot != null) {
                         IconButton(
-                            onClick = { viewModel.toggleFavorite(benchId) },
+                            onClick = { viewModel.toggleFavorite(spotId) },
                             enabled = !uiState.isTogglingFavorite
                         ) {
                             if (uiState.isTogglingFavorite) {
@@ -119,7 +119,7 @@ fun BenchDetailScreen(
                                 )
                             }
                         }
-                        IconButton(onClick = { onEditClick(benchId) }) {
+                        IconButton(onClick = { onEditClick(spotId) }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = stringResource(R.string.cd_edit)
@@ -153,20 +153,20 @@ fun BenchDetailScreen(
                             shape = HopSpotShapes.card
                         )
                         Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
-                        BenchListItemSkeleton()
+                        SpotListItemSkeleton()
                     }
                 }
 
-                uiState.errorMessage != null && uiState.bench == null -> {
+                uiState.errorMessage != null && uiState.spot == null -> {
                     HopSpotErrorView(
                         message = uiState.errorMessage!!,
-                        onRetry = { viewModel.loadBench(benchId) },
+                        onRetry = { viewModel.loadSpot(spotId) },
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
 
-                uiState.bench != null -> {
-                    val bench = uiState.bench!!
+                uiState.spot != null -> {
+                    val spot = uiState.spot!!
 
                     Column(
                         modifier = Modifier
@@ -193,26 +193,26 @@ fun BenchDetailScreen(
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = bench.name,
+                                        text = spot.name,
                                         fontSize = 24.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = colorScheme.onBackground
                                     )
 
-                                    if (bench.rating != null) {
+                                    if (spot.rating != null) {
                                         Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xxs))
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             repeat(5) { index ->
                                                 Icon(
-                                                    imageVector = if (index < bench.rating) Icons.Default.Star else Icons.Default.StarBorder,
+                                                    imageVector = if (index < spot.rating) Icons.Default.Star else Icons.Default.StarBorder,
                                                     contentDescription = null,
-                                                    tint = if (index < bench.rating) colorScheme.primary else colorScheme.outline,
+                                                    tint = if (index < spot.rating) colorScheme.primary else colorScheme.outline,
                                                     modifier = Modifier.size(HopSpotDimensions.Icon.medium)
                                                 )
                                             }
                                             Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
                                             Text(
-                                                text = stringResource(R.string.bench_detail_rating_format, bench.rating),
+                                                text = stringResource(R.string.spot_detail_rating_format, spot.rating),
                                                 color = colorScheme.onSurfaceVariant
                                             )
                                         }
@@ -223,7 +223,7 @@ fun BenchDetailScreen(
 
                                 // Compact "Ich war hier" Button
                                 Button(
-                                    onClick = { viewModel.addVisit(benchId) },
+                                    onClick = { viewModel.addVisit(spotId) },
                                     enabled = !uiState.isAddingVisit,
                                     shape = HopSpotShapes.button,
                                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
@@ -252,7 +252,7 @@ fun BenchDetailScreen(
                             if (uiState.visitAdded) {
                                 Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
                                 Text(
-                                    text = stringResource(R.string.bench_detail_visit_saved),
+                                    text = stringResource(R.string.spot_detail_visit_saved),
                                     color = colorScheme.primary,
                                     fontSize = 14.sp
                                 )
@@ -276,8 +276,8 @@ fun BenchDetailScreen(
 
                                 // Amenities Card
                                 AmenitiesCard(
-                                    hasToilet = bench.hasToilet,
-                                    hasTrashBin = bench.hasTrashBin,
+                                    hasToilet = spot.hasToilet,
+                                    hasTrashBin = spot.hasTrashBin,
                                     modifier = Modifier.weight(1f)
                                 )
                             }
@@ -286,18 +286,18 @@ fun BenchDetailScreen(
 
                             // Location with Mini Map
                             LocationSection(
-                                latitude = bench.latitude,
-                                longitude = bench.longitude,
-                                benchName = bench.name,
+                                latitude = spot.latitude,
+                                longitude = spot.longitude,
+                                spotName = spot.name,
                                 onOpenInMaps = {
-                                    val uri = Uri.parse("geo:${bench.latitude},${bench.longitude}?q=${bench.latitude},${bench.longitude}(${Uri.encode(bench.name)})")
+                                    val uri = Uri.parse("geo:${spot.latitude},${spot.longitude}?q=${spot.latitude},${spot.longitude}(${Uri.encode(spot.name)})")
                                     val intent = Intent(Intent.ACTION_VIEW, uri)
                                     context.startActivity(intent)
                                 }
                             )
 
                             // Description - only show if not blank
-                            if (!bench.description.isNullOrBlank()) {
+                            if (!spot.description.isNullOrBlank()) {
                                 Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
                                 HorizontalDivider()
                                 Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
@@ -309,7 +309,7 @@ fun BenchDetailScreen(
                                 )
                                 Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xxs))
                                 Text(
-                                    text = bench.description,
+                                    text = spot.description,
                                     color = colorScheme.onSurfaceVariant
                                 )
                             }
@@ -327,7 +327,7 @@ fun BenchDetailScreen(
                                 )
                                 Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
                                 Text(
-                                    text = stringResource(R.string.bench_detail_visits_count, uiState.visitCount),
+                                    text = stringResource(R.string.spot_detail_visits_count, uiState.visitCount),
                                     fontSize = 14.sp,
                                     color = colorScheme.onSurfaceVariant
                                 )
@@ -364,7 +364,7 @@ private fun NoPhotosPlaceholder() {
             )
             Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
             Text(
-                text = stringResource(R.string.bench_detail_no_photos),
+                text = stringResource(R.string.spot_detail_no_photos),
                 color = colorScheme.onPrimaryContainer
             )
         }
@@ -405,7 +405,7 @@ private fun WeatherInfoCard(
                 )
                 Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xxs))
                 Text(
-                    text = stringResource(R.string.bench_detail_current_weather),
+                    text = stringResource(R.string.spot_detail_current_weather),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = colorScheme.onSurfaceVariant
@@ -479,7 +479,7 @@ private fun AmenitiesCard(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(R.string.bench_form_amenities),
+                text = stringResource(R.string.spot_form_amenities),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurfaceVariant
@@ -532,7 +532,7 @@ private fun AmenityIndicator(
 private fun LocationSection(
     latitude: Double,
     longitude: Double,
-    benchName: String,
+    spotName: String,
     onOpenInMaps: () -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
@@ -551,7 +551,7 @@ private fun LocationSection(
             )
             Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
             Text(
-                text = stringResource(R.string.bench_detail_location),
+                text = stringResource(R.string.spot_detail_location),
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onBackground
             )
@@ -581,7 +581,7 @@ private fun LocationSection(
                 ),
                 properties = MapProperties(mapType = MapType.NORMAL)
             ) {
-                Marker(state = MarkerState(position = position), title = benchName)
+                Marker(state = MarkerState(position = position), title = spotName)
             }
         }
 
@@ -627,11 +627,11 @@ private fun PhotoGallery(
             ) {
                 AsyncImage(
                     model = mainPhoto.urlMedium ?: mainPhoto.urlThumbnail,
-                    contentDescription = stringResource(R.string.bench_detail_main_image),
+                    contentDescription = stringResource(R.string.spot_detail_main_image),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
-                    placeholder = painterResource(R.drawable.placeholder_bench),
-                    error = painterResource(R.drawable.placeholder_bench)
+                    placeholder = painterResource(R.drawable.placeholder_spot),
+                    error = painterResource(R.drawable.placeholder_spot)
                 )
 
                 Surface(
@@ -653,7 +653,7 @@ private fun PhotoGallery(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = stringResource(R.string.bench_detail_main_image),
+                            text = stringResource(R.string.spot_detail_main_image),
                             fontSize = 12.sp,
                             color = colorScheme.onPrimary
                         )
@@ -669,7 +669,7 @@ private fun PhotoGallery(
             Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.sm))
 
             Text(
-                text = stringResource(R.string.bench_detail_more_photos),
+                text = stringResource(R.string.spot_detail_more_photos),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurfaceVariant
@@ -690,8 +690,8 @@ private fun PhotoGallery(
                             .clip(HopSpotShapes.thumbnail)
                             .clickable { onPhotoClick(index) },
                         contentScale = ContentScale.Crop,
-                        placeholder = painterResource(R.drawable.placeholder_bench),
-                        error = painterResource(R.drawable.placeholder_bench)
+                        placeholder = painterResource(R.drawable.placeholder_spot),
+                        error = painterResource(R.drawable.placeholder_spot)
                     )
                 }
             }

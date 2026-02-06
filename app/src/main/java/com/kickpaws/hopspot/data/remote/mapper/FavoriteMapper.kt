@@ -5,13 +5,13 @@ import com.kickpaws.hopspot.domain.model.Favorite
 
 fun FavoriteDto.toDomain(): Favorite = Favorite(
     id = id,
-    benchId = bench.id,
-    benchName = bench.name,
-    benchLatitude = bench.latitude,
-    benchLongitude = bench.longitude,
-    benchRating = bench.rating,
-    benchHasToilet = bench.hasToilet,
-    benchHasTrashBin = bench.hasTrashBin,
-    benchPhotoUrl = bench.mainPhotoUrl,
+    spotId = spot.id,
+    spotName = spot.name,
+    spotLatitude = spot.latitude,
+    spotLongitude = spot.longitude,
+    spotRating = spot.rating,
+    spotHasToilet = spot.hasToilet,
+    spotHasTrashBin = spot.hasTrashBin,
+    spotPhotoUrl = spot.mainPhotoUrl,
     createdAt = createdAt
 )

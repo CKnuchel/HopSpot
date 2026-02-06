@@ -1,38 +1,38 @@
 package com.kickpaws.hopspot.data.repository
 
 import android.util.Log
-import com.kickpaws.hopspot.data.local.dao.BenchDao
-import com.kickpaws.hopspot.data.local.entity.BenchEntity
+import com.kickpaws.hopspot.data.local.dao.SpotDao
+import com.kickpaws.hopspot.data.local.entity.SpotEntity
 import com.kickpaws.hopspot.data.local.entity.SyncStatus
 import com.kickpaws.hopspot.data.local.mapper.toDomain
 import com.kickpaws.hopspot.data.local.mapper.toDomainList
 import com.kickpaws.hopspot.data.local.mapper.toEntity
 import com.kickpaws.hopspot.data.network.NetworkMonitor
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
-import com.kickpaws.hopspot.data.remote.dto.CreateBenchRequest
-import com.kickpaws.hopspot.data.remote.dto.UpdateBenchRequest
+import com.kickpaws.hopspot.data.remote.dto.CreateSpotRequest
+import com.kickpaws.hopspot.data.remote.dto.UpdateSpotRequest
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
-import com.kickpaws.hopspot.domain.model.Bench
-import com.kickpaws.hopspot.domain.repository.BenchFilter
-import com.kickpaws.hopspot.domain.repository.BenchRepository
-import com.kickpaws.hopspot.domain.repository.PaginatedBenches
+import com.kickpaws.hopspot.domain.model.Spot
+import com.kickpaws.hopspot.domain.repository.SpotFilter
+import com.kickpaws.hopspot.domain.repository.SpotRepository
+import com.kickpaws.hopspot.domain.repository.PaginatedSpots
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.ceil
 
 @Singleton
-class OfflineFirstBenchRepository @Inject constructor(
+class OfflineFirstSpotRepository @Inject constructor(
     private val api: HopSpotApi,
-    private val benchDao: BenchDao,
+    private val spotDao: SpotDao,
     private val networkMonitor: NetworkMonitor
-) : BenchRepository {
+) : SpotRepository {
 
     companion object {
-        private const val TAG = "OfflineFirstBenchRepo"
+        private const val TAG = "OfflineFirstSpotRepo"
         private const val TEMP_ID_START = -1_000_000
     }
 
-    override suspend fun getBenches(filter: BenchFilter): Result<PaginatedBenches> {
+    override suspend fun getSpots(filter: SpotFilter): Result<PaginatedSpots> {
         return if (networkMonitor.isOnlineNow) {
             fetchFromApiAndCache(filter)
         } else {
@@ -40,9 +40,9 @@ class OfflineFirstBenchRepository @Inject constructor(
         }
     }
 
-    private suspend fun fetchFromApiAndCache(filter: BenchFilter): Result<PaginatedBenches> {
+    private suspend fun fetchFromApiAndCache(filter: SpotFilter): Result<PaginatedSpots> {
         return try {
-            val apiResponse = api.getBenches(
+            val apiResponse = api.getSpots(
                 page = filter.page,
                 limit = filter.limit,
                 sortBy = filter.sortBy,
@@ -57,23 +57,23 @@ class OfflineFirstBenchRepository @Inject constructor(
             )
 
             val response = apiResponse.data
-            val benches = response.benches.map { it.toDomain() }
+            val spots = response.spots.map { it.toDomain() }
             val pagination = response.pagination
 
             // Cache to Room (only page 1 for simplicity, or could cache all)
             if (filter.page == 1) {
                 // Get pending changes to preserve
-                val pendingIds = benchDao.getPendingChanges().map { it.id }.toSet()
+                val pendingIds = spotDao.getPendingChanges().map { it.id }.toSet()
 
-                // Insert server benches, don't overwrite pending local changes
-                benches.filter { it.id !in pendingIds }.forEach { bench ->
-                    benchDao.insert(bench.toEntity(SyncStatus.SYNCED))
+                // Insert server spots, don't overwrite pending local changes
+                spots.filter { it.id !in pendingIds }.forEach { spot ->
+                    spotDao.insert(spot.toEntity(SyncStatus.SYNCED))
                 }
             }
 
             Result.success(
-                PaginatedBenches(
-                    benches = benches,
+                PaginatedSpots(
+                    spots = spots,
                     page = pagination.page,
                     limit = pagination.limit,
                     total = pagination.total.toInt(),
@@ -86,10 +86,10 @@ class OfflineFirstBenchRepository @Inject constructor(
         }
     }
 
-    private suspend fun fetchFromLocal(filter: BenchFilter): Result<PaginatedBenches> {
+    private suspend fun fetchFromLocal(filter: SpotFilter): Result<PaginatedSpots> {
         return try {
             val offset = (filter.page - 1) * filter.limit
-            val benches = benchDao.getBenchesFiltered(
+            val spots = spotDao.getSpotsFiltered(
                 search = filter.search,
                 hasToilet = filter.hasToilet,
                 hasTrashBin = filter.hasTrashBin,
@@ -97,7 +97,7 @@ class OfflineFirstBenchRepository @Inject constructor(
                 limit = filter.limit,
                 offset = offset
             )
-            val total = benchDao.getBenchesFilteredCount(
+            val total = spotDao.getSpotsFilteredCount(
                 search = filter.search,
                 hasToilet = filter.hasToilet,
                 hasTrashBin = filter.hasTrashBin,
@@ -105,8 +105,8 @@ class OfflineFirstBenchRepository @Inject constructor(
             )
 
             Result.success(
-                PaginatedBenches(
-                    benches = benches.toDomainList(),
+                PaginatedSpots(
+                    spots = spots.toDomainList(),
                     page = filter.page,
                     limit = filter.limit,
                     total = total,
@@ -119,49 +119,49 @@ class OfflineFirstBenchRepository @Inject constructor(
         }
     }
 
-    override suspend fun getBench(id: Int): Result<Bench> {
+    override suspend fun getSpot(id: Int): Result<Spot> {
         return if (networkMonitor.isOnlineNow) {
             try {
-                val response = api.getBench(id)
-                val bench = response.data.toDomain()
+                val response = api.getSpot(id)
+                val spot = response.data.toDomain()
 
                 // Cache to Room
-                benchDao.insert(bench.toEntity(SyncStatus.SYNCED))
+                spotDao.insert(spot.toEntity(SyncStatus.SYNCED))
 
-                Result.success(bench)
+                Result.success(spot)
             } catch (e: Exception) {
                 Log.e(TAG, "API fetch failed, falling back to local", e)
-                getBenchFromLocal(id)
+                getSpotFromLocal(id)
             }
         } else {
-            getBenchFromLocal(id)
+            getSpotFromLocal(id)
         }
     }
 
-    private suspend fun getBenchFromLocal(id: Int): Result<Bench> {
+    private suspend fun getSpotFromLocal(id: Int): Result<Spot> {
         return try {
-            val entity = benchDao.getBenchById(id)
+            val entity = spotDao.getSpotById(id)
             if (entity != null) {
                 Result.success(entity.toDomain())
             } else {
-                Result.failure(Exception("Bench not found in local database"))
+                Result.failure(Exception("Spot not found in local database"))
             }
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun getRandomBench(): Result<Bench> {
+    override suspend fun getRandomSpot(): Result<Spot> {
         return try {
-            val response = api.getRandomBench()
-            val bench = response.data.toDomain()
-            Result.success(bench)
+            val response = api.getRandomSpot()
+            val spot = response.data.toDomain()
+            Result.success(spot)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun createBench(
+    override suspend fun createSpot(
         name: String,
         latitude: Double,
         longitude: Double,
@@ -169,15 +169,15 @@ class OfflineFirstBenchRepository @Inject constructor(
         rating: Int?,
         hasToilet: Boolean,
         hasTrashBin: Boolean
-    ): Result<Bench> {
+    ): Result<Spot> {
         return if (networkMonitor.isOnlineNow) {
-            createBenchOnline(name, latitude, longitude, description, rating, hasToilet, hasTrashBin)
+            createSpotOnline(name, latitude, longitude, description, rating, hasToilet, hasTrashBin)
         } else {
-            createBenchOffline(name, latitude, longitude, description, rating, hasToilet, hasTrashBin)
+            createSpotOffline(name, latitude, longitude, description, rating, hasToilet, hasTrashBin)
         }
     }
 
-    private suspend fun createBenchOnline(
+    private suspend fun createSpotOnline(
         name: String,
         latitude: Double,
         longitude: Double,
@@ -185,9 +185,9 @@ class OfflineFirstBenchRepository @Inject constructor(
         rating: Int?,
         hasToilet: Boolean,
         hasTrashBin: Boolean
-    ): Result<Bench> {
+    ): Result<Spot> {
         return try {
-            val request = CreateBenchRequest(
+            val request = CreateSpotRequest(
                 name = name,
                 latitude = latitude,
                 longitude = longitude,
@@ -196,20 +196,20 @@ class OfflineFirstBenchRepository @Inject constructor(
                 hasToilet = hasToilet,
                 hasTrashBin = hasTrashBin
             )
-            val response = api.createBench(request)
-            val bench = response.data.toDomain()
+            val response = api.createSpot(request)
+            val spot = response.data.toDomain()
 
             // Cache to Room
-            benchDao.insert(bench.toEntity(SyncStatus.SYNCED))
+            spotDao.insert(spot.toEntity(SyncStatus.SYNCED))
 
-            Result.success(bench)
+            Result.success(spot)
         } catch (e: Exception) {
             Log.e(TAG, "Online create failed, creating offline", e)
-            createBenchOffline(name, latitude, longitude, description, rating, hasToilet, hasTrashBin)
+            createSpotOffline(name, latitude, longitude, description, rating, hasToilet, hasTrashBin)
         }
     }
 
-    private suspend fun createBenchOffline(
+    private suspend fun createSpotOffline(
         name: String,
         latitude: Double,
         longitude: Double,
@@ -217,13 +217,13 @@ class OfflineFirstBenchRepository @Inject constructor(
         rating: Int?,
         hasToilet: Boolean,
         hasTrashBin: Boolean
-    ): Result<Bench> {
+    ): Result<Spot> {
         return try {
-            // Generate temporary negative ID for offline-created bench
+            // Generate temporary negative ID for offline-created spot
             val tempId = TEMP_ID_START - System.currentTimeMillis().toInt()
             val now = java.time.Instant.now().toString()
 
-            val entity = BenchEntity(
+            val entity = SpotEntity(
                 id = tempId,
                 name = name,
                 latitude = latitude,
@@ -242,7 +242,7 @@ class OfflineFirstBenchRepository @Inject constructor(
                 locallyModifiedAt = System.currentTimeMillis()
             )
 
-            benchDao.insert(entity)
+            spotDao.insert(entity)
 
             Result.success(entity.toDomain())
         } catch (e: Exception) {
@@ -250,17 +250,17 @@ class OfflineFirstBenchRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateBench(id: Int, updates: Map<String, Any?>): Result<Bench> {
+    override suspend fun updateSpot(id: Int, updates: Map<String, Any?>): Result<Spot> {
         return if (networkMonitor.isOnlineNow) {
-            updateBenchOnline(id, updates)
+            updateSpotOnline(id, updates)
         } else {
-            updateBenchOffline(id, updates)
+            updateSpotOffline(id, updates)
         }
     }
 
-    private suspend fun updateBenchOnline(id: Int, updates: Map<String, Any?>): Result<Bench> {
+    private suspend fun updateSpotOnline(id: Int, updates: Map<String, Any?>): Result<Spot> {
         return try {
-            val request = UpdateBenchRequest(
+            val request = UpdateSpotRequest(
                 name = updates["name"] as? String,
                 latitude = updates["latitude"] as? Double,
                 longitude = updates["longitude"] as? Double,
@@ -269,23 +269,23 @@ class OfflineFirstBenchRepository @Inject constructor(
                 hasToilet = updates["hasToilet"] as? Boolean,
                 hasTrashBin = updates["hasTrashBin"] as? Boolean
             )
-            val response = api.updateBench(id, request)
-            val bench = response.data.toDomain()
+            val response = api.updateSpot(id, request)
+            val spot = response.data.toDomain()
 
             // Cache to Room
-            benchDao.insert(bench.toEntity(SyncStatus.SYNCED))
+            spotDao.insert(spot.toEntity(SyncStatus.SYNCED))
 
-            Result.success(bench)
+            Result.success(spot)
         } catch (e: Exception) {
             Log.e(TAG, "Online update failed, updating offline", e)
-            updateBenchOffline(id, updates)
+            updateSpotOffline(id, updates)
         }
     }
 
-    private suspend fun updateBenchOffline(id: Int, updates: Map<String, Any?>): Result<Bench> {
+    private suspend fun updateSpotOffline(id: Int, updates: Map<String, Any?>): Result<Spot> {
         return try {
-            val existingEntity = benchDao.getBenchById(id)
-                ?: return Result.failure(Exception("Bench not found"))
+            val existingEntity = spotDao.getSpotById(id)
+                ?: return Result.failure(Exception("Spot not found"))
 
             val updatedEntity = existingEntity.copy(
                 name = updates["name"] as? String ?: existingEntity.name,
@@ -303,7 +303,7 @@ class OfflineFirstBenchRepository @Inject constructor(
                 locallyModifiedAt = System.currentTimeMillis()
             )
 
-            benchDao.update(updatedEntity)
+            spotDao.update(updatedEntity)
 
             Result.success(updatedEntity.toDomain())
         } catch (e: Exception) {
@@ -311,36 +311,36 @@ class OfflineFirstBenchRepository @Inject constructor(
         }
     }
 
-    override suspend fun deleteBench(id: Int): Result<Unit> {
+    override suspend fun deleteSpot(id: Int): Result<Unit> {
         return if (networkMonitor.isOnlineNow) {
-            deleteBenchOnline(id)
+            deleteSpotOnline(id)
         } else {
-            deleteBenchOffline(id)
+            deleteSpotOffline(id)
         }
     }
 
-    private suspend fun deleteBenchOnline(id: Int): Result<Unit> {
+    private suspend fun deleteSpotOnline(id: Int): Result<Unit> {
         return try {
-            api.deleteBench(id)
-            benchDao.deleteById(id)
+            api.deleteSpot(id)
+            spotDao.deleteById(id)
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Online delete failed, marking for offline delete", e)
-            deleteBenchOffline(id)
+            deleteSpotOffline(id)
         }
     }
 
-    private suspend fun deleteBenchOffline(id: Int): Result<Unit> {
+    private suspend fun deleteSpotOffline(id: Int): Result<Unit> {
         return try {
-            val existingEntity = benchDao.getBenchById(id)
+            val existingEntity = spotDao.getSpotById(id)
 
             if (existingEntity != null) {
                 if (existingEntity.syncStatus == SyncStatus.PENDING_CREATE) {
                     // Never synced to server, just delete locally
-                    benchDao.deleteById(id)
+                    spotDao.deleteById(id)
                 } else {
                     // Mark for deletion, will be deleted on server during sync
-                    benchDao.updateSyncStatus(id, SyncStatus.PENDING_DELETE)
+                    spotDao.updateSyncStatus(id, SyncStatus.PENDING_DELETE)
                 }
             }
 

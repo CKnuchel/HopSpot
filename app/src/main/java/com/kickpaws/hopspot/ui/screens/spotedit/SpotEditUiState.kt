@@ -1,12 +1,12 @@
-package com.kickpaws.hopspot.ui.screens.benchedit
+package com.kickpaws.hopspot.ui.screens.spotedit
 
 import android.net.Uri
-import com.kickpaws.hopspot.domain.model.Bench
+import com.kickpaws.hopspot.domain.model.Spot
 import com.kickpaws.hopspot.domain.model.Photo
 
-data class BenchEditUiState(
-    // Bench data
-    val bench: Bench? = null,
+data class SpotEditUiState(
+    // Spot data
+    val spot: Spot? = null,
     val name: String = "",
     val description: String = "",
     val rating: Int? = null,

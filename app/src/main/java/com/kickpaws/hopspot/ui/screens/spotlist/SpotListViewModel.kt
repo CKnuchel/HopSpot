@@ -1,12 +1,12 @@
-package com.kickpaws.hopspot.ui.screens.benchlist
+package com.kickpaws.hopspot.ui.screens.spotlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.analytics.AnalyticsManager
 import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
-import com.kickpaws.hopspot.domain.model.Bench
-import com.kickpaws.hopspot.domain.repository.BenchFilter
-import com.kickpaws.hopspot.domain.repository.BenchRepository
+import com.kickpaws.hopspot.domain.model.Spot
+import com.kickpaws.hopspot.domain.repository.SpotFilter
+import com.kickpaws.hopspot.domain.repository.SpotRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -18,35 +18,35 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class BenchListViewModel @Inject constructor(
-    private val benchRepository: BenchRepository,
+class SpotListViewModel @Inject constructor(
+    private val spotRepository: SpotRepository,
     private val analyticsManager: AnalyticsManager,
     private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(BenchListUiState())
-    val uiState: StateFlow<BenchListUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(SpotListUiState())
+    val uiState: StateFlow<SpotListUiState> = _uiState.asStateFlow()
 
     private var searchJob: Job? = null
 
     init {
-        analyticsManager.logScreenView("BenchList")
-        loadBenches()
+        analyticsManager.logScreenView("SpotList")
+        loadSpots()
     }
 
-    fun loadBenches() {
+    fun loadSpots() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             val filter = buildFilter(page = 1)
-            val result = benchRepository.getBenches(filter)
+            val result = spotRepository.getSpots(filter)
 
             result.fold(
                 onSuccess = { paginated ->
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            benches = paginated.benches,
+                            spots = paginated.spots,
                             currentPage = paginated.page,
                             totalPages = paginated.totalPages,
                             hasMorePages = paginated.page < paginated.totalPages
@@ -70,14 +70,14 @@ class BenchListViewModel @Inject constructor(
             _uiState.update { it.copy(isRefreshing = true) }
 
             val filter = buildFilter(page = 1)
-            val result = benchRepository.getBenches(filter)
+            val result = spotRepository.getSpots(filter)
 
             result.fold(
                 onSuccess = { paginated ->
                     _uiState.update {
                         it.copy(
                             isRefreshing = false,
-                            benches = paginated.benches,
+                            spots = paginated.spots,
                             currentPage = paginated.page,
                             totalPages = paginated.totalPages,
                             hasMorePages = paginated.page < paginated.totalPages,
@@ -97,7 +97,7 @@ class BenchListViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreBenches() {
+    fun loadMoreSpots() {
         val state = _uiState.value
         if (state.isLoadingMore || !state.hasMorePages) return
 
@@ -106,14 +106,14 @@ class BenchListViewModel @Inject constructor(
 
             val nextPage = state.currentPage + 1
             val filter = buildFilter(page = nextPage)
-            val result = benchRepository.getBenches(filter)
+            val result = spotRepository.getSpots(filter)
 
             result.fold(
                 onSuccess = { paginated ->
                     _uiState.update {
                         it.copy(
                             isLoadingMore = false,
-                            benches = it.benches + paginated.benches,
+                            spots = it.spots + paginated.spots,
                             currentPage = paginated.page,
                             totalPages = paginated.totalPages,
                             hasMorePages = paginated.page < paginated.totalPages
@@ -134,13 +134,13 @@ class BenchListViewModel @Inject constructor(
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(300) // Debounce 300ms
-            loadBenches()
+            loadSpots()
         }
     }
 
     fun clearSearch() {
         _uiState.update { it.copy(searchQuery = "") }
-        loadBenches()
+        loadSpots()
     }
 
     // Filter Sheet
@@ -171,12 +171,12 @@ class BenchListViewModel @Inject constructor(
 
     fun setUserLocation(lat: Double, lon: Double) {
         _uiState.update { it.copy(userLat = lat, userLon = lon) }
-        loadBenches()
+        loadSpots()
     }
 
     fun applyFilters() {
         closeFilterSheet()
-        loadBenches()
+        loadSpots()
     }
 
     fun clearFilters() {
@@ -188,33 +188,33 @@ class BenchListViewModel @Inject constructor(
                 sortBy = SortOption.NEWEST
             )
         }
-        loadBenches()
+        loadSpots()
     }
 
     // Delete
-    fun showDeleteConfirmation(bench: Bench) {
-        _uiState.update { it.copy(benchToDelete = bench) }
+    fun showDeleteConfirmation(spot: Spot) {
+        _uiState.update { it.copy(spotToDelete = spot) }
     }
 
     fun hideDeleteConfirmation() {
-        _uiState.update { it.copy(benchToDelete = null) }
+        _uiState.update { it.copy(spotToDelete = null) }
     }
 
-    fun deleteBench() {
-        val bench = _uiState.value.benchToDelete ?: return
+    fun deleteSpot() {
+        val spot = _uiState.value.spotToDelete ?: return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isDeleting = true) }
 
-            val result = benchRepository.deleteBench(bench.id)
+            val result = spotRepository.deleteSpot(spot.id)
 
             result.fold(
                 onSuccess = {
                     _uiState.update {
                         it.copy(
                             isDeleting = false,
-                            benchToDelete = null,
-                            benches = it.benches.filter { b -> b.id != bench.id }
+                            spotToDelete = null,
+                            spots = it.spots.filter { s -> s.id != spot.id }
                         )
                     }
                 },
@@ -222,7 +222,7 @@ class BenchListViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isDeleting = false,
-                            benchToDelete = null,
+                            spotToDelete = null,
                             errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
@@ -231,19 +231,19 @@ class BenchListViewModel @Inject constructor(
         }
     }
 
-    // Random Bench
-    fun getRandomBench() {
+    // Random Spot
+    fun getRandomSpot() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingRandom = true) }
 
-            val result = benchRepository.getRandomBench()
+            val result = spotRepository.getRandomSpot()
 
             result.fold(
-                onSuccess = { bench ->
+                onSuccess = { spot ->
                     _uiState.update {
                         it.copy(
                             isLoadingRandom = false,
-                            randomBenchId = bench.id
+                            randomSpotId = spot.id
                         )
                     }
                 },
@@ -259,13 +259,13 @@ class BenchListViewModel @Inject constructor(
         }
     }
 
-    fun clearRandomBenchId() {
-        _uiState.update { it.copy(randomBenchId = null) }
+    fun clearRandomSpotId() {
+        _uiState.update { it.copy(randomSpotId = null) }
     }
 
-    private fun buildFilter(page: Int): BenchFilter {
+    private fun buildFilter(page: Int): SpotFilter {
         val state = _uiState.value
-        return BenchFilter(
+        return SpotFilter(
             page = page,
             limit = 20,
             sortBy = state.sortBy.apiValue,

@@ -9,13 +9,13 @@ sealed class SyncState {
 
 data class SyncProgress(
     val state: SyncState = SyncState.Idle,
-    val pendingBenchChanges: Int = 0,
+    val pendingSpotChanges: Int = 0,
     val pendingVisitChanges: Int = 0,
     val pendingPhotoUploads: Int = 0,
     val lastSyncTime: Long? = null
 ) {
     val totalPendingChanges: Int
-        get() = pendingBenchChanges + pendingVisitChanges + pendingPhotoUploads
+        get() = pendingSpotChanges + pendingVisitChanges + pendingPhotoUploads
 
     val hasPendingChanges: Boolean
         get() = totalPendingChanges > 0

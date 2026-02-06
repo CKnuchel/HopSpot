@@ -17,11 +17,11 @@ class HopSpotApplication : Application() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "hopspot_benches",
-                "Neue Baenke",
+                "hopspot_spots",
+                "Neue HopSpots",
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = "Benachrichtigungen ueber neue Baenke"
+                description = "Benachrichtigungen ueber neue HopSpots"
             }
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)

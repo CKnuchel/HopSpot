@@ -17,7 +17,7 @@ data class PaginatedVisits(
 
 interface VisitRepository {
     suspend fun getVisits(filter: VisitFilter = VisitFilter()): Result<PaginatedVisits>
-    suspend fun createVisit(benchId: Int): Result<Visit>
+    suspend fun createVisit(spotId: Int): Result<Visit>
     suspend fun deleteVisit(visitId: Int): Result<Unit>
-    suspend fun getVisitCount(benchId: Int): Result<Long>
+    suspend fun getVisitCount(spotId: Int): Result<Long>
 }

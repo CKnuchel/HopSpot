@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 data class VisitEntity(
     @PrimaryKey
     val id: Int,
-    val benchId: Int,
-    val benchName: String,
-    val benchPhotoUrl: String?,
+    val spotId: Int,
+    val spotName: String,
+    val spotPhotoUrl: String?,
     val comment: String?,
     val visitedAt: String,
     val createdAt: String,

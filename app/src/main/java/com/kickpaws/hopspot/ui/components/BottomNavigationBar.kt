@@ -24,7 +24,7 @@ fun BottomNavigationBar(
 ){
     val items = buildList {
         add(BottomNavItem.Map)
-        add(BottomNavItem.BenchList)
+        add(BottomNavItem.SpotList)
         add(BottomNavItem.Visits)
         add(BottomNavItem.Favorites)
         add(BottomNavItem.Profile)

@@ -1,4 +1,4 @@
-package com.kickpaws.hopspot.ui.screens.benchlist
+package com.kickpaws.hopspot.ui.screens.spotlist
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -38,8 +38,8 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.kickpaws.hopspot.R
-import com.kickpaws.hopspot.domain.model.Bench
-import com.kickpaws.hopspot.ui.components.BenchListSkeleton
+import com.kickpaws.hopspot.domain.model.Spot
+import com.kickpaws.hopspot.ui.components.SpotListSkeleton
 import com.kickpaws.hopspot.ui.components.common.HopSpotDeleteConfirmationDialog
 import com.kickpaws.hopspot.ui.components.common.HopSpotEmptyView
 import com.kickpaws.hopspot.ui.components.common.HopSpotErrorView
@@ -53,10 +53,10 @@ import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BenchListScreen(
-    onBenchClick: (Int) -> Unit,
-    onCreateBenchClick: () -> Unit,
-    viewModel: BenchListViewModel = hiltViewModel()
+fun SpotListScreen(
+    onSpotClick: (Int) -> Unit,
+    onCreateSpotClick: () -> Unit,
+    viewModel: SpotListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colorScheme = MaterialTheme.colorScheme
@@ -64,11 +64,11 @@ fun BenchListScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    // Navigate to random bench when ID is set
-    LaunchedEffect(uiState.randomBenchId) {
-        uiState.randomBenchId?.let { benchId ->
-            onBenchClick(benchId)
-            viewModel.clearRandomBenchId()
+    // Navigate to random spot when ID is set
+    LaunchedEffect(uiState.randomSpotId) {
+        uiState.randomSpotId?.let { spotId ->
+            onSpotClick(spotId)
+            viewModel.clearRandomSpotId()
         }
     }
 
@@ -117,13 +117,13 @@ fun BenchListScreen(
     val shouldLoadMore = remember {
         derivedStateOf {
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            lastVisibleItem >= uiState.benches.size - 3
+            lastVisibleItem >= uiState.spots.size - 3
         }
     }
 
     LaunchedEffect(shouldLoadMore.value) {
         if (shouldLoadMore.value && uiState.hasMorePages && !uiState.isLoadingMore) {
-            viewModel.loadMoreBenches()
+            viewModel.loadMoreSpots()
         }
     }
 
@@ -142,11 +142,11 @@ fun BenchListScreen(
     }
 
     // Delete Confirmation Dialog
-    if (uiState.benchToDelete != null) {
+    if (uiState.spotToDelete != null) {
         HopSpotDeleteConfirmationDialog(
-            title = stringResource(R.string.dialog_delete_bench_title),
-            message = stringResource(R.string.dialog_delete_bench_message, uiState.benchToDelete!!.name),
-            onConfirm = viewModel::deleteBench,
+            title = stringResource(R.string.dialog_delete_spot_title),
+            message = stringResource(R.string.dialog_delete_spot_message, uiState.spotToDelete!!.name),
+            onConfirm = viewModel::deleteSpot,
             onDismiss = viewModel::hideDeleteConfirmation,
             icon = Icons.Default.Delete,
             isLoading = uiState.isDeleting
@@ -170,9 +170,9 @@ fun BenchListScreen(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Random Bench FAB
+                // Random Spot FAB
                 SmallFloatingActionButton(
-                    onClick = { viewModel.getRandomBench() },
+                    onClick = { viewModel.getRandomSpot() },
                     containerColor = colorScheme.secondaryContainer,
                     contentColor = colorScheme.onSecondaryContainer
                 ) {
@@ -185,20 +185,20 @@ fun BenchListScreen(
                     } else {
                         Icon(
                             imageVector = Icons.Default.Casino,
-                            contentDescription = stringResource(R.string.cd_random_bench)
+                            contentDescription = stringResource(R.string.cd_random_spot)
                         )
                     }
                 }
 
-                // Create Bench FAB
+                // Create Spot FAB
                 FloatingActionButton(
-                    onClick = onCreateBenchClick,
+                    onClick = onCreateSpotClick,
                     containerColor = colorScheme.primary,
                     contentColor = colorScheme.onPrimary
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.cd_add_bench)
+                        contentDescription = stringResource(R.string.cd_add_spot)
                     )
                 }
             }
@@ -212,22 +212,22 @@ fun BenchListScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    BenchListSkeleton()
+                    SpotListSkeleton()
                 }
 
-                uiState.errorMessage != null && uiState.benches.isEmpty() -> {
+                uiState.errorMessage != null && uiState.spots.isEmpty() -> {
                     HopSpotErrorView(
                         message = uiState.errorMessage!!,
-                        onRetry = viewModel::loadBenches,
+                        onRetry = viewModel::loadSpots,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
 
-                uiState.benches.isEmpty() -> {
+                uiState.spots.isEmpty() -> {
                     HopSpotEmptyView(
                         icon = Icons.Default.Chair,
-                        title = stringResource(R.string.empty_benches_title),
-                        subtitle = stringResource(R.string.empty_benches_subtitle),
+                        title = stringResource(R.string.empty_spots_title),
+                        subtitle = stringResource(R.string.empty_spots_subtitle),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -243,13 +243,13 @@ fun BenchListScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(
-                                items = uiState.benches,
+                                items = uiState.spots,
                                 key = { it.id }
-                            ) { bench ->
-                                BenchListItem(
-                                    bench = bench,
-                                    onClick = { onBenchClick(bench.id) },
-                                    onLongClick = { viewModel.showDeleteConfirmation(bench) }
+                            ) { spot ->
+                                SpotListItem(
+                                    spot = spot,
+                                    onClick = { onSpotClick(spot.id) },
+                                    onLongClick = { viewModel.showDeleteConfirmation(spot) }
                                 )
                             }
 
@@ -349,8 +349,8 @@ private fun SearchTopBar(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun BenchListItem(
-    bench: Bench,
+private fun SpotListItem(
+    spot: Spot,
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
@@ -385,14 +385,14 @@ private fun BenchListItem(
                     .background(colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
-                if (bench.mainPhotoUrl != null) {
+                if (spot.mainPhotoUrl != null) {
                     AsyncImage(
-                        model = bench.mainPhotoUrl,
-                        contentDescription = bench.name,
+                        model = spot.mainPhotoUrl,
+                        contentDescription = spot.name,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        placeholder = painterResource(R.drawable.placeholder_bench),
-                        error = painterResource(R.drawable.placeholder_bench)
+                        placeholder = painterResource(R.drawable.placeholder_spot),
+                        error = painterResource(R.drawable.placeholder_spot)
                     )
                 } else {
                     // Fallback wenn kein Bild
@@ -412,7 +412,7 @@ private fun BenchListItem(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = bench.name,
+                    text = spot.name,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = colorScheme.onSurface,
@@ -423,19 +423,19 @@ private fun BenchListItem(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 // Rating
-                if (bench.rating != null) {
+                if (spot.rating != null) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         repeat(5) { index ->
                             Icon(
-                                imageVector = if (index < bench.rating) {
+                                imageVector = if (index < spot.rating) {
                                     Icons.Default.Star
                                 } else {
                                     Icons.Default.StarBorder
                                 },
                                 contentDescription = null,
-                                tint = if (index < bench.rating) {
+                                tint = if (index < spot.rating) {
                                     colorScheme.primary
                                 } else {
                                     colorScheme.outline
@@ -452,7 +452,7 @@ private fun BenchListItem(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    if (bench.hasToilet) {
+                    if (spot.hasToilet) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -471,7 +471,7 @@ private fun BenchListItem(
                         }
                     }
 
-                    if (bench.hasTrashBin) {
+                    if (spot.hasTrashBin) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -491,7 +491,7 @@ private fun BenchListItem(
                     }
 
                     // Distance
-                    if (bench.distance != null) {
+                    if (spot.distance != null) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -503,7 +503,7 @@ private fun BenchListItem(
                             )
                             Spacer(modifier = Modifier.width(2.dp))
                             Text(
-                                text = formatDistance(bench.distance),
+                                text = formatDistance(spot.distance),
                                 fontSize = 12.sp,
                                 color = colorScheme.secondary,
                                 fontWeight = FontWeight.Medium
@@ -525,7 +525,7 @@ private fun BenchListItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FilterBottomSheet(
-    uiState: BenchListUiState,
+    uiState: SpotListUiState,
     onDismiss: () -> Unit,
     onHasToiletChange: (Boolean?) -> Unit,
     onHasTrashBinChange: (Boolean?) -> Unit,
@@ -548,7 +548,7 @@ private fun FilterBottomSheet(
                 .padding(24.dp)
         ) {
             Text(
-                text = stringResource(R.string.bench_list_filter_title),
+                text = stringResource(R.string.spot_list_filter_title),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.onSurface
@@ -558,7 +558,7 @@ private fun FilterBottomSheet(
 
             // Sort Options
             Text(
-                text = stringResource(R.string.bench_list_sort_by),
+                text = stringResource(R.string.spot_list_sort_by),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurfaceVariant
@@ -600,7 +600,7 @@ private fun FilterBottomSheet(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = stringResource(R.string.bench_list_filter_toilet),
+                        text = stringResource(R.string.spot_list_filter_toilet),
                         color = colorScheme.onSurface
                     )
                 }
@@ -635,7 +635,7 @@ private fun FilterBottomSheet(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = stringResource(R.string.bench_list_filter_trash),
+                        text = stringResource(R.string.spot_list_filter_trash),
                         color = colorScheme.onSurface
                     )
                 }
@@ -656,7 +656,7 @@ private fun FilterBottomSheet(
 
             // Min Rating Filter
             Text(
-                text = stringResource(R.string.bench_list_filter_min_rating),
+                text = stringResource(R.string.spot_list_filter_min_rating),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurfaceVariant
@@ -673,7 +673,7 @@ private fun FilterBottomSheet(
                         onClick = { onMinRatingChange(rating) },
                         label = {
                             if (rating == null) {
-                                Text(stringResource(R.string.bench_list_filter_all))
+                                Text(stringResource(R.string.spot_list_filter_all))
                             } else {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text("$rating")

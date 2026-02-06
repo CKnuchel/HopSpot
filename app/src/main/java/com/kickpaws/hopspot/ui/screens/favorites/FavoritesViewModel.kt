@@ -137,7 +137,7 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isRemoving = true) }
 
-            val result = favoriteRepository.removeFavorite(favoriteToRemove.benchId)
+            val result = favoriteRepository.removeFavorite(favoriteToRemove.spotId)
 
             result.fold(
                 onSuccess = {

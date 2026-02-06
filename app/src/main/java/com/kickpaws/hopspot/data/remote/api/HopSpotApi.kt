@@ -48,9 +48,9 @@ interface HopSpotApi {
         @Body request: ChangePasswordRequest
     )
 
-    // Bench Endpoints
-    @GET("api/v1/benches")
-    suspend fun getBenches(
+    // Spot Endpoints
+    @GET("api/v1/spots")
+    suspend fun getSpots(
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 50,
         @Query("sort_by") sortBy: String? = null,
@@ -62,30 +62,30 @@ interface HopSpotApi {
         @Query("lat") lat: Double? = null,
         @Query("lon") lon: Double? = null,
         @Query("radius") radius: Int? = null
-    ): ApiResponse<PaginatedBenchesDto>
+    ): ApiResponse<PaginatedSpotsDto>
 
-    @GET("api/v1/benches/{id}")
-    suspend fun getBench(
+    @GET("api/v1/spots/{id}")
+    suspend fun getSpot(
         @Path("id") id: Int
-    ): ApiResponse<BenchDto>
+    ): ApiResponse<SpotDto>
 
-    @GET("api/v1/benches/random")
-    suspend fun getRandomBench(): ApiResponse<BenchDto>
+    @GET("api/v1/spots/random")
+    suspend fun getRandomSpot(): ApiResponse<SpotDto>
 
     // Favorite Endpoints
-    @GET("api/v1/benches/{id}/favorite")
+    @GET("api/v1/spots/{id}/favorite")
     suspend fun checkFavorite(
-        @Path("id") benchId: Int
+        @Path("id") spotId: Int
     ): Map<String, Boolean>
 
-    @POST("api/v1/benches/{id}/favorite")
+    @POST("api/v1/spots/{id}/favorite")
     suspend fun addFavorite(
-        @Path("id") benchId: Int
+        @Path("id") spotId: Int
     ): Map<String, Boolean>
 
-    @DELETE("api/v1/benches/{id}/favorite")
+    @DELETE("api/v1/spots/{id}/favorite")
     suspend fun removeFavorite(
-        @Path("id") benchId: Int
+        @Path("id") spotId: Int
     ): Map<String, Boolean>
 
     @GET("api/v1/favorites")
@@ -94,32 +94,32 @@ interface HopSpotApi {
         @Query("limit") limit: Int = 50
     ): PaginatedFavoritesDto
 
-    @POST("api/v1/benches")
-    suspend fun createBench(
-        @Body request: CreateBenchRequest
-    ): ApiResponse<BenchDto>
+    @POST("api/v1/spots")
+    suspend fun createSpot(
+        @Body request: CreateSpotRequest
+    ): ApiResponse<SpotDto>
 
-    @PATCH("api/v1/benches/{id}")
-    suspend fun updateBench(
+    @PATCH("api/v1/spots/{id}")
+    suspend fun updateSpot(
         @Path("id") id: Int,
-        @Body request: UpdateBenchRequest
-    ): ApiResponse<BenchDto>
+        @Body request: UpdateSpotRequest
+    ): ApiResponse<SpotDto>
 
-    @DELETE("api/v1/benches/{id}")
-    suspend fun deleteBench(
+    @DELETE("api/v1/spots/{id}")
+    suspend fun deleteSpot(
         @Path("id") id: Int
     )
 
     // Photo Endpoints
-    @GET("api/v1/benches/{id}/photos")
+    @GET("api/v1/spots/{id}/photos")
     suspend fun getPhotos(
-        @Path("id") benchId: Int
+        @Path("id") spotId: Int
     ): List<PhotoDto>
 
     @Multipart
-    @POST("api/v1/benches/{id}/photos")
+    @POST("api/v1/spots/{id}/photos")
     suspend fun uploadPhoto(
-        @Path("id") benchId: Int,
+        @Path("id") spotId: Int,
         @Part photo: MultipartBody.Part,
         @Part("is_main") isMain: RequestBody
     ): PhotoDto
@@ -145,7 +145,7 @@ interface HopSpotApi {
     suspend fun getVisits(
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 50,
-        @Query("bench_id") benchId: Int? = null,
+        @Query("spot_id") spotId: Int? = null,
         @Query("sort_order") sortOrder: String? = null
     ): PaginatedVisitsDto
 
@@ -159,9 +159,9 @@ interface HopSpotApi {
         @Path("id") visitId: Int
     )
 
-    @GET("api/v1/benches/{id}/visits/count")
+    @GET("api/v1/spots/{id}/visits/count")
     suspend fun getVisitCount(
-        @Path("id") benchId: Int
+        @Path("id") spotId: Int
     ): VisitCountDto
 
     // Weather Endpoints

@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class PendingPhotoEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val benchId: Int,
+    val spotId: Int,
     val localFilePath: String,
     val isMain: Boolean = false,
     val createdAt: Long = System.currentTimeMillis()

@@ -1,25 +1,25 @@
 package com.kickpaws.hopspot.data.repository
 
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
-import com.kickpaws.hopspot.data.remote.dto.CreateBenchRequest
-import com.kickpaws.hopspot.data.remote.dto.UpdateBenchRequest
+import com.kickpaws.hopspot.data.remote.dto.CreateSpotRequest
+import com.kickpaws.hopspot.data.remote.dto.UpdateSpotRequest
 import com.kickpaws.hopspot.data.remote.error.ApiErrorParser
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
-import com.kickpaws.hopspot.domain.model.Bench
-import com.kickpaws.hopspot.domain.repository.BenchFilter
-import com.kickpaws.hopspot.domain.repository.BenchRepository
-import com.kickpaws.hopspot.domain.repository.PaginatedBenches
+import com.kickpaws.hopspot.domain.model.Spot
+import com.kickpaws.hopspot.domain.repository.SpotFilter
+import com.kickpaws.hopspot.domain.repository.SpotRepository
+import com.kickpaws.hopspot.domain.repository.PaginatedSpots
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BenchRepositoryImpl @Inject constructor(
+class SpotRepositoryImpl @Inject constructor(
     private val api: HopSpotApi
-) : BenchRepository {
+) : SpotRepository {
 
-    override suspend fun getBenches(filter: BenchFilter): Result<PaginatedBenches> {
+    override suspend fun getSpots(filter: SpotFilter): Result<PaginatedSpots> {
         return try {
-            val apiResponse = api.getBenches(
+            val apiResponse = api.getSpots(
                 page = filter.page,
                 limit = filter.limit,
                 sortBy = filter.sortBy,
@@ -35,15 +35,15 @@ class BenchRepositoryImpl @Inject constructor(
 
             // Unwrap from "data" wrapper
             val response = apiResponse.data
-            val benches = response.benches?.map { it.toDomain() } ?: emptyList()
+            val spots = response.spots?.map { it.toDomain() } ?: emptyList()
             val pagination = response.pagination
 
             Result.success(
-                PaginatedBenches(
-                    benches = benches,
+                PaginatedSpots(
+                    spots = spots,
                     page = pagination?.page ?: 1,
                     limit = pagination?.limit ?: filter.limit,
-                    total = pagination?.total?.toInt() ?: benches.size,
+                    total = pagination?.total?.toInt() ?: spots.size,
                     totalPages = pagination?.totalPages ?: 1
                 )
             )
@@ -52,25 +52,25 @@ class BenchRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBench(id: Int): Result<Bench> {
+    override suspend fun getSpot(id: Int): Result<Spot> {
         return try {
-            val response = api.getBench(id)
+            val response = api.getSpot(id)
             Result.success(response.data.toDomain())
         } catch (e: Exception) {
             Result.failure(ApiErrorParser.parse(e))
         }
     }
 
-    override suspend fun getRandomBench(): Result<Bench> {
+    override suspend fun getRandomSpot(): Result<Spot> {
         return try {
-            val response = api.getRandomBench()
+            val response = api.getRandomSpot()
             Result.success(response.data.toDomain())
         } catch (e: Exception) {
             Result.failure(ApiErrorParser.parse(e))
         }
     }
 
-    override suspend fun createBench(
+    override suspend fun createSpot(
         name: String,
         latitude: Double,
         longitude: Double,
@@ -78,9 +78,9 @@ class BenchRepositoryImpl @Inject constructor(
         rating: Int?,
         hasToilet: Boolean,
         hasTrashBin: Boolean
-    ): Result<Bench> {
+    ): Result<Spot> {
         return try {
-            val request = CreateBenchRequest(
+            val request = CreateSpotRequest(
                 name = name,
                 latitude = latitude,
                 longitude = longitude,
@@ -89,16 +89,16 @@ class BenchRepositoryImpl @Inject constructor(
                 hasToilet = hasToilet,
                 hasTrashBin = hasTrashBin
             )
-            val response = api.createBench(request)
+            val response = api.createSpot(request)
             Result.success(response.data.toDomain())
         } catch (e: Exception) {
             Result.failure(ApiErrorParser.parse(e))
         }
     }
 
-    override suspend fun updateBench(id: Int, updates: Map<String, Any?>): Result<Bench> {
+    override suspend fun updateSpot(id: Int, updates: Map<String, Any?>): Result<Spot> {
         return try {
-            val request = UpdateBenchRequest(
+            val request = UpdateSpotRequest(
                 name = updates["name"] as? String,
                 latitude = updates["latitude"] as? Double,
                 longitude = updates["longitude"] as? Double,
@@ -107,16 +107,16 @@ class BenchRepositoryImpl @Inject constructor(
                 hasToilet = updates["hasToilet"] as? Boolean,
                 hasTrashBin = updates["hasTrashBin"] as? Boolean
             )
-            val response = api.updateBench(id, request)
+            val response = api.updateSpot(id, request)
             Result.success(response.data.toDomain())
         } catch (e: Exception) {
             Result.failure(ApiErrorParser.parse(e))
         }
     }
 
-    override suspend fun deleteBench(id: Int): Result<Unit> {
+    override suspend fun deleteSpot(id: Int): Result<Unit> {
         return try {
-            api.deleteBench(id)
+            api.deleteSpot(id)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(ApiErrorParser.parse(e))

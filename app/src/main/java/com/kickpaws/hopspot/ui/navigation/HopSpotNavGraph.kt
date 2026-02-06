@@ -12,10 +12,10 @@ import com.kickpaws.hopspot.ui.screens.activityfeed.ActivityFeedScreen
 import com.kickpaws.hopspot.ui.screens.admin.AdminScreen
 import com.kickpaws.hopspot.ui.screens.auth.LoginScreen
 import com.kickpaws.hopspot.ui.screens.auth.RegisterScreen
-import com.kickpaws.hopspot.ui.screens.benchcreate.BenchCreateScreen
-import com.kickpaws.hopspot.ui.screens.benchdetail.BenchDetailScreen
-import com.kickpaws.hopspot.ui.screens.benchedit.BenchEditScreen
-import com.kickpaws.hopspot.ui.screens.benchlist.BenchListScreen
+import com.kickpaws.hopspot.ui.screens.spotcreate.SpotCreateScreen
+import com.kickpaws.hopspot.ui.screens.spotdetail.SpotDetailScreen
+import com.kickpaws.hopspot.ui.screens.spotedit.SpotEditScreen
+import com.kickpaws.hopspot.ui.screens.spotlist.SpotListScreen
 import com.kickpaws.hopspot.ui.screens.favorites.FavoritesScreen
 import com.kickpaws.hopspot.ui.screens.map.MapScreen
 import com.kickpaws.hopspot.ui.screens.profile.ProfileScreen
@@ -27,11 +27,11 @@ fun HopSpotNavGraph(
     modifier: Modifier = Modifier,
     navController : NavHostController,
     startDestination : String = Route.Splash.route,
-    deepLinkBenchId: Int? = null
+    deepLinkSpotId: Int? = null
 ){
-    LaunchedEffect(deepLinkBenchId) {
-        deepLinkBenchId?.let { benchId ->
-            navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+    LaunchedEffect(deepLinkSpotId) {
+        deepLinkSpotId?.let { spotId ->
+            navController.navigate(Route.SpotDetail.createRoute(spotId.toString()))
         }
     }
 
@@ -81,53 +81,53 @@ fun HopSpotNavGraph(
             )
         }
 
-        composable(route = Route.BenchList.route) {
-            BenchListScreen(
-                onBenchClick = { benchId ->
-                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+        composable(route = Route.SpotList.route) {
+            SpotListScreen(
+                onSpotClick = { spotId ->
+                    navController.navigate(Route.SpotDetail.createRoute(spotId.toString()))
                 },
-                onCreateBenchClick = {
-                    navController.navigate(Route.BenchCreate.route)
+                onCreateSpotClick = {
+                    navController.navigate(Route.SpotCreate.route)
                 }
             )
         }
 
         composable(
-            route = Route.BenchDetail.route,
-            arguments = listOf(navArgument("benchId") { type = NavType.IntType })
+            route = Route.SpotDetail.route,
+            arguments = listOf(navArgument("spotId") { type = NavType.IntType })
         ) { backStackEntry ->
-            val benchId = backStackEntry.arguments?.getInt("benchId") ?: return@composable
-            BenchDetailScreen(
-                benchId = benchId,
+            val spotId = backStackEntry.arguments?.getInt("spotId") ?: return@composable
+            SpotDetailScreen(
+                spotId = spotId,
                 onNavigateBack = { navController.popBackStack() },
                 onEditClick = { id ->
-                    navController.navigate(Route.BenchEdit.createRoute(id.toString()))
+                    navController.navigate(Route.SpotEdit.createRoute(id.toString()))
                 }
             )
         }
 
-        composable(route = Route.BenchCreate.route) {
-            BenchCreateScreen(
+        composable(route = Route.SpotCreate.route) {
+            SpotCreateScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onBenchCreated = { benchId ->
-                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString())) {
-                        popUpTo(Route.BenchCreate.route) { inclusive = true }
+                onSpotCreated = { spotId ->
+                    navController.navigate(Route.SpotDetail.createRoute(spotId.toString())) {
+                        popUpTo(Route.SpotCreate.route) { inclusive = true }
                     }
                 }
             )
         }
 
         composable(
-            route = Route.BenchEdit.route,
-            arguments = listOf(navArgument("benchId") { type = NavType.IntType })
+            route = Route.SpotEdit.route,
+            arguments = listOf(navArgument("spotId") { type = NavType.IntType })
         ) { backStackEntry ->
-            val benchId = backStackEntry.arguments?.getInt("benchId") ?: return@composable
-            BenchEditScreen(
-                benchId = benchId,
+            val spotId = backStackEntry.arguments?.getInt("spotId") ?: return@composable
+            SpotEditScreen(
+                spotId = spotId,
                 onNavigateBack = { navController.popBackStack() },
                 onDeleted = {
-                    navController.navigate(Route.BenchList.route) {
-                        popUpTo(Route.BenchList.route) { inclusive = true }
+                    navController.navigate(Route.SpotList.route) {
+                        popUpTo(Route.SpotList.route) { inclusive = true }
                     }
                 }
             )
@@ -135,11 +135,11 @@ fun HopSpotNavGraph(
 
         composable(route = Route.Map.route){
             MapScreen(
-                onBenchClick = { benchId ->
-                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+                onSpotClick = { spotId ->
+                    navController.navigate(Route.SpotDetail.createRoute(spotId.toString()))
                 },
-                onCreateBenchClick = {
-                    navController.navigate(Route.BenchCreate.route)
+                onCreateSpotClick = {
+                    navController.navigate(Route.SpotCreate.route)
                 },
                 onActivityFeedClick = {
                     navController.navigate(Route.ActivityFeed.route)
@@ -149,8 +149,8 @@ fun HopSpotNavGraph(
 
         composable(route = Route.ActivityFeed.route) {
             ActivityFeedScreen(
-                onBenchClick = { benchId ->
-                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+                onSpotClick = { spotId ->
+                    navController.navigate(Route.SpotDetail.createRoute(spotId.toString()))
                 },
                 onBackClick = { navController.popBackStack() }
             )
@@ -158,16 +158,16 @@ fun HopSpotNavGraph(
 
         composable(route = Route.Visits.route) {
             VisitsScreen(
-                onBenchClick = { benchId ->
-                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+                onSpotClick = { spotId ->
+                    navController.navigate(Route.SpotDetail.createRoute(spotId.toString()))
                 }
             )
         }
 
         composable(route = Route.Favorites.route) {
             FavoritesScreen(
-                onBenchClick = { benchId ->
-                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+                onSpotClick = { spotId ->
+                    navController.navigate(Route.SpotDetail.createRoute(spotId.toString()))
                 }
             )
         }

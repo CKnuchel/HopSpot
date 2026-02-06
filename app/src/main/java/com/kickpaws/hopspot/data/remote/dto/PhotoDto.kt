@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class PhotoDto(
     val id: Int,
-    @SerializedName("bench_id")
-    val benchId: Int,
+    @SerializedName("spot_id")
+    val spotId: Int,
     @SerializedName("is_main")
     val isMain: Boolean,
     @SerializedName("url_original")

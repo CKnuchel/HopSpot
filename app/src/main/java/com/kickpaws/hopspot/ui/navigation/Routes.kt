@@ -15,22 +15,22 @@ sealed interface  Route {
         override val route = "register"
     }
 
-    object BenchList : Route{
-        override val route = "bench_list"
+    object SpotList : Route{
+        override val route = "spot_list"
     }
 
-    object BenchDetail : Route{
-        override val route = "bench_detail/{benchId}"
-        fun createRoute(benchId: String) = "bench_detail/$benchId"
+    object SpotDetail : Route{
+        override val route = "spot_detail/{spotId}"
+        fun createRoute(spotId: String) = "spot_detail/$spotId"
     }
 
-    object BenchCreate : Route{
-        override val route = "bench_create"
+    object SpotCreate : Route{
+        override val route = "spot_create"
     }
 
-    object BenchEdit : Route{
-        override val route = "bench_edit/{benchId}"
-        fun createRoute(benchId: String) = "bench_edit/$benchId"
+    object SpotEdit : Route{
+        override val route = "spot_edit/{spotId}"
+        fun createRoute(spotId: String) = "spot_edit/$spotId"
     }
 
     object Map : Route{

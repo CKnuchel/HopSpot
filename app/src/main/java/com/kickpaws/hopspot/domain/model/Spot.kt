@@ -1,11 +1,6 @@
-package com.kickpaws.hopspot.data.local.entity
+package com.kickpaws.hopspot.domain.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "benches")
-data class BenchEntity(
-    @PrimaryKey
+data class Spot(
     val id: Int,
     val name: String,
     val latitude: Double,
@@ -19,7 +14,5 @@ data class BenchEntity(
     val createdById: Int?,
     val createdByName: String?,
     val createdAt: String?,
-    val updatedAt: String?,
-    val syncStatus: SyncStatus = SyncStatus.SYNCED,
-    val locallyModifiedAt: Long = System.currentTimeMillis()
+    val updatedAt: String?
 )

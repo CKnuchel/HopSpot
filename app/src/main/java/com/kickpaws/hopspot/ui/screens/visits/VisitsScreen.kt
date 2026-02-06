@@ -42,7 +42,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VisitsScreen(
-    onBenchClick: (Int) -> Unit,
+    onSpotClick: (Int) -> Unit,
     viewModel: VisitsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -65,7 +65,7 @@ fun VisitsScreen(
     if (uiState.visitToDelete != null) {
         HopSpotDeleteConfirmationDialog(
             title = stringResource(R.string.dialog_delete_visit_title),
-            message = stringResource(R.string.dialog_delete_visit_message, uiState.visitToDelete!!.benchName),
+            message = stringResource(R.string.dialog_delete_visit_message, uiState.visitToDelete!!.spotName),
             onConfirm = { viewModel.confirmDelete() },
             onDismiss = { viewModel.dismissDeleteDialog() },
             icon = Icons.Default.Delete,
@@ -127,7 +127,7 @@ fun VisitsScreen(
                             ) { visit ->
                                 SwipeableVisitItem(
                                     visit = visit,
-                                    onClick = { onBenchClick(visit.benchId) },
+                                    onClick = { onSpotClick(visit.spotId) },
                                     onDelete = { viewModel.showDeleteDialog(visit) }
                                 )
                             }
@@ -243,10 +243,10 @@ private fun VisitListItem(
                     .background(colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
-                if (visit.benchPhotoUrl != null) {
+                if (visit.spotPhotoUrl != null) {
                     AsyncImage(
-                        model = visit.benchPhotoUrl,
-                        contentDescription = visit.benchName,
+                        model = visit.spotPhotoUrl,
+                        contentDescription = visit.spotName,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                         placeholder = painterResource(R.drawable.ic_beer_marker),
@@ -266,7 +266,7 @@ private fun VisitListItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = visit.benchName,
+                    text = visit.spotName,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = colorScheme.onSurface,

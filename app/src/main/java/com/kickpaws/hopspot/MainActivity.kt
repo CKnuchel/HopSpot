@@ -45,11 +45,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val benchIdFromNotification = intent.extras?.getInt("bench_id")?.takeIf { it > 0 }
+        val spotIdFromNotification = intent.extras?.getInt("spot_id")?.takeIf { it > 0 }
 
         // Track notification opened event
-        if (benchIdFromNotification != null) {
-            analyticsManager.logNotificationOpened(benchIdFromNotification)
+        if (spotIdFromNotification != null) {
+            analyticsManager.logNotificationOpened(spotIdFromNotification)
         }
 
         enableEdgeToEdge()
@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
 
                 val showBottomBar = currentRoute in listOf(
                     Route.Map.route,
-                    Route.BenchList.route,
+                    Route.SpotList.route,
                     Route.Visits.route,
                     Route.Favorites.route,
                     Route.Profile.route,
@@ -106,7 +106,7 @@ class MainActivity : ComponentActivity() {
                     HopSpotNavGraph(
                         navController = navController,
                         modifier = Modifier.padding(innerPadding),
-                        deepLinkBenchId = benchIdFromNotification
+                        deepLinkSpotId = spotIdFromNotification
                     )
                 }
             }

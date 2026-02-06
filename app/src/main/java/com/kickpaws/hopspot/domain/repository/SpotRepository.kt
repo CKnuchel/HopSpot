@@ -1,8 +1,8 @@
 package com.kickpaws.hopspot.domain.repository
 
-import com.kickpaws.hopspot.domain.model.Bench
+import com.kickpaws.hopspot.domain.model.Spot
 
-data class BenchFilter(
+data class SpotFilter(
     val page: Int = 1,
     val limit: Int = 50,
     val sortBy: String? = null,
@@ -16,19 +16,19 @@ data class BenchFilter(
     val radius: Int? = null
 )
 
-data class PaginatedBenches(
-    val benches: List<Bench>,
+data class PaginatedSpots(
+    val spots: List<Spot>,
     val page: Int,
     val limit: Int,
     val total: Int,
     val totalPages: Int
 )
 
-interface BenchRepository {
-    suspend fun getBenches(filter: BenchFilter = BenchFilter()): Result<PaginatedBenches>
-    suspend fun getBench(id: Int): Result<Bench>
-    suspend fun getRandomBench(): Result<Bench>
-    suspend fun createBench(
+interface SpotRepository {
+    suspend fun getSpots(filter: SpotFilter = SpotFilter()): Result<PaginatedSpots>
+    suspend fun getSpot(id: Int): Result<Spot>
+    suspend fun getRandomSpot(): Result<Spot>
+    suspend fun createSpot(
         name: String,
         latitude: Double,
         longitude: Double,
@@ -36,7 +36,7 @@ interface BenchRepository {
         rating: Int? = null,
         hasToilet: Boolean = false,
         hasTrashBin: Boolean = false
-    ): Result<Bench>
-    suspend fun updateBench(id: Int, updates: Map<String, Any?>): Result<Bench>
-    suspend fun deleteBench(id: Int): Result<Unit>
+    ): Result<Spot>
+    suspend fun updateSpot(id: Int, updates: Map<String, Any?>): Result<Spot>
+    suspend fun deleteSpot(id: Int): Result<Unit>
 }

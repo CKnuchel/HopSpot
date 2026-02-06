@@ -1,7 +1,7 @@
 package com.kickpaws.hopspot.data.repository
 
 import android.util.Log
-import com.kickpaws.hopspot.data.local.dao.BenchDao
+import com.kickpaws.hopspot.data.local.dao.SpotDao
 import com.kickpaws.hopspot.data.local.dao.VisitDao
 import com.kickpaws.hopspot.data.local.entity.SyncStatus
 import com.kickpaws.hopspot.data.local.entity.VisitEntity
@@ -24,7 +24,7 @@ import kotlin.math.ceil
 class OfflineFirstVisitRepository @Inject constructor(
     private val api: HopSpotApi,
     private val visitDao: VisitDao,
-    private val benchDao: BenchDao,
+    private val spotDao: SpotDao,
     private val networkMonitor: NetworkMonitor
 ) : VisitRepository {
 
@@ -101,18 +101,18 @@ class OfflineFirstVisitRepository @Inject constructor(
         }
     }
 
-    override suspend fun createVisit(benchId: Int): Result<Visit> {
+    override suspend fun createVisit(spotId: Int): Result<Visit> {
         return if (networkMonitor.isOnlineNow) {
-            createVisitOnline(benchId)
+            createVisitOnline(spotId)
         } else {
-            createVisitOffline(benchId)
+            createVisitOffline(spotId)
         }
     }
 
-    private suspend fun createVisitOnline(benchId: Int): Result<Visit> {
+    private suspend fun createVisitOnline(spotId: Int): Result<Visit> {
         return try {
             val request = CreateVisitRequest(
-                benchId = benchId,
+                spotId = spotId,
                 visitedAt = null,
                 comment = null
             )
@@ -125,16 +125,16 @@ class OfflineFirstVisitRepository @Inject constructor(
             Result.success(visit)
         } catch (e: Exception) {
             Log.e(TAG, "Online create failed, creating offline", e)
-            createVisitOffline(benchId)
+            createVisitOffline(spotId)
         }
     }
 
-    private suspend fun createVisitOffline(benchId: Int): Result<Visit> {
+    private suspend fun createVisitOffline(spotId: Int): Result<Visit> {
         return try {
-            // Get bench info for the visit
-            val bench = benchDao.getBenchById(benchId)
-            val benchName = bench?.name ?: "Unknown Bench"
-            val benchPhotoUrl = bench?.mainPhotoUrl
+            // Get spot info for the visit
+            val spot = spotDao.getSpotById(spotId)
+            val spotName = spot?.name ?: "Unknown Spot"
+            val spotPhotoUrl = spot?.mainPhotoUrl
 
             // Generate temporary negative ID for offline-created visit
             val tempId = TEMP_ID_START - System.currentTimeMillis().toInt()
@@ -142,9 +142,9 @@ class OfflineFirstVisitRepository @Inject constructor(
 
             val entity = VisitEntity(
                 id = tempId,
-                benchId = benchId,
-                benchName = benchName,
-                benchPhotoUrl = benchPhotoUrl,
+                spotId = spotId,
+                spotName = spotName,
+                spotPhotoUrl = spotPhotoUrl,
                 comment = null,
                 visitedAt = now,
                 createdAt = now,
@@ -198,23 +198,23 @@ class OfflineFirstVisitRepository @Inject constructor(
         }
     }
 
-    override suspend fun getVisitCount(benchId: Int): Result<Long> {
+    override suspend fun getVisitCount(spotId: Int): Result<Long> {
         return if (networkMonitor.isOnlineNow) {
             try {
-                val response = api.getVisitCount(benchId)
+                val response = api.getVisitCount(spotId)
                 Result.success(response.count)
             } catch (e: Exception) {
                 Log.e(TAG, "API fetch failed, falling back to local", e)
-                getVisitCountFromLocal(benchId)
+                getVisitCountFromLocal(spotId)
             }
         } else {
-            getVisitCountFromLocal(benchId)
+            getVisitCountFromLocal(spotId)
         }
     }
 
-    private suspend fun getVisitCountFromLocal(benchId: Int): Result<Long> {
+    private suspend fun getVisitCountFromLocal(spotId: Int): Result<Long> {
         return try {
-            val count = visitDao.getVisitCountForBench(benchId)
+            val count = visitDao.getVisitCountForSpot(spotId)
             Result.success(count)
         } catch (e: Exception) {
             Result.failure(e)

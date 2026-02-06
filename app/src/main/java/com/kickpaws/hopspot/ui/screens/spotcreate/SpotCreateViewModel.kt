@@ -1,4 +1,4 @@
-package com.kickpaws.hopspot.ui.screens.benchcreate
+package com.kickpaws.hopspot.ui.screens.spotcreate
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.analytics.AnalyticsManager
 import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
-import com.kickpaws.hopspot.domain.repository.BenchRepository
+import com.kickpaws.hopspot.domain.repository.SpotRepository
 import com.kickpaws.hopspot.domain.repository.PhotoRepository
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,19 +23,19 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
-class BenchCreateViewModel @Inject constructor(
-    private val benchRepository: BenchRepository,
+class SpotCreateViewModel @Inject constructor(
+    private val spotRepository: SpotRepository,
     private val photoRepository: PhotoRepository,
     private val application: Application,
     private val analyticsManager: AnalyticsManager,
     private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(BenchCreateUiState())
-    val uiState: StateFlow<BenchCreateUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(SpotCreateUiState())
+    val uiState: StateFlow<SpotCreateUiState> = _uiState.asStateFlow()
 
     init {
-        analyticsManager.logScreenView("BenchCreate")
+        analyticsManager.logScreenView("SpotCreate")
         loadInitialLocation()
     }
 
@@ -115,7 +115,7 @@ class BenchCreateViewModel @Inject constructor(
         _uiState.update { it.copy(photoUri = null) }
     }
 
-    fun saveBench() {
+    fun saveSpot() {
         val state = _uiState.value
 
         if (state.name.isBlank()) {
@@ -131,7 +131,7 @@ class BenchCreateViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
 
-            val result = benchRepository.createBench(
+            val result = spotRepository.createSpot(
                 name = state.name.trim(),
                 latitude = state.latitude,
                 longitude = state.longitude,
@@ -142,14 +142,14 @@ class BenchCreateViewModel @Inject constructor(
             )
 
             result.fold(
-                onSuccess = { bench ->
-                    analyticsManager.logBenchCreated(bench.id)
+                onSuccess = { spot ->
+                    analyticsManager.logSpotCreated(spot.id)
 
                     if (state.photoUri != null) {
                         _uiState.update { it.copy(isUploadingPhoto = true) }
 
                         val photoResult = photoRepository.uploadPhoto(
-                            benchId = bench.id,
+                            spotId = spot.id,
                             photoUri = state.photoUri,
                             isMain = true
                         )
@@ -160,7 +160,7 @@ class BenchCreateViewModel @Inject constructor(
                                     it.copy(
                                         isSaving = false,
                                         isUploadingPhoto = false,
-                                        createdBenchId = bench.id
+                                        createdSpotId = spot.id
                                     )
                                 }
                             },
@@ -169,8 +169,8 @@ class BenchCreateViewModel @Inject constructor(
                                     it.copy(
                                         isSaving = false,
                                         isUploadingPhoto = false,
-                                        createdBenchId = bench.id,
-                                        errorMessage = "Bank erstellt, aber Photo-Upload fehlgeschlagen"
+                                        createdSpotId = spot.id,
+                                        errorMessage = "HopSpot erstellt, aber Photo-Upload fehlgeschlagen"
                                     )
                                 }
                             }
@@ -179,7 +179,7 @@ class BenchCreateViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 isSaving = false,
-                                createdBenchId = bench.id
+                                createdSpotId = spot.id
                             )
                         }
                     }

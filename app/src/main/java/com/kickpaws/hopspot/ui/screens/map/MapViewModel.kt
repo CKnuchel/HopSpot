@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.analytics.AnalyticsManager
 import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
-import com.kickpaws.hopspot.domain.model.Bench
-import com.kickpaws.hopspot.domain.repository.BenchFilter
-import com.kickpaws.hopspot.domain.repository.BenchRepository
+import com.kickpaws.hopspot.domain.model.Spot
+import com.kickpaws.hopspot.domain.repository.SpotFilter
+import com.kickpaws.hopspot.domain.repository.SpotRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,15 +16,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class MapUiState(
-    val benches: List<Bench> = emptyList(),
+    val spots: List<Spot> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val selectedBench: Bench? = null
+    val selectedSpot: Spot? = null
 )
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val benchRepository: BenchRepository,
+    private val spotRepository: SpotRepository,
     private val analyticsManager: AnalyticsManager,
     private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
@@ -34,23 +34,23 @@ class MapViewModel @Inject constructor(
 
     init {
         analyticsManager.logScreenView("Map")
-        loadAllBenches()
+        loadAllSpots()
     }
 
-    fun loadAllBenches() {
+    fun loadAllSpots() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            // Lade alle Bänke (100 = max)
-            val filter = BenchFilter(page = 1, limit = 100)
-            val result = benchRepository.getBenches(filter)
+            // Lade alle Spots (100 = max)
+            val filter = SpotFilter(page = 1, limit = 100)
+            val result = spotRepository.getSpots(filter)
 
             result.fold(
                 onSuccess = { paginated ->
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            benches = paginated.benches
+                            spots = paginated.spots
                         )
                     }
                 },
@@ -66,11 +66,11 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun selectBench(bench: Bench?) {
-        _uiState.update { it.copy(selectedBench = bench) }
+    fun selectSpot(spot: Spot?) {
+        _uiState.update { it.copy(selectedSpot = spot) }
     }
 
     fun clearSelection() {
-        _uiState.update { it.copy(selectedBench = null) }
+        _uiState.update { it.copy(selectedSpot = null) }
     }
 }

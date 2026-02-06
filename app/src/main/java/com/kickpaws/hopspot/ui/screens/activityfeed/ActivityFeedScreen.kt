@@ -42,7 +42,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityFeedScreen(
-    onBenchClick: (Int) -> Unit,
+    onSpotClick: (Int) -> Unit,
     onBackClick: () -> Unit,
     viewModel: ActivityFeedViewModel = hiltViewModel()
 ) {
@@ -126,7 +126,7 @@ fun ActivityFeedScreen(
                                 ActivityListItem(
                                     activity = activity,
                                     onClick = {
-                                        activity.benchId?.let { onBenchClick(it) }
+                                        activity.spotId?.let { onSpotClick(it) }
                                     }
                                 )
                             }
@@ -164,7 +164,7 @@ private fun ActivityListItem(
 
     val actionIcon = remember(activity.actionType) {
         when (activity.actionType) {
-            "bench_created" -> Icons.Default.Add
+            "spot_created" -> Icons.Default.Add
             "visit_added" -> Icons.Default.CheckCircle
             "favorite_added" -> Icons.Default.Favorite
             else -> Icons.Default.Info
@@ -173,7 +173,7 @@ private fun ActivityListItem(
 
     val actionColor = remember(activity.actionType) {
         when (activity.actionType) {
-            "bench_created" -> 0xFF4CAF50  // Green
+            "spot_created" -> 0xFF4CAF50  // Green
             "visit_added" -> 0xFF2196F3    // Blue
             "favorite_added" -> 0xFFE91E63 // Pink
             else -> 0xFF9E9E9E            // Gray
@@ -184,7 +184,7 @@ private fun ActivityListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(
-                enabled = activity.benchId != null,
+                enabled = activity.spotId != null,
                 onClick = onClick
             ),
         shape = HopSpotShapes.card,
@@ -267,8 +267,8 @@ private fun ActivityListItem(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                // Bench thumbnail if available
-                if (activity.benchName != null) {
+                // Spot thumbnail if available
+                if (activity.spotName != null) {
                     Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.sm))
 
                     Row(
@@ -285,10 +285,10 @@ private fun ActivityListItem(
                                 .background(colorScheme.primaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (activity.benchPhotoUrl != null) {
+                            if (activity.spotPhotoUrl != null) {
                                 AsyncImage(
-                                    model = activity.benchPhotoUrl,
-                                    contentDescription = activity.benchName,
+                                    model = activity.spotPhotoUrl,
+                                    contentDescription = activity.spotName,
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop,
                                     placeholder = painterResource(R.drawable.ic_beer_marker),
@@ -307,7 +307,7 @@ private fun ActivityListItem(
                         Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
 
                         Text(
-                            text = activity.benchName,
+                            text = activity.spotName,
                             fontSize = 13.sp,
                             color = colorScheme.onSurfaceVariant,
                             maxLines = 1,
@@ -315,7 +315,7 @@ private fun ActivityListItem(
                             modifier = Modifier.weight(1f)
                         )
 
-                        if (activity.benchId != null) {
+                        if (activity.spotId != null) {
                             Icon(
                                 imageVector = Icons.Default.ChevronRight,
                                 contentDescription = null,

@@ -26,13 +26,13 @@
     <string name="error_invitation_not_found">Einladungscode nicht gefunden.</string>
     <string name="error_invitation_cannot_delete_redeemed">Eingelöste Codes können nicht gelöscht werden.</string>
 
-    <!-- Bench Errors (BENCH_*) -->
-    <string name="error_bench_not_found">Die Bank wurde nicht gefunden.</string>
-    <string name="error_bench_forbidden">Keine Berechtigung für diese Bank.</string>
+    <!-- Spot Errors (SPOT_*) -->
+    <string name="error_spot_not_found">Der HopSpot wurde nicht gefunden.</string>
+    <string name="error_spot_forbidden">Keine Berechtigung für diesen HopSpot.</string>
 
     <!-- Photo Errors (PHOTO_*) -->
     <string name="error_photo_not_found">Foto nicht gefunden.</string>
-    <string name="error_photo_max_reached">Maximal 10 Fotos pro Bank erlaubt.</string>
+    <string name="error_photo_max_reached">Maximal 10 Fotos pro HopSpot erlaubt.</string>
     <string name="error_photo_file_too_large">Datei ist zu gross (max. 10 MB).</string>
     <string name="error_photo_invalid_type">Nur JPEG, PNG und WebP erlaubt.</string>
     <string name="error_photo_forbidden">Keine Berechtigung für dieses Foto.</string>
@@ -100,12 +100,12 @@
     <string name="btn_open_in_maps">In Google Maps öffnen</string>
     <string name="btn_add_photo">Foto hinzufügen</string>
     <string name="btn_choose_other_photo">Anderes Foto wählen</string>
-    <string name="btn_delete_bench">Bank löschen</string>
+    <string name="btn_delete_spot">HopSpot löschen</string>
 
     <!-- Hints / Placeholders -->
     <string name="hint_search">Suchen…</string>
-    <string name="hint_bench_name">z.B. Schöne Waldbank</string>
-    <string name="hint_bench_description">Was macht diese Bank besonders?</string>
+    <string name="hint_spot_name">z.B. Schöner Aussichtspunkt</string>
+    <string name="hint_spot_description">Was macht diesen HopSpot besonders?</string>
     <string name="hint_latitude">z.B. 47.3769</string>
     <string name="hint_longitude">z.B. 8.5417</string>
     <string name="hint_comment_example">z.B. \"Für Max\"</string>
@@ -117,8 +117,8 @@
     <string name="cd_close">Schliessen</string>
     <string name="cd_clear_search">Suche löschen</string>
     <string name="cd_filter">Filter</string>
-    <string name="cd_random_bench">Zufällige Bank</string>
-    <string name="cd_add_bench">Bank hinzufügen</string>
+    <string name="cd_random_spot">Zufälliger HopSpot</string>
+    <string name="cd_add_spot">HopSpot hinzufügen</string>
     <string name="cd_add_photo">Foto hinzufügen</string>
     <string name="cd_remove_photo">Foto entfernen</string>
     <string name="cd_remove_from_favorites">Aus Favoriten entfernen</string>
@@ -126,7 +126,7 @@
     <string name="cd_show_password">Passwort anzeigen</string>
     <string name="cd_hide_password">Passwort verstecken</string>
     <string name="cd_my_location">Mein Standort</string>
-    <string name="cd_new_bench">Neue Bank</string>
+    <string name="cd_new_spot">Neuer HopSpot</string>
     <string name="cd_details">Details</string>
     <string name="cd_toilet">Toilette</string>
     <string name="cd_trash_bin">Abfalleimer</string>
@@ -147,8 +147,8 @@
     <string name="cd_stars" formatted="false">%d Sterne</string>
 
     <!-- Dialog Titles -->
-    <string name="dialog_delete_bench_title">Bank löschen?</string>
-    <string name="dialog_delete_bench_message">Möchtest du \"%1$s\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="dialog_delete_spot_title">HopSpot löschen?</string>
+    <string name="dialog_delete_spot_message">Möchtest du \"%1$s\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <string name="dialog_delete_photo_title">Foto löschen?</string>
     <string name="dialog_delete_photo_message">Möchtest du dieses Foto wirklich löschen?</string>
     <string name="dialog_delete_visit_title">Besuch löschen?</string>
@@ -166,19 +166,19 @@
     <string name="dialog_create_code_hint">Füge optional einen Kommentar hinzu (z.B. \"Für Max\"):</string>
 
     <!-- Empty States -->
-    <string name="empty_benches_title">Noch keine Bänke</string>
-    <string name="empty_benches_subtitle">Füge die erste Bank hinzu!</string>
+    <string name="empty_spots_title">Noch keine HopSpots</string>
+    <string name="empty_spots_subtitle">Füge den ersten HopSpot hinzu!</string>
     <string name="empty_visits_title">Noch keine Besuche</string>
-    <string name="empty_visits_subtitle">Besuche eine Bank und markiere deinen Besuch!</string>
+    <string name="empty_visits_subtitle">Besuche einen HopSpot und markiere deinen Besuch!</string>
     <string name="empty_favorites_title">Noch keine Favoriten</string>
-    <string name="empty_favorites_subtitle">Tippe auf das Herz bei einer Bank, um sie zu deinen Favoriten hinzuzufügen!</string>
+    <string name="empty_favorites_subtitle">Tippe auf das Herz bei einem HopSpot, um ihn zu deinen Favoriten hinzuzufügen!</string>
     <string name="empty_codes_title">Keine Einladungscodes</string>
     <string name="empty_codes_subtitle">Erstelle einen mit dem + Button</string>
     <string name="empty_users_title">Keine Benutzer</string>
     <string name="empty_photos_title">Keine Fotos</string>
 
     <!-- Auth Screens -->
-    <string name="auth_slogan">Finde dein Lieblingsbänkli</string>
+    <string name="auth_slogan">Finde deinen Lieblingsort</string>
     <string name="auth_welcome">Willkommen!</string>
     <string name="auth_join_community">Werde Teil der HopSpot Community</string>
     <string name="auth_no_account">Noch kein Konto? Registrieren</string>
@@ -189,38 +189,38 @@
     <string name="profile_role_admin">Administrator</string>
     <string name="profile_role_user">Benutzer</string>
 
-    <!-- Bench List Screen -->
-    <string name="bench_list_filter_title">Filter &amp; Sortierung</string>
-    <string name="bench_list_sort_by">Sortieren nach</string>
-    <string name="bench_list_filter_toilet">Nur mit Toilette</string>
-    <string name="bench_list_filter_trash">Nur mit Abfalleimer</string>
-    <string name="bench_list_filter_min_rating">Mindestbewertung</string>
-    <string name="bench_list_filter_all">Alle</string>
+    <!-- Spot List Screen -->
+    <string name="spot_list_filter_title">Filter &amp; Sortierung</string>
+    <string name="spot_list_sort_by">Sortieren nach</string>
+    <string name="spot_list_filter_toilet">Nur mit Toilette</string>
+    <string name="spot_list_filter_trash">Nur mit Abfalleimer</string>
+    <string name="spot_list_filter_min_rating">Mindestbewertung</string>
+    <string name="spot_list_filter_all">Alle</string>
 
-    <!-- Bench Detail Screen -->
-    <string name="bench_detail_title">Bank Details</string>
-    <string name="bench_detail_no_photos">Keine Fotos</string>
-    <string name="bench_detail_main_image">Hauptbild</string>
-    <string name="bench_detail_more_photos">Weitere Fotos</string>
-    <string name="bench_detail_location">Standort</string>
-    <string name="bench_detail_visits">Besuche</string>
-    <string name="bench_detail_visits_count">%1$d Besuche insgesamt</string>
-    <string name="bench_detail_visit_saved">Besuch gespeichert!</string>
-    <string name="bench_detail_current_weather">Aktuelles Wetter</string>
-    <string name="bench_detail_temperature">Temperatur</string>
-    <string name="bench_detail_rating_format">%1$d/5</string>
+    <!-- Spot Detail Screen -->
+    <string name="spot_detail_title">HopSpot Details</string>
+    <string name="spot_detail_no_photos">Keine Fotos</string>
+    <string name="spot_detail_main_image">Hauptbild</string>
+    <string name="spot_detail_more_photos">Weitere Fotos</string>
+    <string name="spot_detail_location">Standort</string>
+    <string name="spot_detail_visits">Besuche</string>
+    <string name="spot_detail_visits_count">%1$d Besuche insgesamt</string>
+    <string name="spot_detail_visit_saved">Besuch gespeichert!</string>
+    <string name="spot_detail_current_weather">Aktuelles Wetter</string>
+    <string name="spot_detail_temperature">Temperatur</string>
+    <string name="spot_detail_rating_format">%1$d/5</string>
 
-    <!-- Bench Create/Edit Screen -->
-    <string name="bench_create_title">Neue Bank</string>
-    <string name="bench_edit_title">Bearbeiten</string>
-    <string name="bench_form_amenities">Ausstattung</string>
-    <string name="bench_form_toilet_nearby">Toilette in der Nähe</string>
-    <string name="bench_form_trash_nearby">Abfalleimer vorhanden</string>
-    <string name="bench_form_location_not_set">Noch nicht gesetzt</string>
-    <string name="bench_form_location_hint">GPS-Funktion kommt bald! Vorerst Koordinaten manuell eingeben.</string>
-    <string name="bench_form_rating_format">%1$d von 5 Sternen</string>
-    <string name="bench_form_uploading">Wird hochgeladen…</string>
-    <string name="bench_form_set_main_hint">Tippe auf ☆ um ein Foto als Hauptbild zu setzen</string>
+    <!-- Spot Create/Edit Screen -->
+    <string name="spot_create_title">Neuer HopSpot</string>
+    <string name="spot_edit_title">Bearbeiten</string>
+    <string name="spot_form_amenities">Ausstattung</string>
+    <string name="spot_form_toilet_nearby">Toilette in der Nähe</string>
+    <string name="spot_form_trash_nearby">Abfalleimer vorhanden</string>
+    <string name="spot_form_location_not_set">Noch nicht gesetzt</string>
+    <string name="spot_form_location_hint">GPS-Funktion kommt bald! Vorerst Koordinaten manuell eingeben.</string>
+    <string name="spot_form_rating_format">%1$d von 5 Sternen</string>
+    <string name="spot_form_uploading">Wird hochgeladen…</string>
+    <string name="spot_form_set_main_hint">Tippe auf ☆ um ein Foto als Hauptbild zu setzen</string>
 
     <!-- Visits Screen -->
     <string name="visits_title">Meine Besuche</string>
@@ -243,12 +243,12 @@
     <string name="admin_user_deactivated">Deaktiviert</string>
 
     <!-- Map Screen -->
-    <string name="map_benches_count">%1$d Bänke</string>
+    <string name="map_spots_count">%1$d HopSpots</string>
 
     <!-- Activity Feed Screen -->
     <string name="activity_feed_title">Aktivitäten</string>
     <string name="empty_activity_feed_title">Noch keine Aktivitäten</string>
-    <string name="empty_activity_feed_subtitle">Sobald jemand eine Bank hinzufügt oder besucht, erscheint es hier!</string>
+    <string name="empty_activity_feed_subtitle">Sobald jemand einen HopSpot hinzufügt oder besucht, erscheint es hier!</string>
     <string name="cd_activity_feed">Aktivitäten</string>
 
     <!-- Offline Banner -->

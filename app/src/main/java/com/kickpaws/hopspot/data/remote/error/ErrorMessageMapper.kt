@@ -62,9 +62,9 @@ class ErrorMessageMapper @Inject constructor(
             "INVITATION_NOT_FOUND" -> context.getString(R.string.error_invitation_not_found)
             "INVITATION_CANNOT_DELETE_REDEEMED" -> context.getString(R.string.error_invitation_cannot_delete_redeemed)
 
-            // Bench errors
-            "BENCH_NOT_FOUND" -> context.getString(R.string.error_bench_not_found)
-            "BENCH_FORBIDDEN" -> context.getString(R.string.error_bench_forbidden)
+            // Spot errors
+            "SPOT_NOT_FOUND" -> context.getString(R.string.error_spot_not_found)
+            "SPOT_FORBIDDEN" -> context.getString(R.string.error_spot_forbidden)
 
             // Photo errors
             "PHOTO_NOT_FOUND" -> context.getString(R.string.error_photo_not_found)

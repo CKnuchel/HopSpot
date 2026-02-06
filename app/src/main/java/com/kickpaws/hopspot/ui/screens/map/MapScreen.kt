@@ -39,15 +39,15 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.maps.android.compose.*
 import com.kickpaws.hopspot.R
-import com.kickpaws.hopspot.domain.model.Bench
+import com.kickpaws.hopspot.domain.model.Spot
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import androidx.core.graphics.scale
 
 @Composable
 fun MapScreen(
-    onBenchClick: (Int) -> Unit,
-    onCreateBenchClick: () -> Unit,
+    onSpotClick: (Int) -> Unit,
+    onCreateSpotClick: () -> Unit,
     onActivityFeedClick: () -> Unit,
     viewModel: MapViewModel = hiltViewModel()
 ) {
@@ -158,15 +158,15 @@ fun MapScreen(
                 beerIcon = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
             }
         ) {
-            // Markers für alle Bänke
-            uiState.benches.forEach { bench ->
+            // Markers für alle Spots
+            uiState.spots.forEach { spot ->
                 Marker(
-                    state = MarkerState(position = LatLng(bench.latitude, bench.longitude)),
-                    title = bench.name,
-                    snippet = bench.description?.take(50),
+                    state = MarkerState(position = LatLng(spot.latitude, spot.longitude)),
+                    title = spot.name,
+                    snippet = spot.description?.take(50),
                     icon = beerIcon,
                     onClick = {
-                        viewModel.selectBench(bench)
+                        viewModel.selectSpot(spot)
                         true
                     }
                 )
@@ -205,14 +205,14 @@ fun MapScreen(
                         color = colorScheme.error
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    TextButton(onClick = viewModel::loadAllBenches) {
+                    TextButton(onClick = viewModel::loadAllSpots) {
                         Text(stringResource(R.string.common_retry))
                     }
                 }
             }
         }
 
-        // Bench Count Badge
+        // Spot Count Badge
         Surface(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -232,7 +232,7 @@ fun MapScreen(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = stringResource(R.string.map_benches_count, uiState.benches.size),
+                    text = stringResource(R.string.map_spots_count, uiState.spots.size),
                     color = colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.Medium,
                     fontSize = 14.sp
@@ -286,9 +286,9 @@ fun MapScreen(
             }
         }
 
-        // FAB für neue Bank
+        // FAB für neuen Spot
         FloatingActionButton(
-            onClick = onCreateBenchClick,
+            onClick = onCreateSpotClick,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
@@ -296,15 +296,15 @@ fun MapScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = stringResource(R.string.cd_new_bench)
+                contentDescription = stringResource(R.string.cd_new_spot)
             )
         }
 
-        // Selected Bench Bottom Card
-        uiState.selectedBench?.let { bench ->
-            BenchPreviewCard(
-                bench = bench,
-                onClick = { onBenchClick(bench.id) },
+        // Selected Spot Bottom Card
+        uiState.selectedSpot?.let { spot ->
+            SpotPreviewCard(
+                spot = spot,
+                onClick = { onSpotClick(spot.id) },
                 onDismiss = { viewModel.clearSelection() },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -315,8 +315,8 @@ fun MapScreen(
 }
 
 @Composable
-private fun BenchPreviewCard(
-    bench: Bench,
+private fun SpotPreviewCard(
+    spot: Spot,
     onClick: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
@@ -339,14 +339,14 @@ private fun BenchPreviewCard(
         ) {
             // Thumbnail
             AsyncImage(
-                model = bench.mainPhotoUrl,
-                contentDescription = bench.name,
+                model = spot.mainPhotoUrl,
+                contentDescription = spot.name,
                 modifier = Modifier
                     .size(72.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop,
-                placeholder = painterResource(R.drawable.placeholder_bench),
-                error = painterResource(R.drawable.placeholder_bench)
+                placeholder = painterResource(R.drawable.placeholder_spot),
+                error = painterResource(R.drawable.placeholder_spot)
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -354,29 +354,29 @@ private fun BenchPreviewCard(
             // Info
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = bench.name,
+                    text = spot.name,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
 
-                if (bench.rating != null) {
+                if (spot.rating != null) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         repeat(5) { index ->
                             Icon(
-                                imageVector = if (index < bench.rating) Icons.Default.Star else Icons.Default.StarBorder,
+                                imageVector = if (index < spot.rating) Icons.Default.Star else Icons.Default.StarBorder,
                                 contentDescription = null,
-                                tint = if (index < bench.rating) colorScheme.primary else colorScheme.outline,
+                                tint = if (index < spot.rating) colorScheme.primary else colorScheme.outline,
                                 modifier = Modifier.size(16.dp)
                             )
                         }
                     }
                 }
 
-                if (!bench.description.isNullOrBlank()) {
+                if (!spot.description.isNullOrBlank()) {
                     Text(
-                        text = bench.description,
+                        text = spot.description,
                         fontSize = 12.sp,
                         color = colorScheme.onSurfaceVariant,
                         maxLines = 2,
@@ -386,7 +386,7 @@ private fun BenchPreviewCard(
 
                 // Amenities
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (bench.hasToilet) {
+                    if (spot.hasToilet) {
                         Icon(
                             imageVector = Icons.Default.Wc,
                             contentDescription = stringResource(R.string.cd_toilet),
@@ -394,7 +394,7 @@ private fun BenchPreviewCard(
                             modifier = Modifier.size(16.dp)
                         )
                     }
-                    if (bench.hasTrashBin) {
+                    if (spot.hasTrashBin) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = stringResource(R.string.cd_trash_bin),

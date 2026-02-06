@@ -6,7 +6,7 @@ import com.kickpaws.hopspot.domain.model.Photo
 fun PhotoDto.toDomain(): Photo {
     return Photo(
         id = id,
-        benchId = benchId,
+        spotId = spotId,
         isMain = isMain,
         urlOriginal = urlOriginal,
         urlMedium = urlMedium,

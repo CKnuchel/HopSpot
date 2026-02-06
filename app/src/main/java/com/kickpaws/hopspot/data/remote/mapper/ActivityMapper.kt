@@ -8,9 +8,9 @@ fun ActivityDto.toDomain(): Activity = Activity(
     actionType = actionType,
     userId = user.id,
     userDisplayName = user.displayName,
-    benchId = bench?.id,
-    benchName = bench?.name,
-    benchPhotoUrl = bench?.mainPhotoUrl,
+    spotId = spot?.id,
+    spotName = spot?.name,
+    spotPhotoUrl = spot?.mainPhotoUrl,
     description = description,
     createdAt = createdAt
 )

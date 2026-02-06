@@ -1,4 +1,4 @@
-package com.kickpaws.hopspot.ui.screens.benchdetail
+package com.kickpaws.hopspot.ui.screens.spotdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +8,7 @@ import com.kickpaws.hopspot.data.remote.dto.CreateVisitRequest
 import com.kickpaws.hopspot.data.remote.error.ApiErrorParser
 import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
-import com.kickpaws.hopspot.domain.model.Bench
+import com.kickpaws.hopspot.domain.model.Spot
 import com.kickpaws.hopspot.domain.model.Photo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +25,8 @@ data class WeatherInfo(
     val weathercode: Int
 )
 
-data class BenchDetailUiState(
-    val bench: Bench? = null,
+data class SpotDetailUiState(
+    val spot: Spot? = null,
     val photos: List<Photo> = emptyList(),
     val visitCount: Long = 0,
     val weather: WeatherInfo? = null,
@@ -41,37 +41,37 @@ data class BenchDetailUiState(
 )
 
 @HiltViewModel
-class BenchDetailViewModel @Inject constructor(
+class SpotDetailViewModel @Inject constructor(
     private val api: HopSpotApi,
     private val analyticsManager: AnalyticsManager,
     private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(BenchDetailUiState())
-    val uiState: StateFlow<BenchDetailUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(SpotDetailUiState())
+    val uiState: StateFlow<SpotDetailUiState> = _uiState.asStateFlow()
 
-    fun loadBench(benchId: Int) {
+    fun loadSpot(spotId: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                val response = api.getBench(benchId)
-                val bench = response.data.toDomain()
+                val response = api.getSpot(spotId)
+                val spot = response.data.toDomain()
 
-                analyticsManager.logScreenView("BenchDetail")
-                analyticsManager.logBenchViewed(benchId)
+                analyticsManager.logScreenView("SpotDetail")
+                analyticsManager.logSpotViewed(spotId)
 
                 _uiState.update {
                     it.copy(
-                        bench = bench,
+                        spot = spot,
                         isLoading = false
                     )
                 }
 
-                loadPhotos(benchId)
-                loadVisitCount(benchId)
-                loadWeather(bench.latitude, bench.longitude)
-                loadFavoriteStatus(benchId)
+                loadPhotos(spotId)
+                loadVisitCount(spotId)
+                loadWeather(spot.latitude, spot.longitude)
+                loadFavoriteStatus(spotId)
 
             } catch (e: Exception) {
                 _uiState.update {
@@ -84,12 +84,12 @@ class BenchDetailViewModel @Inject constructor(
         }
     }
 
-    private fun loadPhotos(benchId: Int) {
+    private fun loadPhotos(spotId: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingPhotos = true) }
 
             try {
-                val photos = api.getPhotos(benchId).map { it.toDomain() }
+                val photos = api.getPhotos(spotId).map { it.toDomain() }
                 _uiState.update {
                     it.copy(
                         photos = photos,
@@ -102,10 +102,10 @@ class BenchDetailViewModel @Inject constructor(
         }
     }
 
-    private fun loadVisitCount(benchId: Int) {
+    private fun loadVisitCount(spotId: Int) {
         viewModelScope.launch {
             try {
-                val response = api.getVisitCount(benchId)
+                val response = api.getVisitCount(spotId)
                 _uiState.update { it.copy(visitCount = response.count) }
             } catch (e: Exception) {
                 // Ignore - visit count is optional
@@ -137,10 +137,10 @@ class BenchDetailViewModel @Inject constructor(
         }
     }
 
-    private fun loadFavoriteStatus(benchId: Int) {
+    private fun loadFavoriteStatus(spotId: Int) {
         viewModelScope.launch {
             try {
-                val response = api.checkFavorite(benchId)
+                val response = api.checkFavorite(spotId)
                 _uiState.update { it.copy(isFavorite = response["is_favorite"] == true) }
             } catch (e: Exception) {
                 // Ignore - favorite status is optional
@@ -148,18 +148,18 @@ class BenchDetailViewModel @Inject constructor(
         }
     }
 
-    fun toggleFavorite(benchId: Int) {
+    fun toggleFavorite(spotId: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isTogglingFavorite = true) }
 
             try {
                 val currentState = _uiState.value.isFavorite
                 if (currentState) {
-                    api.removeFavorite(benchId)
+                    api.removeFavorite(spotId)
                 } else {
-                    api.addFavorite(benchId)
+                    api.addFavorite(spotId)
                 }
-                analyticsManager.logBenchFavorited(benchId, added = !currentState)
+                analyticsManager.logSpotFavorited(spotId, added = !currentState)
                 _uiState.update {
                     it.copy(
                         isFavorite = !currentState,
@@ -177,20 +177,20 @@ class BenchDetailViewModel @Inject constructor(
         }
     }
 
-    fun addVisit(benchId: Int, comment: String? = null) {
+    fun addVisit(spotId: Int, comment: String? = null) {
         viewModelScope.launch {
             _uiState.update { it.copy(isAddingVisit = true) }
 
             try {
                 api.createVisit(
                     CreateVisitRequest(
-                        benchId = benchId,
+                        spotId = spotId,
                         visitedAt = null,
                         comment = comment
                     )
                 )
 
-                analyticsManager.logVisitAdded(benchId)
+                analyticsManager.logVisitAdded(spotId)
 
                 _uiState.update {
                     it.copy(

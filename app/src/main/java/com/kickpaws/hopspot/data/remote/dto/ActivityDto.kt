@@ -7,7 +7,7 @@ data class ActivityDto(
     @SerializedName("action_type")
     val actionType: String,
     val user: ActivityUserDto,
-    val bench: ActivityBenchDto?,
+    val spot: ActivitySpotDto?,
     val description: String,
     @SerializedName("created_at")
     val createdAt: String
@@ -19,7 +19,7 @@ data class ActivityUserDto(
     val displayName: String
 )
 
-data class ActivityBenchDto(
+data class ActivitySpotDto(
     val id: Int,
     val name: String,
     @SerializedName("main_photo_url")

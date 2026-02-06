@@ -25,7 +25,7 @@ class PhotoRepositoryImpl @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) : PhotoRepository {
 
-    override suspend fun uploadPhoto(benchId: Int, photoUri: Uri, isMain: Boolean): Result<Unit> {
+    override suspend fun uploadPhoto(spotId: Int, photoUri: Uri, isMain: Boolean): Result<Unit> {
         return try {
             val file = uriToFileWithCorrectOrientation(photoUri)
 
@@ -33,7 +33,7 @@ class PhotoRepositoryImpl @Inject constructor(
             val photoPart = MultipartBody.Part.createFormData("photo", file.name, requestBody)
             val isMainBody = isMain.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
-            api.uploadPhoto(benchId, photoPart, isMainBody)
+            api.uploadPhoto(spotId, photoPart, isMainBody)
 
             file.delete()
             Result.success(Unit)

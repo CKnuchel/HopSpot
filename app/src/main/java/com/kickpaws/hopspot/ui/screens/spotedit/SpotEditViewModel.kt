@@ -1,10 +1,10 @@
-package com.kickpaws.hopspot.ui.screens.benchedit
+package com.kickpaws.hopspot.ui.screens.spotedit
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
-import com.kickpaws.hopspot.data.remote.dto.UpdateBenchRequest
+import com.kickpaws.hopspot.data.remote.dto.UpdateSpotRequest
 import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
 import com.kickpaws.hopspot.domain.model.Photo
@@ -18,37 +18,37 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class BenchEditViewModel @Inject constructor(
+class SpotEditViewModel @Inject constructor(
     private val api: HopSpotApi,
     private val photoRepository: PhotoRepository,
     private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(BenchEditUiState())
-    val uiState: StateFlow<BenchEditUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(SpotEditUiState())
+    val uiState: StateFlow<SpotEditUiState> = _uiState.asStateFlow()
 
-    private var benchId: Int = 0
+    private var spotId: Int = 0
 
-    fun loadBench(id: Int) {
-        benchId = id
+    fun loadSpot(id: Int) {
+        spotId = id
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                val response = api.getBench(id)
-                val bench = response.data.toDomain()
+                val response = api.getSpot(id)
+                val spot = response.data.toDomain()
 
                 _uiState.update {
                     it.copy(
-                        bench = bench,
-                        name = bench.name,
-                        description = bench.description ?: "",
-                        rating = bench.rating,
-                        hasToilet = bench.hasToilet,
-                        hasTrashBin = bench.hasTrashBin,
-                        latitude = bench.latitude,
-                        longitude = bench.longitude,
-                        locationText = "%.5f, %.5f".format(bench.latitude, bench.longitude),
+                        spot = spot,
+                        name = spot.name,
+                        description = spot.description ?: "",
+                        rating = spot.rating,
+                        hasToilet = spot.hasToilet,
+                        hasTrashBin = spot.hasTrashBin,
+                        latitude = spot.latitude,
+                        longitude = spot.longitude,
+                        locationText = "%.5f, %.5f".format(spot.latitude, spot.longitude),
                         isLoading = false
                     )
                 }
@@ -70,7 +70,7 @@ class BenchEditViewModel @Inject constructor(
     private fun loadPhotos() {
         viewModelScope.launch {
             try {
-                val photos = api.getPhotos(benchId).map { it.toDomain() }
+                val photos = api.getPhotos(spotId).map { it.toDomain() }
                 _uiState.update { it.copy(photos = photos) }
             } catch (e: Exception) {
                 // Ignore - photos are optional
@@ -131,7 +131,7 @@ class BenchEditViewModel @Inject constructor(
             val isFirstPhoto = _uiState.value.photos.isEmpty()
 
             val result = photoRepository.uploadPhoto(
-                benchId = benchId,
+                spotId = spotId,
                 photoUri = uri,
                 isMain = isFirstPhoto
             )
@@ -192,7 +192,7 @@ class BenchEditViewModel @Inject constructor(
     }
 
     // Save changes
-    fun saveBench() {
+    fun saveSpot() {
         val state = _uiState.value
 
         if (state.name.isBlank()) {
@@ -204,9 +204,9 @@ class BenchEditViewModel @Inject constructor(
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
 
             try {
-                api.updateBench(
-                    id = benchId,
-                    request = UpdateBenchRequest(
+                api.updateSpot(
+                    id = spotId,
+                    request = UpdateSpotRequest(
                         name = state.name.trim(),
                         latitude = state.latitude,
                         longitude = state.longitude,
@@ -234,13 +234,13 @@ class BenchEditViewModel @Inject constructor(
         }
     }
 
-    // Delete bench
-    fun deleteBench() {
+    // Delete spot
+    fun deleteSpot() {
         viewModelScope.launch {
             _uiState.update { it.copy(isDeleting = true, errorMessage = null) }
 
             try {
-                api.deleteBench(benchId)
+                api.deleteSpot(spotId)
                 _uiState.update {
                     it.copy(
                         isDeleting = false,

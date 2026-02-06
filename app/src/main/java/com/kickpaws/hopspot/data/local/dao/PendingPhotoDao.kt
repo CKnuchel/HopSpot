@@ -15,8 +15,8 @@ interface PendingPhotoDao {
     @Query("SELECT * FROM pending_photos ORDER BY createdAt ASC")
     suspend fun getAllPendingPhotosOnce(): List<PendingPhotoEntity>
 
-    @Query("SELECT * FROM pending_photos WHERE benchId = :benchId")
-    suspend fun getPendingPhotosForBench(benchId: Int): List<PendingPhotoEntity>
+    @Query("SELECT * FROM pending_photos WHERE spotId = :spotId")
+    suspend fun getPendingPhotosForSpot(spotId: Int): List<PendingPhotoEntity>
 
     @Insert
     suspend fun insert(photo: PendingPhotoEntity)
@@ -24,8 +24,8 @@ interface PendingPhotoDao {
     @Query("DELETE FROM pending_photos WHERE id = :id")
     suspend fun deleteById(id: Int)
 
-    @Query("DELETE FROM pending_photos WHERE benchId = :benchId")
-    suspend fun deleteByBenchId(benchId: Int)
+    @Query("DELETE FROM pending_photos WHERE spotId = :spotId")
+    suspend fun deleteBySpotId(spotId: Int)
 
     @Query("SELECT COUNT(*) FROM pending_photos")
     fun getPendingCount(): Flow<Int>

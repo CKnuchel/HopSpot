@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class VisitDto(
     val id: Int,
-    val bench: VisitBenchDto,
+    val spot: VisitSpotDto,
     @SerializedName("visited_at")
     val visitedAt: String,
     val comment: String?,
@@ -12,7 +12,7 @@ data class VisitDto(
     val createdAt: String
 )
 
-data class VisitBenchDto(
+data class VisitSpotDto(
     val id: Int,
     val name: String,
     @SerializedName("main_photo_url")
@@ -25,14 +25,14 @@ data class PaginatedVisitsDto(
 )
 
 data class VisitCountDto(
-    @SerializedName("bench_id")
-    val benchId: Int,
+    @SerializedName("spot_id")
+    val spotId: Int,
     val count: Long
 )
 
 data class CreateVisitRequest(
-    @SerializedName("bench_id")
-    val benchId: Int,
+    @SerializedName("spot_id")
+    val spotId: Int,
     @SerializedName("visited_at")
     val visitedAt: String?,  // Optional, default "now" im Backend
     val comment: String?

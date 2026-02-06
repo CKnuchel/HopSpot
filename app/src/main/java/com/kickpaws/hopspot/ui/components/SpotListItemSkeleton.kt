@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun BenchListItemSkeleton() {
+fun SpotListItemSkeleton() {
     val colorScheme = MaterialTheme.colorScheme
 
     Card(
@@ -89,7 +89,7 @@ fun BenchListItemSkeleton() {
 }
 
 @Composable
-fun BenchListSkeleton(
+fun SpotListSkeleton(
     itemCount: Int = 6
 ) {
     Column(
@@ -99,7 +99,7 @@ fun BenchListSkeleton(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         repeat(itemCount) {
-            BenchListItemSkeleton()
+            SpotListItemSkeleton()
         }
     }
 }

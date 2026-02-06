@@ -7,16 +7,16 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.kickpaws.hopspot.data.local.dao.BenchDao
 import com.kickpaws.hopspot.data.local.dao.PendingPhotoDao
+import com.kickpaws.hopspot.data.local.dao.SpotDao
 import com.kickpaws.hopspot.data.local.dao.VisitDao
 import com.kickpaws.hopspot.data.local.entity.SyncStatus
 import com.kickpaws.hopspot.data.local.mapper.toEntity
 import com.kickpaws.hopspot.data.network.NetworkMonitor
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
-import com.kickpaws.hopspot.data.remote.dto.CreateBenchRequest
+import com.kickpaws.hopspot.data.remote.dto.CreateSpotRequest
 import com.kickpaws.hopspot.data.remote.dto.CreateVisitRequest
-import com.kickpaws.hopspot.data.remote.dto.UpdateBenchRequest
+import com.kickpaws.hopspot.data.remote.dto.UpdateSpotRequest
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -46,7 +46,7 @@ private val Context.syncDataStore: DataStore<Preferences> by preferencesDataStor
 class SyncManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val api: HopSpotApi,
-    private val benchDao: BenchDao,
+    private val spotDao: SpotDao,
     private val visitDao: VisitDao,
     private val pendingPhotoDao: PendingPhotoDao,
     private val networkMonitor: NetworkMonitor
@@ -72,14 +72,14 @@ class SyncManager @Inject constructor(
 
     private fun observePendingChanges() {
         combine(
-            benchDao.getPendingChangesCount(),
+            spotDao.getPendingChangesCount(),
             visitDao.getPendingChangesCount(),
             pendingPhotoDao.getPendingCount(),
             lastSyncTime
-        ) { benchChanges, visitChanges, photoUploads, syncTime ->
+        ) { spotChanges, visitChanges, photoUploads, syncTime ->
             _syncProgress.update { current ->
                 current.copy(
-                    pendingBenchChanges = benchChanges,
+                    pendingSpotChanges = spotChanges,
                     pendingVisitChanges = visitChanges,
                     pendingPhotoUploads = photoUploads,
                     lastSyncTime = syncTime
@@ -153,21 +153,21 @@ class SyncManager @Inject constructor(
     private suspend fun downloadServerData() {
         Log.d(TAG, "Downloading server data...")
 
-        // Download all benches
+        // Download all spots
         try {
-            val response = api.getBenches(page = 1, limit = 1000)
-            val benches = response.data.benches.map { it.toDomain() }
+            val response = api.getSpots(page = 1, limit = 1000)
+            val spots = response.data.spots.map { it.toDomain() }
 
             // Get current pending changes to preserve them
-            val pendingBenches = benchDao.getPendingChanges()
-            val pendingIds = pendingBenches.map { it.id }.toSet()
+            val pendingSpots = spotDao.getPendingChanges()
+            val pendingIds = pendingSpots.map { it.id }.toSet()
 
-            // Insert server benches, but don't overwrite pending local changes
-            benches.filter { it.id !in pendingIds }.forEach { bench ->
-                benchDao.insert(bench.toEntity(SyncStatus.SYNCED))
+            // Insert server spots, but don't overwrite pending local changes
+            spots.filter { it.id !in pendingIds }.forEach { spot ->
+                spotDao.insert(spot.toEntity(SyncStatus.SYNCED))
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to download benches", e)
+            Log.e(TAG, "Failed to download spots", e)
         }
 
         // Download all visits
@@ -189,31 +189,31 @@ class SyncManager @Inject constructor(
     }
 
     private suspend fun uploadPendingCreates() {
-        // Upload pending bench creates
-        val pendingBenchCreates = benchDao.getBenchesBySyncStatus(SyncStatus.PENDING_CREATE)
-        Log.d(TAG, "Uploading ${pendingBenchCreates.size} pending bench creates")
+        // Upload pending spot creates
+        val pendingSpotCreates = spotDao.getSpotsBySyncStatus(SyncStatus.PENDING_CREATE)
+        Log.d(TAG, "Uploading ${pendingSpotCreates.size} pending spot creates")
 
-        for (bench in pendingBenchCreates) {
+        for (spot in pendingSpotCreates) {
             try {
-                val request = CreateBenchRequest(
-                    name = bench.name,
-                    latitude = bench.latitude,
-                    longitude = bench.longitude,
-                    description = bench.description,
-                    rating = bench.rating,
-                    hasToilet = bench.hasToilet,
-                    hasTrashBin = bench.hasTrashBin
+                val request = CreateSpotRequest(
+                    name = spot.name,
+                    latitude = spot.latitude,
+                    longitude = spot.longitude,
+                    description = spot.description,
+                    rating = spot.rating,
+                    hasToilet = spot.hasToilet,
+                    hasTrashBin = spot.hasTrashBin
                 )
-                val response = api.createBench(request)
-                val serverBench = response.data.toDomain()
+                val response = api.createSpot(request)
+                val serverSpot = response.data.toDomain()
 
                 // Delete local entity with temp ID and insert server entity
-                benchDao.deleteById(bench.id)
-                benchDao.insert(serverBench.toEntity(SyncStatus.SYNCED))
+                spotDao.deleteById(spot.id)
+                spotDao.insert(serverSpot.toEntity(SyncStatus.SYNCED))
 
-                Log.d(TAG, "Uploaded bench: ${bench.name}")
+                Log.d(TAG, "Uploaded spot: ${spot.name}")
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to upload bench: ${bench.name}", e)
+                Log.e(TAG, "Failed to upload spot: ${spot.name}", e)
             }
         }
 
@@ -224,7 +224,7 @@ class SyncManager @Inject constructor(
         for (visit in pendingVisitCreates) {
             try {
                 val request = CreateVisitRequest(
-                    benchId = visit.benchId,
+                    spotId = visit.spotId,
                     visitedAt = visit.visitedAt,
                     comment = visit.comment
                 )
@@ -235,53 +235,53 @@ class SyncManager @Inject constructor(
                 visitDao.deleteById(visit.id)
                 visitDao.insert(serverVisit.toEntity(SyncStatus.SYNCED))
 
-                Log.d(TAG, "Uploaded visit for bench: ${visit.benchId}")
+                Log.d(TAG, "Uploaded visit for spot: ${visit.spotId}")
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to upload visit for bench: ${visit.benchId}", e)
+                Log.e(TAG, "Failed to upload visit for spot: ${visit.spotId}", e)
             }
         }
     }
 
     private suspend fun uploadPendingUpdates() {
-        val pendingUpdates = benchDao.getBenchesBySyncStatus(SyncStatus.PENDING_UPDATE)
-        Log.d(TAG, "Uploading ${pendingUpdates.size} pending bench updates")
+        val pendingUpdates = spotDao.getSpotsBySyncStatus(SyncStatus.PENDING_UPDATE)
+        Log.d(TAG, "Uploading ${pendingUpdates.size} pending spot updates")
 
-        for (bench in pendingUpdates) {
+        for (spot in pendingUpdates) {
             try {
-                val request = UpdateBenchRequest(
-                    name = bench.name,
-                    latitude = bench.latitude,
-                    longitude = bench.longitude,
-                    description = bench.description,
-                    rating = bench.rating,
-                    hasToilet = bench.hasToilet,
-                    hasTrashBin = bench.hasTrashBin
+                val request = UpdateSpotRequest(
+                    name = spot.name,
+                    latitude = spot.latitude,
+                    longitude = spot.longitude,
+                    description = spot.description,
+                    rating = spot.rating,
+                    hasToilet = spot.hasToilet,
+                    hasTrashBin = spot.hasTrashBin
                 )
-                val response = api.updateBench(bench.id, request)
-                val serverBench = response.data.toDomain()
+                val response = api.updateSpot(spot.id, request)
+                val serverSpot = response.data.toDomain()
 
                 // Update local entity with server response
-                benchDao.insert(serverBench.toEntity(SyncStatus.SYNCED))
+                spotDao.insert(serverSpot.toEntity(SyncStatus.SYNCED))
 
-                Log.d(TAG, "Updated bench: ${bench.name}")
+                Log.d(TAG, "Updated spot: ${spot.name}")
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to update bench: ${bench.name}", e)
+                Log.e(TAG, "Failed to update spot: ${spot.name}", e)
             }
         }
     }
 
     private suspend fun uploadPendingDeletes() {
-        // Upload pending bench deletes
-        val pendingBenchDeletes = benchDao.getBenchesBySyncStatus(SyncStatus.PENDING_DELETE)
-        Log.d(TAG, "Uploading ${pendingBenchDeletes.size} pending bench deletes")
+        // Upload pending spot deletes
+        val pendingSpotDeletes = spotDao.getSpotsBySyncStatus(SyncStatus.PENDING_DELETE)
+        Log.d(TAG, "Uploading ${pendingSpotDeletes.size} pending spot deletes")
 
-        for (bench in pendingBenchDeletes) {
+        for (spot in pendingSpotDeletes) {
             try {
-                api.deleteBench(bench.id)
-                benchDao.deleteById(bench.id)
-                Log.d(TAG, "Deleted bench: ${bench.name}")
+                api.deleteSpot(spot.id)
+                spotDao.deleteById(spot.id)
+                Log.d(TAG, "Deleted spot: ${spot.name}")
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to delete bench: ${bench.name}", e)
+                Log.e(TAG, "Failed to delete spot: ${spot.name}", e)
             }
         }
 
@@ -317,12 +317,12 @@ class SyncManager @Inject constructor(
                 val photoPart = MultipartBody.Part.createFormData("photo", file.name, requestFile)
                 val isMainBody = photo.isMain.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
-                api.uploadPhoto(photo.benchId, photoPart, isMainBody)
+                api.uploadPhoto(photo.spotId, photoPart, isMainBody)
                 pendingPhotoDao.deleteById(photo.id)
 
-                Log.d(TAG, "Uploaded photo for bench: ${photo.benchId}")
+                Log.d(TAG, "Uploaded photo for spot: ${photo.spotId}")
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to upload photo for bench: ${photo.benchId}", e)
+                Log.e(TAG, "Failed to upload photo for spot: ${photo.spotId}", e)
             }
         }
     }

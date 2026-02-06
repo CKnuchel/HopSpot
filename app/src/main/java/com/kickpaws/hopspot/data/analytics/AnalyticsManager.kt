@@ -23,28 +23,28 @@ class AnalyticsManager @Inject constructor(
     }
 
     // Custom Events
-    fun logBenchCreated(benchId: Int) {
-        analytics.logEvent("bench_created") {
-            param("bench_id", benchId.toLong())
+    fun logSpotCreated(spotId: Int) {
+        analytics.logEvent("spot_created") {
+            param("spot_id", spotId.toLong())
         }
     }
 
-    fun logBenchViewed(benchId: Int) {
-        analytics.logEvent("bench_viewed") {
-            param("bench_id", benchId.toLong())
+    fun logSpotViewed(spotId: Int) {
+        analytics.logEvent("spot_viewed") {
+            param("spot_id", spotId.toLong())
         }
     }
 
-    fun logBenchFavorited(benchId: Int, added: Boolean) {
-        analytics.logEvent("bench_favorited") {
-            param("bench_id", benchId.toLong())
+    fun logSpotFavorited(spotId: Int, added: Boolean) {
+        analytics.logEvent("spot_favorited") {
+            param("spot_id", spotId.toLong())
             param("added", if (added) 1L else 0L)
         }
     }
 
-    fun logVisitAdded(benchId: Int) {
+    fun logVisitAdded(spotId: Int) {
         analytics.logEvent("visit_added") {
-            param("bench_id", benchId.toLong())
+            param("spot_id", spotId.toLong())
         }
     }
 
@@ -58,9 +58,9 @@ class AnalyticsManager @Inject constructor(
         analytics.logEvent("logout", null)
     }
 
-    fun logNotificationOpened(benchId: Int?) {
+    fun logNotificationOpened(spotId: Int?) {
         analytics.logEvent("notification_opened") {
-            benchId?.let { param("bench_id", it.toLong()) }
+            spotId?.let { param("spot_id", it.toLong()) }
         }
     }
 

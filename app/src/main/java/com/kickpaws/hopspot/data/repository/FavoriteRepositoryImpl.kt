@@ -37,27 +37,27 @@ class FavoriteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addFavorite(benchId: Int): Result<Boolean> {
+    override suspend fun addFavorite(spotId: Int): Result<Boolean> {
         return try {
-            val response = api.addFavorite(benchId)
+            val response = api.addFavorite(spotId)
             Result.success(response["is_favorite"] == true)
         } catch (e: Exception) {
             Result.failure(ApiErrorParser.parse(e))
         }
     }
 
-    override suspend fun removeFavorite(benchId: Int): Result<Boolean> {
+    override suspend fun removeFavorite(spotId: Int): Result<Boolean> {
         return try {
-            val response = api.removeFavorite(benchId)
+            val response = api.removeFavorite(spotId)
             Result.success(response["is_favorite"] == false)
         } catch (e: Exception) {
             Result.failure(ApiErrorParser.parse(e))
         }
     }
 
-    override suspend fun isFavorite(benchId: Int): Result<Boolean> {
+    override suspend fun isFavorite(spotId: Int): Result<Boolean> {
         return try {
-            val response = api.checkFavorite(benchId)
+            val response = api.checkFavorite(spotId)
             Result.success(response["is_favorite"] == true)
         } catch (e: Exception) {
             Result.failure(ApiErrorParser.parse(e))

@@ -16,7 +16,7 @@ data class PaginatedFavorites(
 
 interface FavoriteRepository {
     suspend fun getFavorites(filter: FavoriteFilter = FavoriteFilter()): Result<PaginatedFavorites>
-    suspend fun addFavorite(benchId: Int): Result<Boolean>
-    suspend fun removeFavorite(benchId: Int): Result<Boolean>
-    suspend fun isFavorite(benchId: Int): Result<Boolean>
+    suspend fun addFavorite(spotId: Int): Result<Boolean>
+    suspend fun removeFavorite(spotId: Int): Result<Boolean>
+    suspend fun isFavorite(spotId: Int): Result<Boolean>
 }
