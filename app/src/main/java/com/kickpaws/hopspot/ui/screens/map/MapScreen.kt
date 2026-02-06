@@ -1,3 +1,5 @@
+@file:Suppress("GoogleMapComposable", "KotlinConstantConditions")
+
 package com.kickpaws.hopspot.ui.screens.map
 
 import android.Manifest
@@ -308,7 +310,6 @@ fun MapScreen(
             SpotPreviewCard(
                 spot = spot,
                 onClick = { onSpotClick(spot.id) },
-                onDismiss = { viewModel.clearSelection() },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(start = 16.dp, end = 16.dp, bottom = 80.dp)
@@ -321,7 +322,6 @@ fun MapScreen(
 private fun SpotPreviewCard(
     spot: Spot,
     onClick: () -> Unit,
-    onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colorScheme = MaterialTheme.colorScheme
@@ -439,7 +439,7 @@ private suspend fun getCurrentLocation(context: Context): Pair<Double, Double>? 
                 null
             }
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 }
