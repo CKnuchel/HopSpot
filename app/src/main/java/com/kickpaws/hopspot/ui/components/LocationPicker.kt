@@ -1,3 +1,5 @@
+@file:Suppress("GoogleMapComposable", "KotlinConstantConditions")
+
 package com.kickpaws.hopspot.ui.components
 
 import android.Manifest
