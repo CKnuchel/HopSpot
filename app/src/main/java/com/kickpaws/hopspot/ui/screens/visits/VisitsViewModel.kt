@@ -116,4 +116,43 @@ class VisitsViewModel @Inject constructor(
             )
         }
     }
+
+    fun showDeleteDialog(visit: com.kickpaws.hopspot.domain.model.Visit) {
+        _uiState.update { it.copy(visitToDelete = visit) }
+    }
+
+    fun dismissDeleteDialog() {
+        _uiState.update { it.copy(visitToDelete = null) }
+    }
+
+    fun confirmDelete() {
+        val visitToDelete = _uiState.value.visitToDelete ?: return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isDeleting = true) }
+
+            val result = visitRepository.deleteVisit(visitToDelete.id)
+
+            result.fold(
+                onSuccess = {
+                    _uiState.update {
+                        it.copy(
+                            isDeleting = false,
+                            visitToDelete = null,
+                            visits = it.visits.filter { v -> v.id != visitToDelete.id }
+                        )
+                    }
+                },
+                onFailure = { exception ->
+                    _uiState.update {
+                        it.copy(
+                            isDeleting = false,
+                            visitToDelete = null,
+                            errorMessage = exception.message ?: "Fehler beim Loeschen"
+                        )
+                    }
+                }
+            )
+        }
+    }
 }

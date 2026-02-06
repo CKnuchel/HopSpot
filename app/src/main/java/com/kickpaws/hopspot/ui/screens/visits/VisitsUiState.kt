@@ -12,5 +12,9 @@ data class VisitsUiState(
     val currentPage: Int = 1,
     val totalPages: Int = 1,
     val hasMorePages: Boolean = false,
-    val isLoadingMore: Boolean = false
+    val isLoadingMore: Boolean = false,
+
+    // Delete
+    val visitToDelete: Visit? = null,
+    val isDeleting: Boolean = false
 )

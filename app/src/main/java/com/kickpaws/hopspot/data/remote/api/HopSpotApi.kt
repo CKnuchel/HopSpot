@@ -129,6 +129,11 @@ interface HopSpotApi {
         @Body request: CreateVisitRequest
     ): VisitDto
 
+    @DELETE("api/v1/visits/{id}")
+    suspend fun deleteVisit(
+        @Path("id") visitId: Int
+    )
+
     @GET("api/v1/benches/{id}/visits/count")
     suspend fun getVisitCount(
         @Path("id") benchId: Int

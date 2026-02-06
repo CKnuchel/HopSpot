@@ -1,9 +1,9 @@
 package com.kickpaws.hopspot.di
 
 import com.kickpaws.hopspot.data.repository.AdminRepositoryImpl
-import com.kickpaws.hopspot.data.repository.BenchRepositoryImpl
+import com.kickpaws.hopspot.data.repository.OfflineFirstBenchRepository
+import com.kickpaws.hopspot.data.repository.OfflineFirstVisitRepository
 import com.kickpaws.hopspot.data.repository.PhotoRepositoryImpl
-import com.kickpaws.hopspot.data.repository.VisitRepositoryImpl
 import com.kickpaws.hopspot.domain.repository.AdminRepository
 import com.kickpaws.hopspot.domain.repository.AuthRepository
 import com.kickpaws.hopspot.domain.repository.AuthRepositoryImpl
@@ -14,7 +14,6 @@ import com.kickpaws.hopspot.domain.repository.UserRepositoryImpl
 import com.kickpaws.hopspot.domain.repository.VisitRepository
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -38,7 +37,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindBenchRepository(
-        benchRepositoryImpl: BenchRepositoryImpl
+        offlineFirstBenchRepository: OfflineFirstBenchRepository
     ): BenchRepository
 
     @Binds
@@ -56,6 +55,6 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindVisitRepository(
-        visitRepositoryImpl: VisitRepositoryImpl
+        offlineFirstVisitRepository: OfflineFirstVisitRepository
     ): VisitRepository
 }

@@ -53,6 +53,15 @@ class VisitRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteVisit(visitId: Int): Result<Unit> {
+        return try {
+            api.deleteVisit(visitId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun getVisitCount(benchId: Int): Result<Long> {
         return try {
             val response = api.getVisitCount(benchId)

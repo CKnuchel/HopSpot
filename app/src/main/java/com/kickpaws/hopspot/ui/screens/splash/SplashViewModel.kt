@@ -5,6 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import com.kickpaws.hopspot.data.local.CurrentUserManager
 import com.kickpaws.hopspot.data.local.TokenManager
+import com.kickpaws.hopspot.data.local.dao.UserDao
+import com.kickpaws.hopspot.data.local.mapper.toDomain
+import com.kickpaws.hopspot.data.local.mapper.toEntity
+import com.kickpaws.hopspot.data.network.NetworkMonitor
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
 import com.kickpaws.hopspot.data.remote.dto.RefreshFCMTokenRequest
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
@@ -21,7 +25,9 @@ import javax.inject.Inject
 class SplashViewModel @Inject constructor(
     private val tokenManager: TokenManager,
     private val api: HopSpotApi,
-    private val currentUserManager: CurrentUserManager
+    private val currentUserManager: CurrentUserManager,
+    private val networkMonitor: NetworkMonitor,
+    private val userDao: UserDao
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SplashUiState())
@@ -33,22 +39,69 @@ class SplashViewModel @Inject constructor(
 
     private fun checkAuthStatus() {
         viewModelScope.launch {
-            val isLoggedIn = tokenManager.isLoggedIn()
+            val hasToken = tokenManager.isLoggedIn()
+            val isOnline = networkMonitor.isOnlineNow
+            val cachedUser = userDao.getCurrentUser()
 
-            if (isLoggedIn) {
-                try {
-                    val user = api.getMe().toDomain()
-                    currentUserManager.setUser(user)
+            when {
+                hasToken && isOnline -> {
+                    // Online with token: validate via API
+                    try {
+                        val user = api.getMe().toDomain()
+                        currentUserManager.setUser(user)
 
-                    sendFcmTokenToBackend()
+                        // Cache user for offline use
+                        userDao.insertUser(user.toEntity())
 
-                    _uiState.update { it.copy(isLoading = false, isLoggedIn = true) }
-                } catch (e: Exception) {
-                    tokenManager.clearTokens()
-                    _uiState.update { it.copy(isLoading = false, isLoggedIn = false) }
+                        sendFcmTokenToBackend()
+
+                        _uiState.update {
+                            it.copy(isLoading = false, isLoggedIn = true, isOffline = false)
+                        }
+                    } catch (e: Exception) {
+                        // API failed, check if we have cached user
+                        if (cachedUser != null) {
+                            // Use cached user in offline mode
+                            currentUserManager.setUser(cachedUser.toDomain())
+                            _uiState.update {
+                                it.copy(isLoading = false, isLoggedIn = true, isOffline = true)
+                            }
+                        } else {
+                            // No cached user, clear tokens and go to login
+                            tokenManager.clearTokens()
+                            _uiState.update {
+                                it.copy(isLoading = false, isLoggedIn = false, isOffline = false)
+                            }
+                        }
+                    }
                 }
-            } else {
-                _uiState.update { it.copy(isLoading = false, isLoggedIn = false) }
+
+                hasToken && !isOnline && cachedUser != null -> {
+                    // Offline mode with cached user
+                    currentUserManager.setUser(cachedUser.toDomain())
+                    _uiState.update {
+                        it.copy(isLoading = false, isLoggedIn = true, isOffline = true)
+                    }
+                }
+
+                hasToken && !isOnline && cachedUser == null -> {
+                    // First start without internet - need internet for first login
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isLoggedIn = false,
+                            isOffline = true,
+                            error = "Internet fuer erste Anmeldung erforderlich"
+                        )
+                    }
+                }
+
+                else -> {
+                    // No token, go to login
+                    _uiState.update {
+                        it.copy(isLoading = false, isLoggedIn = false, isOffline = !isOnline)
+                    }
+                }
             }
         }
     }

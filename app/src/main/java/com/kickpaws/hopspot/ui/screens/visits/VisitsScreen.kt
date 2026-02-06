@@ -1,5 +1,6 @@
 package com.kickpaws.hopspot.ui.screens.visits
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +54,42 @@ fun VisitsScreen(
         if (shouldLoadMore.value && uiState.hasMorePages && !uiState.isLoadingMore) {
             viewModel.loadMoreVisits()
         }
+    }
+
+    // Delete confirmation dialog
+    if (uiState.visitToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissDeleteDialog() },
+            title = { Text("Besuch loeschen?") },
+            text = {
+                Text("Moechtest du den Besuch bei \"${uiState.visitToDelete!!.benchName}\" wirklich loeschen?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.confirmDelete() },
+                    enabled = !uiState.isDeleting,
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error)
+                ) {
+                    if (uiState.isDeleting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = colorScheme.onError,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Loeschen")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.dismissDeleteDialog() },
+                    enabled = !uiState.isDeleting
+                ) {
+                    Text("Abbrechen")
+                }
+            }
+        )
     }
 
     Scaffold(
@@ -101,9 +139,10 @@ fun VisitsScreen(
                                 items = uiState.visits,
                                 key = { it.id }
                             ) { visit ->
-                                VisitListItem(
+                                SwipeableVisitItem(
                                     visit = visit,
-                                    onClick = { onBenchClick(visit.benchId) }
+                                    onClick = { onBenchClick(visit.benchId) },
+                                    onDelete = { viewModel.showDeleteDialog(visit) }
                                 )
                             }
 
@@ -128,6 +167,59 @@ fun VisitsScreen(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeableVisitItem(
+    visit: Visit,
+    onClick: () -> Unit,
+    onDelete: () -> Unit
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { dismissValue ->
+            if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
+                onDelete()
+                false // Don't dismiss yet, wait for dialog confirmation
+            } else {
+                false
+            }
+        }
+    )
+
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = {
+            val backgroundColor by animateColorAsState(
+                when (dismissState.targetValue) {
+                    SwipeToDismissBoxValue.EndToStart -> colorScheme.errorContainer
+                    else -> Color.Transparent
+                },
+                label = "backgroundColor"
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(backgroundColor, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 20.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Loeschen",
+                        tint = colorScheme.onErrorContainer
+                    )
+                }
+            }
+        },
+        enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = true
+    ) {
+        VisitListItem(visit = visit, onClick = onClick)
     }
 }
 

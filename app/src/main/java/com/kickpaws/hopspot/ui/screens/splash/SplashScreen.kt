@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kickpaws.hopspot.R
@@ -31,11 +34,10 @@ fun SplashScreen(
     val uiState by viewModel.uiState.collectAsState()
     val colorScheme = MaterialTheme.colorScheme
 
-    LaunchedEffect(uiState.isLoggedIn) {
-        when (uiState.isLoggedIn) {
-            true -> onNavigateToHome()
-            false -> onNavigateToLogin()
-            null -> { /* Still loading */ }
+    LaunchedEffect(uiState.isLoggedIn, uiState.error) {
+        when {
+            uiState.isLoggedIn == true -> onNavigateToHome()
+            uiState.isLoggedIn == false && uiState.error == null -> onNavigateToLogin()
         }
     }
 
@@ -63,11 +65,21 @@ fun SplashScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            CircularProgressIndicator(
-                modifier = Modifier.size(48.dp),
-                color = colorScheme.background,
-                strokeWidth = 4.dp
-            )
+            if (uiState.error != null) {
+                Text(
+                    text = uiState.error!!,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = colorScheme.background,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 32.dp)
+                )
+            } else {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(48.dp),
+                    color = colorScheme.background,
+                    strokeWidth = 4.dp
+                )
+            }
         }
     }
 }
