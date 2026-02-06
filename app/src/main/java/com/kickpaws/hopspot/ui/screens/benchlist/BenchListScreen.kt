@@ -55,6 +55,14 @@ fun BenchListScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    // Navigate to random bench when ID is set
+    LaunchedEffect(uiState.randomBenchId) {
+        uiState.randomBenchId?.let { benchId ->
+            onBenchClick(benchId)
+            viewModel.clearRandomBenchId()
+        }
+    }
+
     // Location Permission
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -147,15 +155,41 @@ fun BenchListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onCreateBenchClick,
-                containerColor = colorScheme.primary,
-                contentColor = colorScheme.onPrimary
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Bank hinzufügen"
-                )
+                // Random Bench FAB
+                SmallFloatingActionButton(
+                    onClick = { viewModel.getRandomBench() },
+                    containerColor = colorScheme.secondaryContainer,
+                    contentColor = colorScheme.onSecondaryContainer
+                ) {
+                    if (uiState.isLoadingRandom) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = colorScheme.onSecondaryContainer
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Casino,
+                            contentDescription = "Zufaellige Bank"
+                        )
+                    }
+                }
+
+                // Create Bench FAB
+                FloatingActionButton(
+                    onClick = onCreateBenchClick,
+                    containerColor = colorScheme.primary,
+                    contentColor = colorScheme.onPrimary
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Bank hinzufuegen"
+                    )
+                }
             }
         }
     ) { innerPadding ->

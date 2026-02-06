@@ -226,6 +226,38 @@ class BenchListViewModel @Inject constructor(
         }
     }
 
+    // Random Bench
+    fun getRandomBench() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingRandom = true) }
+
+            val result = benchRepository.getRandomBench()
+
+            result.fold(
+                onSuccess = { bench ->
+                    _uiState.update {
+                        it.copy(
+                            isLoadingRandom = false,
+                            randomBenchId = bench.id
+                        )
+                    }
+                },
+                onFailure = { exception ->
+                    _uiState.update {
+                        it.copy(
+                            isLoadingRandom = false,
+                            errorMessage = exception.message ?: "Keine Bank gefunden"
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    fun clearRandomBenchId() {
+        _uiState.update { it.copy(randomBenchId = null) }
+    }
+
     private fun buildFilter(page: Int): BenchFilter {
         val state = _uiState.value
         return BenchFilter(

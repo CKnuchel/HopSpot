@@ -31,7 +31,11 @@ data class BenchListUiState(
 
     // Delete
     val benchToDelete: Bench? = null,
-    val isDeleting: Boolean = false
+    val isDeleting: Boolean = false,
+
+    // Random Bench
+    val randomBenchId: Int? = null,
+    val isLoadingRandom: Boolean = false
 )
 
 enum class SortOption(val apiValue: String, val displayName: String) {

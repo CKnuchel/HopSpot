@@ -151,6 +151,16 @@ class OfflineFirstBenchRepository @Inject constructor(
         }
     }
 
+    override suspend fun getRandomBench(): Result<Bench> {
+        return try {
+            val response = api.getRandomBench()
+            val bench = response.data.toDomain()
+            Result.success(bench)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun createBench(
         name: String,
         latitude: Double,

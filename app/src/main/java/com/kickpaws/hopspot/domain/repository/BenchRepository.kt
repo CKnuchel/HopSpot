@@ -27,6 +27,7 @@ data class PaginatedBenches(
 interface BenchRepository {
     suspend fun getBenches(filter: BenchFilter = BenchFilter()): Result<PaginatedBenches>
     suspend fun getBench(id: Int): Result<Bench>
+    suspend fun getRandomBench(): Result<Bench>
     suspend fun createBench(
         name: String,
         latitude: Double,

@@ -69,6 +69,9 @@ interface HopSpotApi {
         @Path("id") id: Int
     ): ApiResponse<BenchDto>
 
+    @GET("api/v1/benches/random")
+    suspend fun getRandomBench(): ApiResponse<BenchDto>
+
     @POST("api/v1/benches")
     suspend fun createBench(
         @Body request: CreateBenchRequest

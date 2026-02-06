@@ -60,6 +60,15 @@ class BenchRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getRandomBench(): Result<Bench> {
+        return try {
+            val response = api.getRandomBench()
+            Result.success(response.data.toDomain())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun createBench(
         name: String,
         latitude: Double,
