@@ -2,6 +2,7 @@ package com.kickpaws.hopspot.ui.screens.map
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kickpaws.hopspot.data.analytics.AnalyticsManager
 import com.kickpaws.hopspot.domain.model.Bench
 import com.kickpaws.hopspot.domain.repository.BenchFilter
 import com.kickpaws.hopspot.domain.repository.BenchRepository
@@ -22,13 +23,15 @@ data class MapUiState(
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val benchRepository: BenchRepository
+    private val benchRepository: BenchRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
     init {
+        analyticsManager.logScreenView("Map")
         loadAllBenches()
     }
 

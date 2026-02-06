@@ -2,6 +2,7 @@ package com.kickpaws.hopspot.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kickpaws.hopspot.data.analytics.AnalyticsManager
 import com.kickpaws.hopspot.domain.repository.AuthRepository
 import com.kickpaws.hopspot.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,13 +16,15 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
     init {
+        analyticsManager.logScreenView("Profile")
         loadProfile()
     }
 
@@ -33,6 +36,8 @@ class ProfileViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = { user ->
+                    analyticsManager.setUserId(user.id)
+                    analyticsManager.setUserRole(user.role)
                     _uiState.update { it.copy(isLoading = false, user = user) }
                 },
                 onFailure = { exception ->
@@ -53,6 +58,9 @@ class ProfileViewModel @Inject constructor(
 
             // Logout (clears tokens)
             authRepository.logout()
+
+            analyticsManager.logLogout()
+            analyticsManager.setUserId(null)
 
             _uiState.update { it.copy(isLoggingOut = false, isLoggedOut = true) }
         }

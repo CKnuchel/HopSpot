@@ -2,6 +2,7 @@ package com.kickpaws.hopspot.ui.screens.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kickpaws.hopspot.data.analytics.AnalyticsManager
 import com.kickpaws.hopspot.domain.model.Favorite
 import com.kickpaws.hopspot.domain.repository.FavoriteFilter
 import com.kickpaws.hopspot.domain.repository.FavoriteRepository
@@ -15,13 +16,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
-    private val favoriteRepository: FavoriteRepository
+    private val favoriteRepository: FavoriteRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavoritesUiState())
     val uiState: StateFlow<FavoritesUiState> = _uiState.asStateFlow()
 
     init {
+        analyticsManager.logScreenView("Favorites")
         loadFavorites()
     }
 

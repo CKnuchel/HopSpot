@@ -2,6 +2,7 @@ package com.kickpaws.hopspot.ui.screens.benchlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kickpaws.hopspot.data.analytics.AnalyticsManager
 import com.kickpaws.hopspot.domain.model.Bench
 import com.kickpaws.hopspot.domain.repository.BenchFilter
 import com.kickpaws.hopspot.domain.repository.BenchRepository
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BenchListViewModel @Inject constructor(
-    private val benchRepository: BenchRepository
+    private val benchRepository: BenchRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BenchListUiState())
@@ -26,6 +28,7 @@ class BenchListViewModel @Inject constructor(
     private var searchJob: Job? = null
 
     init {
+        analyticsManager.logScreenView("BenchList")
         loadBenches()
     }
 

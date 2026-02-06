@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.kickpaws.hopspot.data.analytics.AnalyticsManager
 import com.kickpaws.hopspot.data.local.CurrentUserManager
 import com.kickpaws.hopspot.data.network.NetworkMonitor
 import com.kickpaws.hopspot.data.sync.SyncManager
@@ -41,10 +42,18 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var syncManager: SyncManager
 
+    @Inject
+    lateinit var analyticsManager: AnalyticsManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val benchIdFromNotification = intent.extras?.getInt("bench_id")?.takeIf { it > 0 }
+
+        // Track notification opened event
+        if (benchIdFromNotification != null) {
+            analyticsManager.logNotificationOpened(benchIdFromNotification)
+        }
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Brown700.toArgb()),

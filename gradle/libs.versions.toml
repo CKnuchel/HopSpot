@@ -99,6 +99,7 @@ play-services-location = { group = "com.google.android.gms", name = "play-servic
 # Firebase
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

@@ -8,6 +8,7 @@ import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kickpaws.hopspot.data.analytics.AnalyticsManager
 import com.kickpaws.hopspot.domain.repository.BenchRepository
 import com.kickpaws.hopspot.domain.repository.PhotoRepository
 import com.google.android.gms.location.LocationServices
@@ -24,13 +25,15 @@ import javax.inject.Inject
 class BenchCreateViewModel @Inject constructor(
     private val benchRepository: BenchRepository,
     private val photoRepository: PhotoRepository,
-    private val application: Application
+    private val application: Application,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BenchCreateUiState())
     val uiState: StateFlow<BenchCreateUiState> = _uiState.asStateFlow()
 
     init {
+        analyticsManager.logScreenView("BenchCreate")
         loadInitialLocation()
     }
 
@@ -138,6 +141,8 @@ class BenchCreateViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = { bench ->
+                    analyticsManager.logBenchCreated(bench.id)
+
                     if (state.photoUri != null) {
                         _uiState.update { it.copy(isUploadingPhoto = true) }
 

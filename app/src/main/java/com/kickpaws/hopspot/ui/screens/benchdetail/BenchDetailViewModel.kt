@@ -2,6 +2,7 @@ package com.kickpaws.hopspot.ui.screens.benchdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kickpaws.hopspot.data.analytics.AnalyticsManager
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
 import com.kickpaws.hopspot.data.remote.dto.CreateVisitRequest
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
@@ -39,7 +40,8 @@ data class BenchDetailUiState(
 
 @HiltViewModel
 class BenchDetailViewModel @Inject constructor(
-    private val api: HopSpotApi
+    private val api: HopSpotApi,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BenchDetailUiState())
@@ -52,6 +54,9 @@ class BenchDetailViewModel @Inject constructor(
             try {
                 val response = api.getBench(benchId)
                 val bench = response.data.toDomain()
+
+                analyticsManager.logScreenView("BenchDetail")
+                analyticsManager.logBenchViewed(benchId)
 
                 _uiState.update {
                     it.copy(
@@ -151,6 +156,7 @@ class BenchDetailViewModel @Inject constructor(
                 } else {
                     api.addFavorite(benchId)
                 }
+                analyticsManager.logBenchFavorited(benchId, added = !currentState)
                 _uiState.update {
                     it.copy(
                         isFavorite = !currentState,
@@ -180,6 +186,8 @@ class BenchDetailViewModel @Inject constructor(
                         comment = comment
                     )
                 )
+
+                analyticsManager.logVisitAdded(benchId)
 
                 _uiState.update {
                     it.copy(
