@@ -23,7 +23,7 @@ sealed class BottomNavItem(
     object SpotList : BottomNavItem(
         route = Route.SpotList.route,
         icon = Icons.AutoMirrored.Filled.List,
-        label = "HopSpots"
+        label = "Spots"
     )
 
     object Visits : BottomNavItem(
