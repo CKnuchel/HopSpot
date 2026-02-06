@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.kickpaws.hopspot.R
 
 @Composable
 fun LoginScreen(
@@ -68,21 +70,21 @@ fun LoginScreen(
         ) {
             // Logo / Title
             Text(
-                text = "🍺",
+                text = "\uD83C\uDF7A",
                 fontSize = 64.sp
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "HopSpot",
+                text = stringResource(R.string.app_name),
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.background
             )
 
             Text(
-                text = "Finde dein Lieblingsbänkli",
+                text = stringResource(R.string.auth_slogan),
                 fontSize = 16.sp,
                 color = colorScheme.background.copy(alpha = 0.8f)
             )
@@ -110,7 +112,7 @@ fun LoginScreen(
                     HopSpotTextField(
                         value = uiState.email,
                         onValueChange = viewModel::onEmailChange,
-                        label = "Email",
+                        label = stringResource(R.string.label_email),
                         leadingIcon = Icons.Default.Email,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Email,
@@ -127,7 +129,7 @@ fun LoginScreen(
                     HopSpotTextField(
                         value = uiState.password,
                         onValueChange = viewModel::onPasswordChange,
-                        label = "Passwort",
+                        label = stringResource(R.string.label_password),
                         leadingIcon = Icons.Default.Lock,
                         isPassword = true,
                         isPasswordVisible = uiState.isPasswordVisible,
@@ -159,7 +161,7 @@ fun LoginScreen(
 
                     // Login Button
                     HopSpotButton(
-                        text = "Prost! 🍻",
+                        text = stringResource(R.string.btn_login),
                         onClick = viewModel::login,
                         isLoading = uiState.isLoading,
                         modifier = Modifier.fillMaxWidth()
@@ -170,7 +172,7 @@ fun LoginScreen(
                     // Register Link
                     TextButton(onClick = onNavigateToRegister) {
                         Text(
-                            text = "Noch kein Konto? Registrieren",
+                            text = stringResource(R.string.auth_no_account),
                             color = colorScheme.secondary
                         )
                     }
@@ -216,9 +218,9 @@ fun HopSpotTextField(
                             Icons.Default.Visibility
                         },
                         contentDescription = if (isPasswordVisible) {
-                            "Passwort verstecken"
+                            stringResource(R.string.cd_hide_password)
                         } else {
-                            "Passwort anzeigen"
+                            stringResource(R.string.cd_show_password)
                         },
                         tint = colorScheme.onSurfaceVariant
                     )

@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -204,7 +205,7 @@ fun MapScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     TextButton(onClick = viewModel::loadAllBenches) {
-                        Text("Retry")
+                        Text(stringResource(R.string.common_retry))
                     }
                 }
             }
@@ -230,7 +231,7 @@ fun MapScreen(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "${uiState.benches.size} Bänke",
+                    text = stringResource(R.string.map_benches_count, uiState.benches.size),
                     color = colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.Medium,
                     fontSize = 14.sp
@@ -260,7 +261,7 @@ fun MapScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.MyLocation,
-                contentDescription = "Mein Standort",
+                contentDescription = stringResource(R.string.cd_my_location),
                 tint = colorScheme.primary
             )
         }
@@ -275,7 +276,7 @@ fun MapScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Neue Bank"
+                contentDescription = stringResource(R.string.cd_new_bench)
             )
         }
 
@@ -368,7 +369,7 @@ private fun BenchPreviewCard(
                     if (bench.hasToilet) {
                         Icon(
                             imageVector = Icons.Default.Wc,
-                            contentDescription = "Toilette",
+                            contentDescription = stringResource(R.string.cd_toilet),
                             tint = colorScheme.primary,
                             modifier = Modifier.size(16.dp)
                         )
@@ -376,7 +377,7 @@ private fun BenchPreviewCard(
                     if (bench.hasTrashBin) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Abfalleimer",
+                            contentDescription = stringResource(R.string.cd_trash_bin),
                             tint = colorScheme.primary,
                             modifier = Modifier.size(16.dp)
                         )
@@ -387,7 +388,7 @@ private fun BenchPreviewCard(
             // Arrow
             Icon(
                 imageVector = Icons.Default.ChevronRight,
-                contentDescription = "Details",
+                contentDescription = stringResource(R.string.cd_details),
                 tint = colorScheme.primary
             )
         }

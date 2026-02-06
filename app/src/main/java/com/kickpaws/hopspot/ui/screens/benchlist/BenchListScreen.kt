@@ -23,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -32,7 +34,6 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
-import androidx.compose.ui.res.painterResource
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -174,7 +175,7 @@ fun BenchListScreen(
                     } else {
                         Icon(
                             imageVector = Icons.Default.Casino,
-                            contentDescription = "Zufaellige Bank"
+                            contentDescription = stringResource(R.string.cd_random_bench)
                         )
                     }
                 }
@@ -187,7 +188,7 @@ fun BenchListScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Bank hinzufuegen"
+                        contentDescription = stringResource(R.string.cd_add_bench)
                     )
                 }
             }
@@ -279,7 +280,7 @@ private fun SearchTopBar(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = onSearchChange,
-                placeholder = { Text("Suchen...") },
+                placeholder = { Text(stringResource(R.string.hint_search)) },
                 singleLine = true,
                 leadingIcon = {
                     Icon(
@@ -293,7 +294,7 @@ private fun SearchTopBar(
                         IconButton(onClick = onClearSearch) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
-                                contentDescription = "Suche löschen"
+                                contentDescription = stringResource(R.string.cd_clear_search)
                             )
                         }
                     }
@@ -324,7 +325,7 @@ private fun SearchTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.FilterList,
-                        contentDescription = "Filter",
+                        contentDescription = stringResource(R.string.cd_filter),
                         tint = colorScheme.onSurface
                     )
                 }
@@ -447,13 +448,13 @@ private fun BenchListItem(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Wc,
-                                contentDescription = "Toilette",
+                                contentDescription = stringResource(R.string.cd_toilet),
                                 tint = colorScheme.primary,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(2.dp))
                             Text(
-                                text = "WC",
+                                text = stringResource(R.string.amenity_wc),
                                 fontSize = 12.sp,
                                 color = colorScheme.onSurfaceVariant
                             )
@@ -466,13 +467,13 @@ private fun BenchListItem(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Abfalleimer",
+                                contentDescription = stringResource(R.string.cd_trash_bin),
                                 tint = colorScheme.primary,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(2.dp))
                             Text(
-                                text = "Abfall",
+                                text = stringResource(R.string.amenity_trash),
                                 fontSize = 12.sp,
                                 color = colorScheme.onSurfaceVariant
                             )
@@ -486,7 +487,7 @@ private fun BenchListItem(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.NearMe,
-                                contentDescription = "Entfernung",
+                                contentDescription = stringResource(R.string.cd_distance),
                                 tint = colorScheme.secondary,
                                 modifier = Modifier.size(16.dp)
                             )
@@ -530,10 +531,10 @@ private fun DeleteConfirmationDialog(
             )
         },
         title = {
-            Text("Bank löschen?")
+            Text(stringResource(R.string.dialog_delete_bench_title))
         },
         text = {
-            Text("Möchtest du \"$benchName\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.")
+            Text(stringResource(R.string.dialog_delete_bench_message, benchName))
         },
         confirmButton = {
             Button(
@@ -551,7 +552,7 @@ private fun DeleteConfirmationDialog(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text("Löschen")
+                    Text(stringResource(R.string.common_delete))
                 }
             }
         },
@@ -560,7 +561,7 @@ private fun DeleteConfirmationDialog(
                 onClick = onDismiss,
                 enabled = !isDeleting
             ) {
-                Text("Abbrechen")
+                Text(stringResource(R.string.common_cancel))
             }
         }
     )
@@ -592,7 +593,7 @@ private fun FilterBottomSheet(
                 .padding(24.dp)
         ) {
             Text(
-                text = "Filter & Sortierung",
+                text = stringResource(R.string.bench_list_filter_title),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.onSurface
@@ -602,7 +603,7 @@ private fun FilterBottomSheet(
 
             // Sort Options
             Text(
-                text = "Sortieren nach",
+                text = stringResource(R.string.bench_list_sort_by),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurfaceVariant
@@ -617,7 +618,7 @@ private fun FilterBottomSheet(
                     FilterChip(
                         selected = uiState.sortBy == option,
                         onClick = { onSortByChange(option) },
-                        label = { Text(option.displayName) },
+                        label = { Text(option.displayName()) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = colorScheme.primary,
                             selectedLabelColor = colorScheme.onPrimary
@@ -644,7 +645,7 @@ private fun FilterBottomSheet(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Nur mit Toilette",
+                        text = stringResource(R.string.bench_list_filter_toilet),
                         color = colorScheme.onSurface
                     )
                 }
@@ -679,7 +680,7 @@ private fun FilterBottomSheet(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Nur mit Abfalleimer",
+                        text = stringResource(R.string.bench_list_filter_trash),
                         color = colorScheme.onSurface
                     )
                 }
@@ -700,7 +701,7 @@ private fun FilterBottomSheet(
 
             // Min Rating Filter
             Text(
-                text = "Mindestbewertung",
+                text = stringResource(R.string.bench_list_filter_min_rating),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurfaceVariant
@@ -717,7 +718,7 @@ private fun FilterBottomSheet(
                         onClick = { onMinRatingChange(rating) },
                         label = {
                             if (rating == null) {
-                                Text("Alle")
+                                Text(stringResource(R.string.bench_list_filter_all))
                             } else {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text("$rating")
@@ -749,7 +750,7 @@ private fun FilterBottomSheet(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Zurücksetzen")
+                    Text(stringResource(R.string.common_reset))
                 }
 
                 Button(
@@ -761,7 +762,7 @@ private fun FilterBottomSheet(
                         contentColor = colorScheme.onPrimary
                     )
                 ) {
-                    Text("Anwenden")
+                    Text(stringResource(R.string.common_apply))
                 }
             }
 
@@ -783,7 +784,7 @@ private fun ErrorView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "😕",
+            text = "\uD83D\uDE15",
             fontSize = 48.sp
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -794,7 +795,7 @@ private fun ErrorView(
         )
         Spacer(modifier = Modifier.height(16.dp))
         TextButton(onClick = onRetry) {
-            Text("Erneut versuchen", color = colorScheme.primary)
+            Text(stringResource(R.string.common_retry), color = colorScheme.primary)
         }
     }
 }
@@ -810,19 +811,19 @@ private fun EmptyView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "🪑",
+            text = "\uD83E\uDE91",
             fontSize = 64.sp
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Noch keine Bänke",
+            text = stringResource(R.string.empty_benches_title),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Füge die erste Bank hinzu!",
+            text = stringResource(R.string.empty_benches_subtitle),
             color = colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )

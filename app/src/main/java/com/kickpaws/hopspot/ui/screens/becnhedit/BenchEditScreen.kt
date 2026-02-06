@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -104,7 +105,7 @@ fun BenchEditScreen(
             ) {
                 AsyncImage(
                     model = selectedPhotoUrl,
-                    contentDescription = "Foto gross",
+                    contentDescription = stringResource(R.string.cd_photo_large),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(8.dp)),
@@ -125,9 +126,9 @@ fun BenchEditScreen(
                     tint = colorScheme.error
                 )
             },
-            title = { Text("Bank löschen?") },
+            title = { Text(stringResource(R.string.dialog_delete_bench_title)) },
             text = {
-                Text("Möchtest du \"${uiState.name}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.")
+                Text(stringResource(R.string.dialog_delete_bench_message, uiState.name))
             },
             confirmButton = {
                 Button(
@@ -139,12 +140,12 @@ fun BenchEditScreen(
                         containerColor = colorScheme.error
                     )
                 ) {
-                    Text("Löschen")
+                    Text(stringResource(R.string.common_delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.common_cancel))
                 }
             }
         )
@@ -161,8 +162,8 @@ fun BenchEditScreen(
                     tint = colorScheme.error
                 )
             },
-            title = { Text("Foto löschen?") },
-            text = { Text("Möchtest du dieses Foto wirklich löschen?") },
+            title = { Text(stringResource(R.string.dialog_delete_photo_title)) },
+            text = { Text(stringResource(R.string.dialog_delete_photo_message)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -173,12 +174,12 @@ fun BenchEditScreen(
                         containerColor = colorScheme.error
                     )
                 ) {
-                    Text("Löschen")
+                    Text(stringResource(R.string.common_delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { photoToDelete = null }) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.common_cancel))
                 }
             }
         )
@@ -187,12 +188,12 @@ fun BenchEditScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Bearbeiten") },
+                title = { Text(stringResource(R.string.bench_edit_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Zurück"
+                            contentDescription = stringResource(R.string.cd_back)
                         )
                     }
                 },
@@ -208,7 +209,7 @@ fun BenchEditScreen(
                             )
                         } else {
                             Text(
-                                text = "Speichern",
+                                text = stringResource(R.string.common_save),
                                 color = colorScheme.primary,
                                 fontWeight = FontWeight.Bold
                             )
@@ -275,7 +276,7 @@ fun BenchEditScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         TextButton(onClick = { viewModel.loadBench(benchId) }) {
-                            Text("Erneut versuchen")
+                            Text(stringResource(R.string.common_retry))
                         }
                     }
                 }
@@ -309,7 +310,7 @@ fun BenchEditScreen(
                         OutlinedTextField(
                             value = uiState.name,
                             onValueChange = viewModel::onNameChange,
-                            label = { Text("Name *") },
+                            label = { Text(stringResource(R.string.label_name_required)) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.Chair,
@@ -337,7 +338,7 @@ fun BenchEditScreen(
                         OutlinedTextField(
                             value = uiState.description,
                             onValueChange = viewModel::onDescriptionChange,
-                            label = { Text("Beschreibung") },
+                            label = { Text(stringResource(R.string.label_description)) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.Description,
@@ -419,7 +420,7 @@ fun BenchEditScreen(
                                     contentDescription = null
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Bank löschen")
+                                Text(stringResource(R.string.btn_delete_bench))
                             }
                         }
 
@@ -456,7 +457,7 @@ private fun PhotoSection(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Fotos",
+                text = stringResource(R.string.label_photos),
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface
             )
@@ -474,7 +475,7 @@ private fun PhotoSection(
                 ) {
                     AsyncImage(
                         model = mainPhoto.urlMedium ?: mainPhoto.urlThumbnail,
-                        contentDescription = "Hauptbild",
+                        contentDescription = stringResource(R.string.cd_main_image),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                         placeholder = painterResource(R.drawable.placeholder_bench),
@@ -501,7 +502,7 @@ private fun PhotoSection(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "Hauptbild",
+                                text = stringResource(R.string.bench_detail_main_image),
                                 fontSize = 12.sp,
                                 color = colorScheme.onPrimary
                             )
@@ -517,7 +518,7 @@ private fun PhotoSection(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Löschen",
+                            contentDescription = stringResource(R.string.cd_delete),
                             tint = colorScheme.error,
                             modifier = Modifier
                                 .background(
@@ -552,7 +553,7 @@ private fun PhotoSection(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Foto hinzufügen",
+                            text = stringResource(R.string.btn_add_photo),
                             color = colorScheme.onSurfaceVariant
                         )
                     }
@@ -572,7 +573,7 @@ private fun PhotoSection(
                         strokeWidth = 2.dp
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Wird hochgeladen...", color = colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.bench_form_uploading), color = colorScheme.onSurfaceVariant)
                 }
             }
 
@@ -580,7 +581,7 @@ private fun PhotoSection(
 
             // Other photos (horizontal scroll)
             Text(
-                text = "Weitere Fotos",
+                text = stringResource(R.string.bench_detail_more_photos),
                 fontSize = 14.sp,
                 color = colorScheme.onSurfaceVariant
             )
@@ -616,7 +617,7 @@ private fun PhotoSection(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Foto hinzufügen",
+                            contentDescription = stringResource(R.string.cd_add_photo),
                             tint = colorScheme.primary,
                             modifier = Modifier.size(32.dp)
                         )
@@ -627,7 +628,7 @@ private fun PhotoSection(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Tippe auf ☆ um ein Foto als Hauptbild zu setzen",
+                text = stringResource(R.string.bench_form_set_main_hint),
                 fontSize = 12.sp,
                 color = colorScheme.onSurfaceVariant
             )
@@ -653,7 +654,7 @@ private fun PhotoThumbnail(
     ) {
         AsyncImage(
             model = photo.urlThumbnail,
-            contentDescription = "Foto",
+            contentDescription = stringResource(R.string.cd_photo),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(R.drawable.placeholder_bench),
@@ -677,7 +678,7 @@ private fun PhotoThumbnail(
             ) {
                 Icon(
                     imageVector = Icons.Default.StarBorder,
-                    contentDescription = "Als Hauptbild",
+                    contentDescription = stringResource(R.string.cd_set_as_main),
                     tint = colorScheme.primary,
                     modifier = Modifier.size(18.dp)
                 )
@@ -690,7 +691,7 @@ private fun PhotoThumbnail(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Löschen",
+                    contentDescription = stringResource(R.string.cd_delete),
                     tint = colorScheme.error,
                     modifier = Modifier.size(18.dp)
                 )
@@ -732,7 +733,7 @@ private fun LocationCard(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "Standort *",
+                            text = stringResource(R.string.label_location_required),
                             fontWeight = FontWeight.Medium,
                             color = colorScheme.onSurface
                         )
@@ -748,7 +749,7 @@ private fun LocationCard(
                     onClick = { showDialog = true },
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Ändern")
+                    Text(stringResource(R.string.common_change))
                 }
             }
         }
@@ -775,14 +776,14 @@ private fun ManualLocationDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Koordinaten eingeben") },
+        title = { Text(stringResource(R.string.dialog_enter_coordinates_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
                     value = latitude,
                     onValueChange = { latitude = it },
-                    label = { Text("Latitude") },
-                    placeholder = { Text("z.B. 47.3769") },
+                    label = { Text(stringResource(R.string.label_latitude)) },
+                    placeholder = { Text(stringResource(R.string.hint_latitude)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -790,8 +791,8 @@ private fun ManualLocationDialog(
                 OutlinedTextField(
                     value = longitude,
                     onValueChange = { longitude = it },
-                    label = { Text("Longitude") },
-                    placeholder = { Text("z.B. 8.5417") },
+                    label = { Text(stringResource(R.string.label_longitude)) },
+                    placeholder = { Text(stringResource(R.string.hint_longitude)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -803,12 +804,12 @@ private fun ManualLocationDialog(
                 onClick = { onConfirm(latitude, longitude) },
                 enabled = latitude.isNotBlank() && longitude.isNotBlank()
             ) {
-                Text("OK")
+                Text(stringResource(R.string.common_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Abbrechen")
+                Text(stringResource(R.string.common_cancel))
             }
         }
     )
@@ -832,7 +833,7 @@ private fun RatingSelector(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Bewertung",
+                text = stringResource(R.string.label_rating),
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface
             )
@@ -851,7 +852,7 @@ private fun RatingSelector(
                             } else {
                                 Icons.Default.StarBorder
                             },
-                            contentDescription = "$star Sterne",
+                            contentDescription = stringResource(R.string.cd_stars, star),
                             tint = if (rating != null && star <= rating) {
                                 colorScheme.primary
                             } else {
@@ -864,7 +865,7 @@ private fun RatingSelector(
             }
             if (rating != null) {
                 Text(
-                    text = "$rating von 5 Sternen",
+                    text = stringResource(R.string.bench_form_rating_format, rating),
                     fontSize = 14.sp,
                     color = colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth(),
@@ -895,7 +896,7 @@ private fun AmenitiesCard(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Ausstattung",
+                text = stringResource(R.string.bench_form_amenities),
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface
             )
@@ -913,7 +914,7 @@ private fun AmenitiesCard(
                         tint = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("Toilette in der Nähe")
+                    Text(stringResource(R.string.bench_form_toilet_nearby))
                 }
                 Switch(
                     checked = hasToilet,
@@ -935,7 +936,7 @@ private fun AmenitiesCard(
                         tint = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("Abfalleimer vorhanden")
+                    Text(stringResource(R.string.bench_form_trash_nearby))
                 }
                 Switch(
                     checked = hasTrashBin,

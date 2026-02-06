@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -86,12 +87,12 @@ fun BenchDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(uiState.bench?.name ?: "Bank Details") },
+                title = { Text(uiState.bench?.name ?: stringResource(R.string.bench_detail_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Zurück"
+                            contentDescription = stringResource(R.string.cd_back)
                         )
                     }
                 },
@@ -115,9 +116,9 @@ fun BenchDetailScreen(
                                         Icons.Default.FavoriteBorder
                                     },
                                     contentDescription = if (uiState.isFavorite) {
-                                        "Aus Favoriten entfernen"
+                                        stringResource(R.string.cd_remove_from_favorites)
                                     } else {
-                                        "Zu Favoriten hinzufügen"
+                                        stringResource(R.string.cd_add_to_favorites)
                                     },
                                     tint = if (uiState.isFavorite) {
                                         Color.Red
@@ -131,7 +132,7 @@ fun BenchDetailScreen(
                         IconButton(onClick = { onEditClick(benchId) }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = "Bearbeiten"
+                                contentDescription = stringResource(R.string.cd_edit)
                             )
                         }
                     }
@@ -186,7 +187,7 @@ fun BenchDetailScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         TextButton(onClick = { viewModel.loadBench(benchId) }) {
-                            Text("Erneut versuchen")
+                            Text(stringResource(R.string.common_retry))
                         }
                     }
                 }
@@ -229,7 +230,7 @@ fun BenchDetailScreen(
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
-                                        text = "Keine Fotos",
+                                        text = stringResource(R.string.bench_detail_no_photos),
                                         color = colorScheme.onPrimaryContainer
                                     )
                                 }
@@ -271,7 +272,7 @@ fun BenchDetailScreen(
                                     }
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "${bench.rating}/5",
+                                        text = stringResource(R.string.bench_detail_rating_format, bench.rating),
                                         color = colorScheme.onSurfaceVariant
                                     )
                                 }
@@ -285,12 +286,12 @@ fun BenchDetailScreen(
                             ) {
                                 AmenityChip(
                                     icon = Icons.Default.Wc,
-                                    label = "Toilette",
+                                    label = stringResource(R.string.amenity_toilet),
                                     available = bench.hasToilet
                                 )
                                 AmenityChip(
                                     icon = Icons.Default.Delete,
-                                    label = "Abfalleimer",
+                                    label = stringResource(R.string.amenity_trash_bin),
                                     available = bench.hasTrashBin
                                 )
                             }
@@ -318,7 +319,7 @@ fun BenchDetailScreen(
                             // Description
                             if (!bench.description.isNullOrBlank()) {
                                 Text(
-                                    text = "Beschreibung",
+                                    text = stringResource(R.string.label_description),
                                     fontWeight = FontWeight.Medium,
                                     color = colorScheme.onBackground
                                 )
@@ -356,12 +357,12 @@ fun BenchDetailScreen(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "Besuche",
+                                        text = stringResource(R.string.bench_detail_visits),
                                         fontWeight = FontWeight.Medium,
                                         color = colorScheme.onBackground
                                     )
                                     Text(
-                                        text = "${uiState.visitCount} Besuche insgesamt",
+                                        text = stringResource(R.string.bench_detail_visits_count, uiState.visitCount),
                                         fontSize = 14.sp,
                                         color = colorScheme.onSurfaceVariant
                                     )
@@ -392,7 +393,7 @@ fun BenchDetailScreen(
                                         contentDescription = null
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Ich war hier! 🍺")
+                                    Text(stringResource(R.string.btn_i_was_here))
                                 }
                             }
 
@@ -400,7 +401,7 @@ fun BenchDetailScreen(
                             if (uiState.visitAdded) {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "✓ Besuch gespeichert!",
+                                    text = stringResource(R.string.bench_detail_visit_saved),
                                     color = colorScheme.primary,
                                     modifier = Modifier.fillMaxWidth(),
                                     textAlign = TextAlign.Center
@@ -440,7 +441,7 @@ private fun LocationSection(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Standort",
+                text = stringResource(R.string.bench_detail_location),
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onBackground
             )
@@ -489,7 +490,7 @@ private fun LocationSection(
                 modifier = Modifier.size(18.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("In Google Maps öffnen")
+            Text(stringResource(R.string.btn_open_in_maps))
         }
     }
 }
@@ -519,7 +520,7 @@ private fun PhotoGallery(
             ) {
                 AsyncImage(
                     model = mainPhoto.urlMedium ?: mainPhoto.urlThumbnail,
-                    contentDescription = "Hauptbild",
+                    contentDescription = stringResource(R.string.bench_detail_main_image),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(R.drawable.placeholder_bench),
@@ -546,7 +547,7 @@ private fun PhotoGallery(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Hauptbild",
+                            text = stringResource(R.string.bench_detail_main_image),
                             fontSize = 12.sp,
                             color = colorScheme.onPrimary
                         )
@@ -563,7 +564,7 @@ private fun PhotoGallery(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Weitere Fotos",
+                text = stringResource(R.string.bench_detail_more_photos),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurfaceVariant
@@ -578,7 +579,7 @@ private fun PhotoGallery(
                     val (index, photo) = otherPhotosWithIndex[i]
                     AsyncImage(
                         model = photo.urlThumbnail ?: photo.urlMedium,
-                        contentDescription = "Foto",
+                        contentDescription = stringResource(R.string.cd_photo),
                         modifier = Modifier
                             .size(80.dp)
                             .clip(RoundedCornerShape(8.dp))
@@ -691,7 +692,7 @@ private fun FullscreenImageViewer(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Schliessen",
+                    contentDescription = stringResource(R.string.cd_close),
                     tint = Color.White,
                     modifier = Modifier.size(28.dp)
                 )
@@ -773,7 +774,7 @@ private fun ZoomableImage(
     ) {
         AsyncImage(
             model = imageUrl,
-            contentDescription = "Foto Vollbild",
+            contentDescription = stringResource(R.string.cd_photo_fullscreen),
             modifier = Modifier
                 .fillMaxWidth()
                 .graphicsLayer(
@@ -809,7 +810,7 @@ private fun WeatherCard(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Aktuelles Wetter",
+                text = stringResource(R.string.bench_detail_current_weather),
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onBackground
             )
@@ -885,7 +886,7 @@ private fun WeatherCard(
                             )
                         }
                         Text(
-                            text = "Temperatur",
+                            text = stringResource(R.string.bench_detail_temperature),
                             fontSize = 12.sp,
                             color = colorScheme.onSurfaceVariant
                         )
@@ -918,7 +919,7 @@ private fun WeatherCard(
                             )
                         }
                         Text(
-                            text = "Wind ${getWindDirectionText(weather.winddirection)}",
+                            text = stringResource(R.string.wind_format, getWindDirectionText(weather.winddirection)),
                             fontSize = 12.sp,
                             color = colorScheme.onSurfaceVariant
                         )
@@ -942,37 +943,35 @@ private fun getWeatherColor(code: Int, colorScheme: ColorScheme): Color {
     }
 }
 
-private fun getWeatherDescription(code: Int): String {
-    return when (code) {
-        0 -> "Klar"
-        1 -> "Heiter"
-        2 -> "Teilweise bewölkt"
-        3 -> "Bewölkt"
-        45, 48 -> "Nebel"
-        51, 53, 55 -> "Nieselregen"
-        56, 57 -> "Gefrierender Niesel"
-        61, 63, 65 -> "Regen"
-        66, 67 -> "Gefrierender Regen"
-        71, 73, 75 -> "Schneefall"
-        77 -> "Schneekörner"
-        80, 81, 82 -> "Regenschauer"
-        85, 86 -> "Schneeschauer"
-        95 -> "Gewitter"
-        96, 99 -> "Gewitter mit Hagel"
-        else -> "Unbekannt"
-    }
+@Composable
+private fun getWeatherDescription(code: Int): String = when (code) {
+    0 -> stringResource(R.string.weather_clear)
+    1 -> stringResource(R.string.weather_fair)
+    2 -> stringResource(R.string.weather_partly_cloudy)
+    3 -> stringResource(R.string.weather_cloudy)
+    45, 48 -> stringResource(R.string.weather_fog)
+    51, 53, 55 -> stringResource(R.string.weather_drizzle)
+    56, 57 -> stringResource(R.string.weather_freezing_drizzle)
+    61, 63, 65 -> stringResource(R.string.weather_rain)
+    66, 67 -> stringResource(R.string.weather_freezing_rain)
+    71, 73, 75 -> stringResource(R.string.weather_snow)
+    77 -> stringResource(R.string.weather_snow_grains)
+    80, 81, 82 -> stringResource(R.string.weather_rain_showers)
+    85, 86 -> stringResource(R.string.weather_snow_showers)
+    95 -> stringResource(R.string.weather_thunderstorm)
+    96, 99 -> stringResource(R.string.weather_thunderstorm_hail)
+    else -> stringResource(R.string.weather_unknown)
 }
 
-private fun getWindDirectionText(degrees: Int): String {
-    return when ((degrees + 22) % 360 / 45) {
-        0 -> "N"
-        1 -> "NO"
-        2 -> "O"
-        3 -> "SO"
-        4 -> "S"
-        5 -> "SW"
-        6 -> "W"
-        7 -> "NW"
-        else -> ""
-    }
+@Composable
+private fun getWindDirectionText(degrees: Int): String = when ((degrees + 22) % 360 / 45) {
+    0 -> stringResource(R.string.wind_n)
+    1 -> stringResource(R.string.wind_ne)
+    2 -> stringResource(R.string.wind_e)
+    3 -> stringResource(R.string.wind_se)
+    4 -> stringResource(R.string.wind_s)
+    5 -> stringResource(R.string.wind_sw)
+    6 -> stringResource(R.string.wind_w)
+    7 -> stringResource(R.string.wind_nw)
+    else -> ""
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,9 +58,9 @@ fun FavoritesScreen(
     if (uiState.favoriteToRemove != null) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissRemoveDialog() },
-            title = { Text("Favorit entfernen?") },
+            title = { Text(stringResource(R.string.dialog_remove_favorite_title)) },
             text = {
-                Text("Moechtest du \"${uiState.favoriteToRemove!!.benchName}\" wirklich aus deinen Favoriten entfernen?")
+                Text(stringResource(R.string.dialog_remove_favorite_message, uiState.favoriteToRemove!!.benchName))
             },
             confirmButton = {
                 Button(
@@ -74,7 +75,7 @@ fun FavoritesScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Entfernen")
+                        Text(stringResource(R.string.common_remove))
                     }
                 }
             },
@@ -83,7 +84,7 @@ fun FavoritesScreen(
                     onClick = { viewModel.dismissRemoveDialog() },
                     enabled = !uiState.isRemoving
                 ) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.common_cancel))
                 }
             }
         )
@@ -92,7 +93,7 @@ fun FavoritesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Meine Favoriten") },
+                title = { Text(stringResource(R.string.favorites_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = colorScheme.background
                 )
@@ -207,7 +208,7 @@ private fun SwipeableFavoriteItem(
                 if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
                     Icon(
                         imageVector = Icons.Default.HeartBroken,
-                        contentDescription = "Entfernen",
+                        contentDescription = stringResource(R.string.common_remove),
                         tint = colorScheme.onErrorContainer
                     )
                 }
@@ -304,7 +305,7 @@ private fun FavoriteListItem(
                     if (favorite.benchHasToilet) {
                         Icon(
                             imageVector = Icons.Default.Wc,
-                            contentDescription = "Toilette",
+                            contentDescription = stringResource(R.string.cd_toilet),
                             tint = colorScheme.primary,
                             modifier = Modifier.size(14.dp)
                         )
@@ -313,7 +314,7 @@ private fun FavoriteListItem(
                     if (favorite.benchHasTrashBin) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Abfalleimer",
+                            contentDescription = stringResource(R.string.cd_trash_bin),
                             tint = colorScheme.primary,
                             modifier = Modifier.size(14.dp)
                         )
@@ -355,14 +356,14 @@ private fun EmptyFavoritesView(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Noch keine Favoriten",
+            text = stringResource(R.string.empty_favorites_title),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Tippe auf das Herz bei einer Bank, um sie zu deinen Favoriten hinzuzufuegen!",
+            text = stringResource(R.string.empty_favorites_subtitle),
             color = colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
@@ -389,7 +390,7 @@ private fun ErrorView(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Fehler",
+            text = stringResource(R.string.common_error),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.onBackground
@@ -402,7 +403,7 @@ private fun ErrorView(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onRetry) {
-            Text("Erneut versuchen")
+            Text(stringResource(R.string.common_retry))
         }
     }
 }

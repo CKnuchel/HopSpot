@@ -20,12 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.kickpaws.hopspot.R
 
 @Composable
 fun ProfileScreen(
@@ -86,7 +88,7 @@ fun ProfileScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     TextButton(onClick = { viewModel.loadProfile() }) {
-                        Text("Erneut versuchen", color = colorScheme.primary)
+                        Text(stringResource(R.string.common_retry), color = colorScheme.primary)
                     }
                 }
             }
@@ -140,7 +142,7 @@ fun ProfileScreen(
                             color = colorScheme.primary
                         ) {
                             Text(
-                                text = "👑 Admin",
+                                text = stringResource(R.string.profile_admin_badge),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                                 color = colorScheme.onPrimary,
                                 fontSize = 14.sp,
@@ -169,7 +171,7 @@ fun ProfileScreen(
                         ) {
                             ProfileInfoRow(
                                 icon = Icons.Default.Person,
-                                label = "Name",
+                                label = stringResource(R.string.label_name),
                                 value = user.displayName,
                                 onClick = { viewModel.openEditDialog() }
                             )
@@ -181,7 +183,7 @@ fun ProfileScreen(
 
                             ProfileInfoRow(
                                 icon = Icons.Default.Email,
-                                label = "Email",
+                                label = stringResource(R.string.label_email),
                                 value = user.email
                             )
 
@@ -192,8 +194,8 @@ fun ProfileScreen(
 
                             ProfileInfoRow(
                                 icon = Icons.Default.Shield,
-                                label = "Rolle",
-                                value = if (user.role == "admin") "Administrator" else "Benutzer"
+                                label = stringResource(R.string.label_role),
+                                value = if (user.role == "admin") stringResource(R.string.profile_role_admin) else stringResource(R.string.profile_role_user)
                             )
                         }
                     }
@@ -229,7 +231,7 @@ fun ProfileScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Ausloggen",
+                                text = stringResource(R.string.btn_logout),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -290,7 +292,7 @@ private fun ProfileInfoRow(
         if (onClick != null) {
             Icon(
                 imageVector = Icons.Default.Edit,
-                contentDescription = "Bearbeiten",
+                contentDescription = stringResource(R.string.cd_edit),
                 tint = colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(18.dp)
             )
@@ -322,7 +324,7 @@ private fun EditProfileDialog(
                     .padding(24.dp)
             ) {
                 Text(
-                    text = "Name ändern",
+                    text = stringResource(R.string.dialog_edit_name_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.onSurface
@@ -333,7 +335,7 @@ private fun EditProfileDialog(
                 OutlinedTextField(
                     value = displayName,
                     onValueChange = onDisplayNameChange,
-                    label = { Text("Dein Name") },
+                    label = { Text(stringResource(R.string.label_your_name)) },
                     singleLine = true,
                     enabled = !isSaving,
                     shape = RoundedCornerShape(12.dp),
@@ -367,7 +369,7 @@ private fun EditProfileDialog(
                         onClick = onDismiss,
                         enabled = !isSaving
                     ) {
-                        Text("Abbrechen", color = colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.common_cancel), color = colorScheme.onSurfaceVariant)
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -388,7 +390,7 @@ private fun EditProfileDialog(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Speichern")
+                            Text(stringResource(R.string.common_save))
                         }
                     }
                 }

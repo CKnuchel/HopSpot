@@ -56,4 +56,236 @@
     <string name="error_system_internal">Ein Serverfehler ist aufgetreten.</string>
     <string name="error_system_database">Datenbankfehler. Bitte später erneut versuchen.</string>
     <string name="error_system_rate_limited">Zu viele Anfragen. Bitte warte einen Moment.</string>
+
+    <!-- Common Actions -->
+    <string name="common_cancel">Abbrechen</string>
+    <string name="common_save">Speichern</string>
+    <string name="common_delete">Löschen</string>
+    <string name="common_retry">Erneut versuchen</string>
+    <string name="common_ok">OK</string>
+    <string name="common_close">Schliessen</string>
+    <string name="common_edit">Bearbeiten</string>
+    <string name="common_remove">Entfernen</string>
+    <string name="common_create">Erstellen</string>
+    <string name="common_change">Ändern</string>
+    <string name="common_set">Setzen</string>
+    <string name="common_apply">Anwenden</string>
+    <string name="common_reset">Zurücksetzen</string>
+    <string name="common_error">Fehler</string>
+
+    <!-- Labels -->
+    <string name="label_email">Email</string>
+    <string name="label_password">Passwort</string>
+    <string name="label_name">Name</string>
+    <string name="label_name_required">Name *</string>
+    <string name="label_your_name">Dein Name</string>
+    <string name="label_description">Beschreibung</string>
+    <string name="label_rating">Bewertung</string>
+    <string name="label_location">Standort</string>
+    <string name="label_location_required">Standort *</string>
+    <string name="label_photo">Foto</string>
+    <string name="label_photos">Fotos</string>
+    <string name="label_invitation_code">Einladungscode</string>
+    <string name="label_comment">Kommentar</string>
+    <string name="label_comment_optional">Kommentar (optional)</string>
+    <string name="label_latitude">Latitude</string>
+    <string name="label_longitude">Longitude</string>
+    <string name="label_role">Rolle</string>
+
+    <!-- Buttons -->
+    <string name="btn_login">Prost!</string>
+    <string name="btn_register">Dabei!</string>
+    <string name="btn_logout">Ausloggen</string>
+    <string name="btn_i_was_here">Ich war hier!</string>
+    <string name="btn_open_in_maps">In Google Maps öffnen</string>
+    <string name="btn_add_photo">Foto hinzufügen</string>
+    <string name="btn_choose_other_photo">Anderes Foto wählen</string>
+    <string name="btn_delete_bench">Bank löschen</string>
+
+    <!-- Hints / Placeholders -->
+    <string name="hint_search">Suchen…</string>
+    <string name="hint_bench_name">z.B. Schöne Waldbank</string>
+    <string name="hint_bench_description">Was macht diese Bank besonders?</string>
+    <string name="hint_latitude">z.B. 47.3769</string>
+    <string name="hint_longitude">z.B. 8.5417</string>
+    <string name="hint_comment_example">z.B. \"Für Max\"</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_back">Zurück</string>
+    <string name="cd_edit">Bearbeiten</string>
+    <string name="cd_delete">Löschen</string>
+    <string name="cd_close">Schliessen</string>
+    <string name="cd_clear_search">Suche löschen</string>
+    <string name="cd_filter">Filter</string>
+    <string name="cd_random_bench">Zufällige Bank</string>
+    <string name="cd_add_bench">Bank hinzufügen</string>
+    <string name="cd_add_photo">Foto hinzufügen</string>
+    <string name="cd_remove_photo">Foto entfernen</string>
+    <string name="cd_remove_from_favorites">Aus Favoriten entfernen</string>
+    <string name="cd_add_to_favorites">Zu Favoriten hinzufügen</string>
+    <string name="cd_show_password">Passwort anzeigen</string>
+    <string name="cd_hide_password">Passwort verstecken</string>
+    <string name="cd_my_location">Mein Standort</string>
+    <string name="cd_new_bench">Neue Bank</string>
+    <string name="cd_details">Details</string>
+    <string name="cd_toilet">Toilette</string>
+    <string name="cd_trash_bin">Abfalleimer</string>
+    <string name="cd_distance">Entfernung</string>
+    <string name="cd_create_code">Code erstellen</string>
+    <string name="cd_copy_code">Code kopieren</string>
+    <string name="cd_delete_code">Code löschen</string>
+    <string name="cd_set_as_main">Als Hauptbild</string>
+    <string name="cd_main_image">Hauptbild</string>
+    <string name="cd_photo">Foto</string>
+    <string name="cd_photo_fullscreen">Foto Vollbild</string>
+    <string name="cd_selected_photo">Ausgewähltes Foto</string>
+    <string name="cd_photo_large">Foto gross</string>
+    <string name="cd_deactivate">Deaktivieren</string>
+    <string name="cd_activate">Aktivieren</string>
+    <string name="cd_make_user">Zu User machen</string>
+    <string name="cd_make_admin">Zu Admin machen</string>
+    <string name="cd_stars" formatted="false">%d Sterne</string>
+
+    <!-- Dialog Titles -->
+    <string name="dialog_delete_bench_title">Bank löschen?</string>
+    <string name="dialog_delete_bench_message">Möchtest du \"%1$s\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="dialog_delete_photo_title">Foto löschen?</string>
+    <string name="dialog_delete_photo_message">Möchtest du dieses Foto wirklich löschen?</string>
+    <string name="dialog_delete_visit_title">Besuch löschen?</string>
+    <string name="dialog_delete_visit_message">Möchtest du den Besuch bei \"%1$s\" wirklich löschen?</string>
+    <string name="dialog_remove_favorite_title">Favorit entfernen?</string>
+    <string name="dialog_remove_favorite_message">Möchtest du \"%1$s\" wirklich aus deinen Favoriten entfernen?</string>
+    <string name="dialog_delete_code_title">Code löschen?</string>
+    <string name="dialog_delete_code_message">Möchtest du den Code \"%1$s\" wirklich löschen?</string>
+    <string name="dialog_delete_user_title">Benutzer löschen?</string>
+    <string name="dialog_delete_user_message">Möchtest du %1$s wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="dialog_edit_name_title">Name ändern</string>
+    <string name="dialog_enter_coordinates_title">Koordinaten eingeben</string>
+    <string name="dialog_enter_coordinates_hint">Gib die GPS-Koordinaten ein (z.B. von Google Maps)</string>
+    <string name="dialog_create_code_title">Neuen Code erstellen</string>
+    <string name="dialog_create_code_hint">Füge optional einen Kommentar hinzu (z.B. \"Für Max\"):</string>
+
+    <!-- Empty States -->
+    <string name="empty_benches_title">Noch keine Bänke</string>
+    <string name="empty_benches_subtitle">Füge die erste Bank hinzu!</string>
+    <string name="empty_visits_title">Noch keine Besuche</string>
+    <string name="empty_visits_subtitle">Besuche eine Bank und markiere deinen Besuch!</string>
+    <string name="empty_favorites_title">Noch keine Favoriten</string>
+    <string name="empty_favorites_subtitle">Tippe auf das Herz bei einer Bank, um sie zu deinen Favoriten hinzuzufügen!</string>
+    <string name="empty_codes_title">Keine Einladungscodes</string>
+    <string name="empty_codes_subtitle">Erstelle einen mit dem + Button</string>
+    <string name="empty_users_title">Keine Benutzer</string>
+    <string name="empty_photos_title">Keine Fotos</string>
+
+    <!-- Auth Screens -->
+    <string name="auth_slogan">Finde dein Lieblingsbänkli</string>
+    <string name="auth_welcome">Willkommen!</string>
+    <string name="auth_join_community">Werde Teil der HopSpot Community</string>
+    <string name="auth_no_account">Noch kein Konto? Registrieren</string>
+    <string name="auth_have_account">Schon ein Konto? Einloggen</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_admin_badge">Admin</string>
+    <string name="profile_role_admin">Administrator</string>
+    <string name="profile_role_user">Benutzer</string>
+
+    <!-- Bench List Screen -->
+    <string name="bench_list_filter_title">Filter &amp; Sortierung</string>
+    <string name="bench_list_sort_by">Sortieren nach</string>
+    <string name="bench_list_filter_toilet">Nur mit Toilette</string>
+    <string name="bench_list_filter_trash">Nur mit Abfalleimer</string>
+    <string name="bench_list_filter_min_rating">Mindestbewertung</string>
+    <string name="bench_list_filter_all">Alle</string>
+
+    <!-- Bench Detail Screen -->
+    <string name="bench_detail_title">Bank Details</string>
+    <string name="bench_detail_no_photos">Keine Fotos</string>
+    <string name="bench_detail_main_image">Hauptbild</string>
+    <string name="bench_detail_more_photos">Weitere Fotos</string>
+    <string name="bench_detail_location">Standort</string>
+    <string name="bench_detail_visits">Besuche</string>
+    <string name="bench_detail_visits_count">%1$d Besuche insgesamt</string>
+    <string name="bench_detail_visit_saved">Besuch gespeichert!</string>
+    <string name="bench_detail_current_weather">Aktuelles Wetter</string>
+    <string name="bench_detail_temperature">Temperatur</string>
+    <string name="bench_detail_rating_format">%1$d/5</string>
+
+    <!-- Bench Create/Edit Screen -->
+    <string name="bench_create_title">Neue Bank</string>
+    <string name="bench_edit_title">Bearbeiten</string>
+    <string name="bench_form_amenities">Ausstattung</string>
+    <string name="bench_form_toilet_nearby">Toilette in der Nähe</string>
+    <string name="bench_form_trash_nearby">Abfalleimer vorhanden</string>
+    <string name="bench_form_location_not_set">Noch nicht gesetzt</string>
+    <string name="bench_form_location_hint">GPS-Funktion kommt bald! Vorerst Koordinaten manuell eingeben.</string>
+    <string name="bench_form_rating_format">%1$d von 5 Sternen</string>
+    <string name="bench_form_uploading">Wird hochgeladen…</string>
+    <string name="bench_form_set_main_hint">Tippe auf ☆ um ein Foto als Hauptbild zu setzen</string>
+
+    <!-- Visits Screen -->
+    <string name="visits_title">Meine Besuche</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_title">Meine Favoriten</string>
+
+    <!-- Admin Screen -->
+    <string name="admin_title">Admin Panel</string>
+    <string name="admin_tab_codes">Einladungscodes</string>
+    <string name="admin_tab_users">Benutzer</string>
+    <string name="admin_code_redeemed">Eingelöst</string>
+    <string name="admin_code_active">Aktiv</string>
+    <string name="admin_code_redeemed_by">Eingelöst von: %1$s</string>
+    <string name="admin_code_created_by">Erstellt von: %1$s</string>
+    <string name="admin_code_copied">Code kopiert!</string>
+    <string name="admin_code_copied_format">Code kopiert: %1$s</string>
+    <string name="admin_user_badge_admin">Admin</string>
+    <string name="admin_user_badge_user">User</string>
+    <string name="admin_user_deactivated">Deaktiviert</string>
+
+    <!-- Map Screen -->
+    <string name="map_benches_count">%1$d Bänke</string>
+
+    <!-- Offline Banner -->
+    <string name="offline_banner_message">Offline-Modus - Änderungen werden synchronisiert</string>
+
+    <!-- Amenities -->
+    <string name="amenity_toilet">Toilette</string>
+    <string name="amenity_trash_bin">Abfalleimer</string>
+    <string name="amenity_wc">WC</string>
+    <string name="amenity_trash">Abfall</string>
+
+    <!-- Sort Options -->
+    <string name="sort_newest">Neueste</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_rating">Bewertung</string>
+    <string name="sort_distance">Entfernung</string>
+
+    <!-- Weather Descriptions -->
+    <string name="weather_clear">Klar</string>
+    <string name="weather_fair">Heiter</string>
+    <string name="weather_partly_cloudy">Teilweise bewölkt</string>
+    <string name="weather_cloudy">Bewölkt</string>
+    <string name="weather_fog">Nebel</string>
+    <string name="weather_drizzle">Nieselregen</string>
+    <string name="weather_freezing_drizzle">Gefrierender Niesel</string>
+    <string name="weather_rain">Regen</string>
+    <string name="weather_freezing_rain">Gefrierender Regen</string>
+    <string name="weather_snow">Schneefall</string>
+    <string name="weather_snow_grains">Schneekörner</string>
+    <string name="weather_rain_showers">Regenschauer</string>
+    <string name="weather_snow_showers">Schneeschauer</string>
+    <string name="weather_thunderstorm">Gewitter</string>
+    <string name="weather_thunderstorm_hail">Gewitter mit Hagel</string>
+    <string name="weather_unknown">Unbekannt</string>
+
+    <!-- Wind Directions -->
+    <string name="wind_n">N</string>
+    <string name="wind_ne">NO</string>
+    <string name="wind_e">O</string>
+    <string name="wind_se">SO</string>
+    <string name="wind_s">S</string>
+    <string name="wind_sw">SW</string>
+    <string name="wind_w">W</string>
+    <string name="wind_nw">NW</string>
+    <string name="wind_format">Wind %1$s</string>
 </resources>

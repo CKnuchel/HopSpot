@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -60,9 +61,9 @@ fun VisitsScreen(
     if (uiState.visitToDelete != null) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissDeleteDialog() },
-            title = { Text("Besuch loeschen?") },
+            title = { Text(stringResource(R.string.dialog_delete_visit_title)) },
             text = {
-                Text("Moechtest du den Besuch bei \"${uiState.visitToDelete!!.benchName}\" wirklich loeschen?")
+                Text(stringResource(R.string.dialog_delete_visit_message, uiState.visitToDelete!!.benchName))
             },
             confirmButton = {
                 Button(
@@ -77,7 +78,7 @@ fun VisitsScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Loeschen")
+                        Text(stringResource(R.string.common_delete))
                     }
                 }
             },
@@ -86,7 +87,7 @@ fun VisitsScreen(
                     onClick = { viewModel.dismissDeleteDialog() },
                     enabled = !uiState.isDeleting
                 ) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.common_cancel))
                 }
             }
         )
@@ -95,7 +96,7 @@ fun VisitsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Meine Besuche") },
+                title = { Text(stringResource(R.string.visits_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = colorScheme.background
                 )
@@ -210,7 +211,7 @@ private fun SwipeableVisitItem(
                 if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Loeschen",
+                        contentDescription = stringResource(R.string.cd_delete),
                         tint = colorScheme.onErrorContainer
                     )
                 }
@@ -337,14 +338,14 @@ private fun EmptyVisitsView(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Noch keine Besuche",
+            text = stringResource(R.string.empty_visits_title),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Besuche eine Bank und markiere deinen Besuch!",
+            text = stringResource(R.string.empty_visits_subtitle),
             color = colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
@@ -371,7 +372,7 @@ private fun ErrorView(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Fehler",
+            text = stringResource(R.string.common_error),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.onBackground
@@ -384,7 +385,7 @@ private fun ErrorView(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onRetry) {
-            Text("Erneut versuchen")
+            Text(stringResource(R.string.common_retry))
         }
     }
 }

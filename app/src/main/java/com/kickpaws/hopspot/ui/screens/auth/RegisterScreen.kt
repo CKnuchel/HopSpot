@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.kickpaws.hopspot.R
 
 @Composable
 fun RegisterScreen(
@@ -70,21 +72,21 @@ fun RegisterScreen(
         ) {
             // Logo / Title
             Text(
-                text = "🍺",
+                text = "\uD83C\uDF7A",
                 fontSize = 64.sp
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Willkommen!",
+                text = stringResource(R.string.auth_welcome),
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.background
             )
 
             Text(
-                text = "Werde Teil der HopSpot Community",
+                text = stringResource(R.string.auth_join_community),
                 fontSize = 16.sp,
                 color = colorScheme.background.copy(alpha = 0.8f)
             )
@@ -112,7 +114,7 @@ fun RegisterScreen(
                     HopSpotTextField(
                         value = uiState.displayName,
                         onValueChange = viewModel::onDisplayNameChange,
-                        label = "Dein Name",
+                        label = stringResource(R.string.label_your_name),
                         leadingIcon = Icons.Default.Person,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
@@ -129,7 +131,7 @@ fun RegisterScreen(
                     HopSpotTextField(
                         value = uiState.email,
                         onValueChange = viewModel::onEmailChange,
-                        label = "Email",
+                        label = stringResource(R.string.label_email),
                         leadingIcon = Icons.Default.Email,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Email,
@@ -146,7 +148,7 @@ fun RegisterScreen(
                     HopSpotTextField(
                         value = uiState.password,
                         onValueChange = viewModel::onPasswordChange,
-                        label = "Passwort",
+                        label = stringResource(R.string.label_password),
                         leadingIcon = Icons.Default.Lock,
                         isPassword = true,
                         isPasswordVisible = uiState.isPasswordVisible,
@@ -166,7 +168,7 @@ fun RegisterScreen(
                     HopSpotTextField(
                         value = uiState.invitationCode,
                         onValueChange = viewModel::onInvitationCodeChange,
-                        label = "Einladungscode",
+                        label = stringResource(R.string.label_invitation_code),
                         leadingIcon = Icons.Default.Badge,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
@@ -195,7 +197,7 @@ fun RegisterScreen(
 
                     // Register Button
                     HopSpotButton(
-                        text = "Dabei! 🍻",
+                        text = stringResource(R.string.btn_register),
                         onClick = viewModel::register,
                         isLoading = uiState.isLoading,
                         modifier = Modifier.fillMaxWidth()
@@ -206,7 +208,7 @@ fun RegisterScreen(
                     // Login Link
                     TextButton(onClick = onNavigateToLogin) {
                         Text(
-                            text = "Schon ein Konto? Einloggen",
+                            text = stringResource(R.string.auth_have_account),
                             color = colorScheme.secondary
                         )
                     }

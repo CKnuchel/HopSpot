@@ -15,11 +15,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.InvitationCode
 import com.kickpaws.hopspot.domain.model.User
 
@@ -32,13 +34,18 @@ fun AdminScreen(
     val context = LocalContext.current
     val colorScheme = MaterialTheme.colorScheme
 
-    val tabs = listOf("Einladungscodes", "Benutzer")
+    val tabCodes = stringResource(R.string.admin_tab_codes)
+    val tabUsers = stringResource(R.string.admin_tab_users)
+    val tabs = listOf(tabCodes, tabUsers)
+
+    val codeCopiedMessage = stringResource(R.string.admin_code_copied)
+    val codeCopiedFormatMessage = stringResource(R.string.admin_code_copied_format)
 
     // Handle created code - copy to clipboard
     LaunchedEffect(uiState.createdCode) {
         uiState.createdCode?.let { code ->
             copyToClipboard(context, code)
-            Toast.makeText(context, "Code kopiert: $code", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, codeCopiedFormatMessage.replace("%1\$s", code), Toast.LENGTH_LONG).show()
             viewModel.clearCreatedCode()
         }
     }
@@ -66,9 +73,9 @@ fun AdminScreen(
     if (uiState.showDeleteCodeDialog && uiState.codeToDelete != null) {
         AlertDialog(
             onDismissRequest = viewModel::hideDeleteCodeDialog,
-            title = { Text("Code löschen?") },
+            title = { Text(stringResource(R.string.dialog_delete_code_title)) },
             text = {
-                Text("Möchtest du den Code \"${uiState.codeToDelete?.code}\" wirklich löschen?")
+                Text(stringResource(R.string.dialog_delete_code_message, uiState.codeToDelete?.code ?: ""))
             },
             confirmButton = {
                 Button(
@@ -85,13 +92,13 @@ fun AdminScreen(
                             color = colorScheme.onError
                         )
                     } else {
-                        Text("Löschen")
+                        Text(stringResource(R.string.common_delete))
                     }
                 }
             },
             dismissButton = {
                 TextButton(onClick = viewModel::hideDeleteCodeDialog) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.common_cancel))
                 }
             }
         )
@@ -100,7 +107,7 @@ fun AdminScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Admin Panel") },
+                title = { Text(stringResource(R.string.admin_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = colorScheme.background
                 )
@@ -112,7 +119,7 @@ fun AdminScreen(
                     onClick = viewModel::showCreateCodeDialog,
                     containerColor = colorScheme.primary
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Code erstellen")
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.cd_create_code))
                 }
             }
         }
@@ -149,7 +156,10 @@ fun AdminScreen(
                     isLoading = uiState.isLoadingCodes,
                     error = uiState.codesError,
                     onRefresh = viewModel::loadInvitationCodes,
-                    onCopyCode = { code -> copyToClipboard(context, code) },
+                    onCopyCode = { code ->
+                        copyToClipboard(context, code)
+                        Toast.makeText(context, codeCopiedMessage, Toast.LENGTH_SHORT).show()
+                    },
                     onDeleteCode = viewModel::showDeleteCodeDialog
                 )
                 1 -> UsersTab(
@@ -176,7 +186,6 @@ private fun InvitationCodesTab(
     onDeleteCode: (InvitationCode) -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val context = LocalContext.current
 
     when {
         isLoading -> {
@@ -200,7 +209,7 @@ private fun InvitationCodesTab(
                 Text(error, color = colorScheme.error, textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(16.dp))
                 TextButton(onClick = onRefresh) {
-                    Text("Erneut versuchen")
+                    Text(stringResource(R.string.common_retry))
                 }
             }
         }
@@ -212,8 +221,8 @@ private fun InvitationCodesTab(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("🔑", fontSize = 48.sp)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Keine Einladungscodes", color = colorScheme.onSurfaceVariant)
-                    Text("Erstelle einen mit dem + Button", fontSize = 14.sp, color = colorScheme.outline)
+                    Text(stringResource(R.string.empty_codes_title), color = colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.empty_codes_subtitle), fontSize = 14.sp, color = colorScheme.outline)
                 }
             }
         }
@@ -229,10 +238,7 @@ private fun InvitationCodesTab(
                 items(sortedCodes) { code ->
                     InvitationCodeCard(
                         code = code,
-                        onCopy = {
-                            onCopyCode(code.code)
-                            Toast.makeText(context, "Code kopiert!", Toast.LENGTH_SHORT).show()
-                        },
+                        onCopy = { onCopyCode(code.code) },
                         onDelete = { onDeleteCode(code) }
                     )
                 }
@@ -280,7 +286,7 @@ private fun InvitationCodeCard(
                             color = colorScheme.outline
                         ) {
                             Text(
-                                text = "Eingelöst",
+                                text = stringResource(R.string.admin_code_redeemed),
                                 fontSize = 10.sp,
                                 color = colorScheme.surface,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -292,7 +298,7 @@ private fun InvitationCodeCard(
                             color = colorScheme.primary
                         ) {
                             Text(
-                                text = "Aktiv",
+                                text = stringResource(R.string.admin_code_active),
                                 fontSize = 10.sp,
                                 color = colorScheme.onPrimary,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -314,13 +320,13 @@ private fun InvitationCodeCard(
 
                 if (code.isRedeemed && code.redeemedBy != null) {
                     Text(
-                        text = "Eingelöst von: ${code.redeemedBy.displayName}",
+                        text = stringResource(R.string.admin_code_redeemed_by, code.redeemedBy.displayName),
                         fontSize = 12.sp,
                         color = colorScheme.outline
                     )
                 } else {
                     Text(
-                        text = "Erstellt von: ${code.createdBy.displayName}",
+                        text = stringResource(R.string.admin_code_created_by, code.createdBy.displayName),
                         fontSize = 12.sp,
                         color = colorScheme.outline
                     )
@@ -332,14 +338,14 @@ private fun InvitationCodeCard(
                 IconButton(onClick = onCopy) {
                     Icon(
                         imageVector = Icons.Default.ContentCopy,
-                        contentDescription = "Code kopieren",
+                        contentDescription = stringResource(R.string.cd_copy_code),
                         tint = colorScheme.onPrimaryContainer
                     )
                 }
                 IconButton(onClick = onDelete) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Code löschen",
+                        contentDescription = stringResource(R.string.cd_delete_code),
                         tint = colorScheme.error
                     )
                 }
@@ -365,8 +371,8 @@ private fun UsersTab(
     userToDelete?.let { user ->
         AlertDialog(
             onDismissRequest = { userToDelete = null },
-            title = { Text("Benutzer löschen?") },
-            text = { Text("Möchtest du ${user.displayName} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.") },
+            title = { Text(stringResource(R.string.dialog_delete_user_title)) },
+            text = { Text(stringResource(R.string.dialog_delete_user_message, user.displayName)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -375,12 +381,12 @@ private fun UsersTab(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = colorScheme.error)
                 ) {
-                    Text("Löschen")
+                    Text(stringResource(R.string.common_delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { userToDelete = null }) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.common_cancel))
                 }
             }
         )
@@ -408,7 +414,7 @@ private fun UsersTab(
                 Text(error, color = colorScheme.error, textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(16.dp))
                 TextButton(onClick = onRefresh) {
-                    Text("Erneut versuchen")
+                    Text(stringResource(R.string.common_retry))
                 }
             }
         }
@@ -420,7 +426,7 @@ private fun UsersTab(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("👥", fontSize = 48.sp)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Keine Benutzer", color = colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.empty_users_title), color = colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -527,7 +533,7 @@ private fun UserCard(
                         color = if (isAdmin) colorScheme.primary else colorScheme.outline
                     ) {
                         Text(
-                            text = if (isAdmin) "Admin" else "User",
+                            text = if (isAdmin) stringResource(R.string.admin_user_badge_admin) else stringResource(R.string.admin_user_badge_user),
                             fontSize = 10.sp,
                             color = if (isAdmin) colorScheme.onPrimary else colorScheme.surface,
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -541,7 +547,7 @@ private fun UserCard(
                             color = colorScheme.error
                         ) {
                             Text(
-                                text = "Deaktiviert",
+                                text = stringResource(R.string.admin_user_deactivated),
                                 fontSize = 10.sp,
                                 color = colorScheme.onError,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -559,7 +565,7 @@ private fun UserCard(
                     ) {
                         Icon(
                             imageVector = if (user.isActive) Icons.Default.PersonOff else Icons.Default.PersonAdd,
-                            contentDescription = if (user.isActive) "Deaktivieren" else "Aktivieren",
+                            contentDescription = if (user.isActive) stringResource(R.string.cd_deactivate) else stringResource(R.string.cd_activate),
                             tint = if (user.isActive) colorScheme.error else colorScheme.primary,
                             modifier = Modifier.size(20.dp)
                         )
@@ -572,7 +578,7 @@ private fun UserCard(
                     ) {
                         Icon(
                             imageVector = if (isAdmin) Icons.Default.PersonRemove else Icons.Default.AdminPanelSettings,
-                            contentDescription = if (isAdmin) "Zu User machen" else "Zu Admin machen",
+                            contentDescription = if (isAdmin) stringResource(R.string.cd_make_user) else stringResource(R.string.cd_make_admin),
                             tint = colorScheme.primary,
                             modifier = Modifier.size(20.dp)
                         )
@@ -585,7 +591,7 @@ private fun UserCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Löschen",
+                            contentDescription = stringResource(R.string.cd_delete),
                             tint = colorScheme.error,
                             modifier = Modifier.size(20.dp)
                         )
@@ -606,11 +612,11 @@ private fun CreateCodeDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Neuen Code erstellen") },
+        title = { Text(stringResource(R.string.dialog_create_code_title)) },
         text = {
             Column {
                 Text(
-                    text = "Füge optional einen Kommentar hinzu (z.B. \"Für Max\"):",
+                    text = stringResource(R.string.dialog_create_code_hint),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -618,7 +624,7 @@ private fun CreateCodeDialog(
                 OutlinedTextField(
                     value = comment,
                     onValueChange = onCommentChange,
-                    label = { Text("Kommentar (optional)") },
+                    label = { Text(stringResource(R.string.label_comment_optional)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -636,13 +642,13 @@ private fun CreateCodeDialog(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text("Erstellen")
+                    Text(stringResource(R.string.common_create))
                 }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Abbrechen")
+                Text(stringResource(R.string.common_cancel))
             }
         }
     )

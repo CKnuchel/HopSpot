@@ -1,5 +1,8 @@
 package com.kickpaws.hopspot.ui.screens.benchlist
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.Bench
 
 /**
@@ -38,9 +41,17 @@ data class BenchListUiState(
     val isLoadingRandom: Boolean = false
 )
 
-enum class SortOption(val apiValue: String, val displayName: String) {
-    NEWEST("created_at", "Neueste"),
-    NAME("name", "Name"),
-    RATING("rating", "Bewertung"),
-    DISTANCE("distance", "Entfernung")
+enum class SortOption(val apiValue: String) {
+    NEWEST("created_at"),
+    NAME("name"),
+    RATING("rating"),
+    DISTANCE("distance")
+}
+
+@Composable
+fun SortOption.displayName(): String = when (this) {
+    SortOption.NEWEST -> stringResource(R.string.sort_newest)
+    SortOption.NAME -> stringResource(R.string.sort_name)
+    SortOption.RATING -> stringResource(R.string.sort_rating)
+    SortOption.DISTANCE -> stringResource(R.string.sort_distance)
 }

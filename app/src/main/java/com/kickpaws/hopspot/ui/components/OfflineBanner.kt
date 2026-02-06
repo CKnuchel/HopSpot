@@ -18,7 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kickpaws.hopspot.R
 
 @Composable
 fun OfflineBanner(
@@ -46,7 +48,7 @@ fun OfflineBanner(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Offline-Modus - Aenderungen werden synchronisiert",
+                text = stringResource(R.string.offline_banner_message),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.ui.components.LocationPickerCard
 import com.kickpaws.hopspot.ui.components.PhotoPickerDialog
 
@@ -64,12 +66,12 @@ fun BenchCreateScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Neue Bank") },
+                title = { Text(stringResource(R.string.bench_create_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Abbrechen"
+                            contentDescription = stringResource(R.string.common_cancel)
                         )
                     }
                 },
@@ -85,7 +87,7 @@ fun BenchCreateScreen(
                             )
                         } else {
                             Text(
-                                text = "Speichern",
+                                text = stringResource(R.string.common_save),
                                 color = colorScheme.primary,
                                 fontWeight = FontWeight.Bold
                             )
@@ -119,8 +121,8 @@ fun BenchCreateScreen(
             OutlinedTextField(
                 value = uiState.name,
                 onValueChange = viewModel::onNameChange,
-                label = { Text("Name *") },
-                placeholder = { Text("z.B. Schöne Waldbank") },
+                label = { Text(stringResource(R.string.label_name_required)) },
+                placeholder = { Text(stringResource(R.string.hint_bench_name)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Chair,
@@ -153,8 +155,8 @@ fun BenchCreateScreen(
             OutlinedTextField(
                 value = uiState.description,
                 onValueChange = viewModel::onDescriptionChange,
-                label = { Text("Beschreibung") },
-                placeholder = { Text("Was macht diese Bank besonders?") },
+                label = { Text(stringResource(R.string.label_description)) },
+                placeholder = { Text(stringResource(R.string.hint_bench_description)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Description,
@@ -246,7 +248,7 @@ private fun PhotoCard(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Foto",
+                text = stringResource(R.string.label_photo),
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface
             )
@@ -266,7 +268,7 @@ private fun PhotoCard(
                             .data(photoUri)
                             .crossfade(true)
                             .build(),
-                        contentDescription = "Ausgewähltes Foto",
+                        contentDescription = stringResource(R.string.cd_selected_photo),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
@@ -286,7 +288,7 @@ private fun PhotoCard(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "Wird hochgeladen...",
+                                    text = stringResource(R.string.bench_form_uploading),
                                     color = colorScheme.onSurface
                                 )
                             }
@@ -301,7 +303,7 @@ private fun PhotoCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Foto entfernen",
+                                contentDescription = stringResource(R.string.cd_remove_photo),
                                 tint = colorScheme.onSurface,
                                 modifier = Modifier
                                     .background(
@@ -339,7 +341,7 @@ private fun PhotoCard(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Foto hinzufügen",
+                            text = stringResource(R.string.btn_add_photo),
                             color = colorScheme.onSurfaceVariant
                         )
                     }
@@ -358,7 +360,7 @@ private fun PhotoCard(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Anderes Foto wählen")
+                    Text(stringResource(R.string.btn_choose_other_photo))
                 }
             }
         }
@@ -402,7 +404,7 @@ private fun LocationCard(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "Standort *",
+                            text = stringResource(R.string.label_location_required),
                             fontWeight = FontWeight.Medium,
                             color = colorScheme.onSurface
                         )
@@ -421,14 +423,14 @@ private fun LocationCard(
                         containerColor = colorScheme.primary
                     )
                 ) {
-                    Text("Setzen")
+                    Text(stringResource(R.string.common_set))
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "💡 Tipp: GPS-Funktion kommt bald! Vorerst Koordinaten manuell eingeben.",
+                text = stringResource(R.string.bench_form_location_hint),
                 fontSize = 12.sp,
                 color = colorScheme.onSurfaceVariant
             )
@@ -458,13 +460,13 @@ private fun ManualLocationDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Koordinaten eingeben") },
+        title = { Text(stringResource(R.string.dialog_enter_coordinates_title)) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "Gib die GPS-Koordinaten ein (z.B. von Google Maps)",
+                    text = stringResource(R.string.dialog_enter_coordinates_hint),
                     fontSize = 14.sp,
                     color = colorScheme.onSurfaceVariant
                 )
@@ -472,8 +474,8 @@ private fun ManualLocationDialog(
                 OutlinedTextField(
                     value = latitude,
                     onValueChange = { latitude = it },
-                    label = { Text("Latitude") },
-                    placeholder = { Text("z.B. 47.3769") },
+                    label = { Text(stringResource(R.string.label_latitude)) },
+                    placeholder = { Text(stringResource(R.string.hint_latitude)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -482,8 +484,8 @@ private fun ManualLocationDialog(
                 OutlinedTextField(
                     value = longitude,
                     onValueChange = { longitude = it },
-                    label = { Text("Longitude") },
-                    placeholder = { Text("z.B. 8.5417") },
+                    label = { Text(stringResource(R.string.label_longitude)) },
+                    placeholder = { Text(stringResource(R.string.hint_longitude)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -495,12 +497,12 @@ private fun ManualLocationDialog(
                 onClick = { onConfirm(latitude, longitude) },
                 enabled = latitude.isNotBlank() && longitude.isNotBlank()
             ) {
-                Text("OK")
+                Text(stringResource(R.string.common_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Abbrechen")
+                Text(stringResource(R.string.common_cancel))
             }
         }
     )
@@ -526,7 +528,7 @@ private fun RatingSelector(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Bewertung",
+                text = stringResource(R.string.label_rating),
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface
             )
@@ -549,7 +551,7 @@ private fun RatingSelector(
                             } else {
                                 Icons.Default.StarBorder
                             },
-                            contentDescription = "$star Sterne",
+                            contentDescription = stringResource(R.string.cd_stars, star),
                             tint = if (rating != null && star <= rating) {
                                 colorScheme.primary
                             } else {
@@ -563,7 +565,7 @@ private fun RatingSelector(
 
             if (rating != null) {
                 Text(
-                    text = "$rating von 5 Sternen",
+                    text = stringResource(R.string.bench_form_rating_format, rating),
                     fontSize = 14.sp,
                     color = colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth(),
@@ -596,7 +598,7 @@ private fun AmenitiesCard(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Ausstattung",
+                text = stringResource(R.string.bench_form_amenities),
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface
             )
@@ -618,7 +620,7 @@ private fun AmenitiesCard(
                         tint = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("Toilette in der Nähe")
+                    Text(stringResource(R.string.bench_form_toilet_nearby))
                 }
 
                 Switch(
@@ -651,7 +653,7 @@ private fun AmenitiesCard(
                         tint = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("Abfalleimer vorhanden")
+                    Text(stringResource(R.string.bench_form_trash_nearby))
                 }
 
                 Switch(
