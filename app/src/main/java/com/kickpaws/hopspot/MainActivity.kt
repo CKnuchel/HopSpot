@@ -3,7 +3,6 @@ package com.kickpaws.hopspot
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
@@ -13,7 +12,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kickpaws.hopspot.data.analytics.AnalyticsManager
@@ -25,7 +23,6 @@ import com.kickpaws.hopspot.ui.components.OfflineBanner
 import com.kickpaws.hopspot.ui.components.SyncStatusBar
 import com.kickpaws.hopspot.ui.navigation.HopSpotNavGraph
 import com.kickpaws.hopspot.ui.navigation.Route
-import com.kickpaws.hopspot.ui.theme.Brown700
 import com.kickpaws.hopspot.ui.theme.HopSpotTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -55,10 +52,7 @@ class MainActivity : ComponentActivity() {
             analyticsManager.logNotificationOpened(benchIdFromNotification)
         }
 
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(Brown700.toArgb()),
-            navigationBarStyle = SystemBarStyle.dark(Brown700.toArgb())
-        )
+        enableEdgeToEdge()
 
         setContent {
             HopSpotTheme {
