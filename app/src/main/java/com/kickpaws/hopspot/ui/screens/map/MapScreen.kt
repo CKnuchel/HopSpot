@@ -1,4 +1,4 @@
-@file:Suppress("GoogleMapComposable", "KotlinConstantConditions")
+@file:Suppress("GoogleMapComposable", "KotlinConstantConditions", "UNUSED_VALUE")
 
 package com.kickpaws.hopspot.ui.screens.map
 
@@ -135,6 +135,7 @@ fun MapScreen(
                 )
             )
         }
+        @Suppress("UNUSED_VALUE")
         hasInitializedCamera = true
     }
 

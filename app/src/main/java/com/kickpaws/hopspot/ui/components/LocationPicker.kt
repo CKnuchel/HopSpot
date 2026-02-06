@@ -1,4 +1,4 @@
-@file:Suppress("GoogleMapComposable", "KotlinConstantConditions")
+@file:Suppress("GoogleMapComposable", "KotlinConstantConditions", "UNUSED_VALUE")
 
 package com.kickpaws.hopspot.ui.components
 
@@ -130,8 +130,8 @@ fun LocationPickerCard(
     if (showFullscreenMap) {
         FullscreenMapDialog(
             initialPosition = currentPosition,
-            onDismiss = { showFullscreenMap = false },
-            onLocationSelected = { lat, lon ->
+            onDismiss = @Suppress("UNUSED_VALUE") { showFullscreenMap = false },
+            onLocationSelected = @Suppress("UNUSED_VALUE") { lat, lon ->
                 onLocationSet(lat, lon)
                 showFullscreenMap = false
             },
@@ -232,7 +232,7 @@ fun LocationPickerCard(
                         scrollGesturesEnabledDuringRotateOrZoom = false
                     ),
                     properties = MapProperties(mapType = MapType.NORMAL),
-                    onMapClick = { showFullscreenMap = true }
+                    onMapClick = @Suppress("UNUSED_VALUE") { showFullscreenMap = true }
                 ) {
                     Marker(
                         state = rememberMarkerState(position = currentPosition)
@@ -241,7 +241,7 @@ fun LocationPickerCard(
 
                 // Fullscreen button overlay
                 FilledIconButton(
-                    onClick = { showFullscreenMap = true },
+                    onClick = @Suppress("UNUSED_VALUE") { showFullscreenMap = true },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(8.dp)

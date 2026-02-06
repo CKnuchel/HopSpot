@@ -1,4 +1,4 @@
-@file:Suppress("GoogleMapComposable", "KotlinConstantConditions")
+@file:Suppress("GoogleMapComposable", "KotlinConstantConditions", "UNUSED_VALUE")
 
 package com.kickpaws.hopspot.ui.screens.spotdetail
 
@@ -82,7 +82,7 @@ fun SpotDetailScreen(
         FullscreenImageViewer(
             photos = uiState.photos,
             initialIndex = selectedPhotoIndex,
-            onDismiss = { selectedPhotoIndex = -1 }
+            onDismiss = @Suppress("UNUSED_VALUE") { selectedPhotoIndex = -1 }
         )
     }
 
@@ -179,7 +179,7 @@ fun SpotDetailScreen(
                         if (uiState.photos.isNotEmpty()) {
                             PhotoGallery(
                                 photos = uiState.photos,
-                                onPhotoClick = { index -> selectedPhotoIndex = index }
+                                onPhotoClick = @Suppress("UNUSED_VALUE") { index -> selectedPhotoIndex = index }
                             )
                         } else if (!uiState.isLoadingPhotos) {
                             NoPhotosPlaceholder()
