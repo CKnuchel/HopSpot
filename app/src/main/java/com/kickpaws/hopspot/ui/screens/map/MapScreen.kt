@@ -187,6 +187,7 @@ fun MapScreen(
             Card(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
+                    .statusBarsPadding()
                     .padding(16.dp),
                 colors = CardDefaults.cardColors(containerColor = colorScheme.errorContainer)
             ) {
@@ -216,6 +217,7 @@ fun MapScreen(
         Surface(
             modifier = Modifier
                 .align(Alignment.TopStart)
+                .statusBarsPadding()
                 .padding(16.dp),
             shape = RoundedCornerShape(20.dp),
             color = colorScheme.primaryContainer
@@ -244,6 +246,7 @@ fun MapScreen(
         Column(
             modifier = Modifier
                 .align(Alignment.TopEnd)
+                .statusBarsPadding()
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {

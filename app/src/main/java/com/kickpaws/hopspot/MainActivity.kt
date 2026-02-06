@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,6 +61,7 @@ class MainActivity : ComponentActivity() {
             analyticsManager.logNotificationOpened(spotIdFromNotification)
         }
 
+        // Enable edge-to-edge for modern Android look
         enableEdgeToEdge()
 
         setContent {
@@ -93,7 +95,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
                         if (showStatusBars) {
-                            Column {
+                            Column(modifier = Modifier.statusBarsPadding()) {
                                 OfflineBanner(isVisible = !isOnline)
                                 SyncStatusBar(
                                     syncProgress = syncProgress,
