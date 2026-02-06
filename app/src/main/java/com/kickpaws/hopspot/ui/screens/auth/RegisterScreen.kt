@@ -3,7 +3,6 @@ package com.kickpaws.hopspot.ui.screens.auth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -27,10 +26,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kickpaws.hopspot.R
+import com.kickpaws.hopspot.ui.components.common.HopSpotButton
+import com.kickpaws.hopspot.ui.components.common.HopSpotTextField
+import com.kickpaws.hopspot.ui.theme.HopSpotDimensions
+import com.kickpaws.hopspot.ui.theme.HopSpotElevations
+import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 
 @Composable
 fun RegisterScreen(
@@ -65,7 +68,7 @@ fun RegisterScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(HopSpotDimensions.Spacing.lg)
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -76,7 +79,7 @@ fun RegisterScreen(
                 fontSize = 64.sp
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
 
             Text(
                 text = stringResource(R.string.auth_welcome),
@@ -91,23 +94,23 @@ fun RegisterScreen(
                 color = colorScheme.background.copy(alpha = 0.8f)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xl))
 
             // Register Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = HopSpotShapes.dialog,
                 colors = CardDefaults.cardColors(
                     containerColor = colorScheme.background
                 ),
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = 8.dp
+                    defaultElevation = HopSpotElevations.high
                 )
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(HopSpotDimensions.Spacing.lg),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Display Name Field
@@ -125,7 +128,7 @@ fun RegisterScreen(
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
 
                     // Email Field
                     HopSpotTextField(
@@ -142,7 +145,7 @@ fun RegisterScreen(
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
 
                     // Password Field
                     HopSpotTextField(
@@ -162,7 +165,7 @@ fun RegisterScreen(
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
 
                     // Invitation Code Field
                     HopSpotTextField(
@@ -184,7 +187,7 @@ fun RegisterScreen(
 
                     // Error Message
                     if (uiState.errorMessage != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
                         Text(
                             text = uiState.errorMessage!!,
                             color = colorScheme.error,
@@ -193,7 +196,7 @@ fun RegisterScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.lg))
 
                     // Register Button
                     HopSpotButton(
@@ -203,7 +206,7 @@ fun RegisterScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
 
                     // Login Link
                     TextButton(onClick = onNavigateToLogin) {
@@ -215,7 +218,7 @@ fun RegisterScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.lg))
         }
     }
 }

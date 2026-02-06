@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -21,7 +20,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +27,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.Visit
+import com.kickpaws.hopspot.ui.components.common.HopSpotDeleteConfirmationDialog
+import com.kickpaws.hopspot.ui.components.common.HopSpotEmptyView
+import com.kickpaws.hopspot.ui.components.common.HopSpotErrorView
+import com.kickpaws.hopspot.ui.components.common.HopSpotLoadingIndicator
+import com.kickpaws.hopspot.ui.components.common.LoadingSize
+import com.kickpaws.hopspot.ui.theme.HopSpotDimensions
+import com.kickpaws.hopspot.ui.theme.HopSpotElevations
+import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -43,7 +49,6 @@ fun VisitsScreen(
     val colorScheme = MaterialTheme.colorScheme
     val listState = rememberLazyListState()
 
-    // Load more when reaching end of list
     val shouldLoadMore = remember {
         derivedStateOf {
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
@@ -57,39 +62,14 @@ fun VisitsScreen(
         }
     }
 
-    // Delete confirmation dialog
     if (uiState.visitToDelete != null) {
-        AlertDialog(
-            onDismissRequest = { viewModel.dismissDeleteDialog() },
-            title = { Text(stringResource(R.string.dialog_delete_visit_title)) },
-            text = {
-                Text(stringResource(R.string.dialog_delete_visit_message, uiState.visitToDelete!!.benchName))
-            },
-            confirmButton = {
-                Button(
-                    onClick = { viewModel.confirmDelete() },
-                    enabled = !uiState.isDeleting,
-                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error)
-                ) {
-                    if (uiState.isDeleting) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            color = colorScheme.onError,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(stringResource(R.string.common_delete))
-                    }
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { viewModel.dismissDeleteDialog() },
-                    enabled = !uiState.isDeleting
-                ) {
-                    Text(stringResource(R.string.common_cancel))
-                }
-            }
+        HopSpotDeleteConfirmationDialog(
+            title = stringResource(R.string.dialog_delete_visit_title),
+            message = stringResource(R.string.dialog_delete_visit_message, uiState.visitToDelete!!.benchName),
+            onConfirm = { viewModel.confirmDelete() },
+            onDismiss = { viewModel.dismissDeleteDialog() },
+            icon = Icons.Default.Delete,
+            isLoading = uiState.isDeleting
         )
     }
 
@@ -115,7 +95,7 @@ fun VisitsScreen(
                 }
 
                 uiState.errorMessage != null && uiState.visits.isEmpty() -> {
-                    ErrorView(
+                    HopSpotErrorView(
                         message = uiState.errorMessage!!,
                         onRetry = viewModel::loadVisits,
                         modifier = Modifier.align(Alignment.Center)
@@ -123,7 +103,12 @@ fun VisitsScreen(
                 }
 
                 uiState.visits.isEmpty() -> {
-                    EmptyVisitsView(modifier = Modifier.align(Alignment.Center))
+                    HopSpotEmptyView(
+                        icon = Icons.Default.History,
+                        title = stringResource(R.string.empty_visits_title),
+                        subtitle = stringResource(R.string.empty_visits_subtitle),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
                 else -> {
@@ -133,8 +118,8 @@ fun VisitsScreen(
                     ) {
                         LazyColumn(
                             state = listState,
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            contentPadding = PaddingValues(HopSpotDimensions.Screen.padding),
+                            verticalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.sm)
                         ) {
                             items(
                                 items = uiState.visits,
@@ -147,19 +132,15 @@ fun VisitsScreen(
                                 )
                             }
 
-                            // Loading more indicator
                             if (uiState.isLoadingMore) {
                                 item {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(16.dp),
+                                            .padding(HopSpotDimensions.Spacing.md),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(32.dp),
-                                            color = colorScheme.primary
-                                        )
+                                        HopSpotLoadingIndicator(size = LoadingSize.Center)
                                     }
                                 }
                             }
@@ -183,7 +164,7 @@ private fun SwipeableVisitItem(
         confirmValueChange = { dismissValue ->
             if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
                 onDelete()
-                false // Don't dismiss yet, wait for dialog confirmation
+                false
             } else {
                 false
             }
@@ -204,7 +185,7 @@ private fun SwipeableVisitItem(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(backgroundColor, RoundedCornerShape(12.dp))
+                    .background(backgroundColor, HopSpotShapes.card)
                     .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
@@ -231,7 +212,6 @@ private fun VisitListItem(
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
-    // Parse and format date
     val formattedDate = remember(visit.visitedAt) {
         try {
             val zonedDateTime = ZonedDateTime.parse(visit.visitedAt)
@@ -246,21 +226,20 @@ private fun VisitListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
+        shape = HopSpotShapes.card,
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = HopSpotElevations.low)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(HopSpotDimensions.Spacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Bench photo or placeholder
             Box(
                 modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .size(HopSpotDimensions.ListItem.thumbnailSize)
+                    .clip(HopSpotShapes.thumbnail)
                     .background(colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
@@ -283,7 +262,7 @@ private fun VisitListItem(
                 }
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.md))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -295,7 +274,7 @@ private fun VisitListItem(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xxs))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -304,7 +283,7 @@ private fun VisitListItem(
                         tint = colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(14.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xxs))
                     Text(
                         text = formattedDate,
                         fontSize = 12.sp,
@@ -323,121 +302,50 @@ private fun VisitListItem(
 }
 
 @Composable
-private fun EmptyVisitsView(modifier: Modifier = Modifier) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Column(
-        modifier = modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = Icons.Default.History,
-            contentDescription = null,
-            tint = colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(64.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = stringResource(R.string.empty_visits_title),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = stringResource(R.string.empty_visits_subtitle),
-            color = colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-@Composable
-private fun ErrorView(
-    message: String,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Column(
-        modifier = modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = Icons.Default.ErrorOutline,
-            contentDescription = null,
-            tint = colorScheme.error,
-            modifier = Modifier.size(48.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = stringResource(R.string.common_error),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = message,
-            color = colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onRetry) {
-            Text(stringResource(R.string.common_retry))
-        }
-    }
-}
-
-@Composable
 private fun VisitsListSkeleton() {
     val colorScheme = MaterialTheme.colorScheme
 
     LazyColumn(
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(HopSpotDimensions.Screen.padding),
+        verticalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.sm)
     ) {
         items(5) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = HopSpotShapes.card,
                 colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(HopSpotDimensions.Spacing.md),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Photo placeholder
                     Box(
                         modifier = Modifier
-                            .size(56.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .size(HopSpotDimensions.ListItem.thumbnailSize)
+                            .clip(HopSpotShapes.thumbnail)
                             .background(colorScheme.surfaceVariant)
                     )
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.md))
 
                     Column(modifier = Modifier.weight(1f)) {
-                        // Name placeholder
                         Box(
                             modifier = Modifier
                                 .width(120.dp)
                                 .height(16.dp)
-                                .clip(RoundedCornerShape(4.dp))
+                                .clip(HopSpotShapes.thumbnail)
                                 .background(colorScheme.surfaceVariant)
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
 
-                        // Date placeholder
                         Box(
                             modifier = Modifier
                                 .width(160.dp)
                                 .height(12.dp)
-                                .clip(RoundedCornerShape(4.dp))
+                                .clip(HopSpotShapes.thumbnail)
                                 .background(colorScheme.surfaceVariant)
                         )
                     }

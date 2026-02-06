@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -17,13 +16,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.InvitationCode
 import com.kickpaws.hopspot.domain.model.User
+import com.kickpaws.hopspot.ui.components.common.HopSpotCenteredLoadingIndicator
+import com.kickpaws.hopspot.ui.components.common.HopSpotDeleteConfirmationDialog
+import com.kickpaws.hopspot.ui.components.common.HopSpotEmptyView
+import com.kickpaws.hopspot.ui.components.common.HopSpotErrorView
+import com.kickpaws.hopspot.ui.components.common.HopSpotLoadingIndicator
+import com.kickpaws.hopspot.ui.components.common.LoadingSize
+import com.kickpaws.hopspot.ui.theme.HopSpotDimensions
+import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +47,6 @@ fun AdminScreen(
     val codeCopiedMessage = stringResource(R.string.admin_code_copied)
     val codeCopiedFormatMessage = stringResource(R.string.admin_code_copied_format)
 
-    // Handle created code - copy to clipboard
     LaunchedEffect(uiState.createdCode) {
         uiState.createdCode?.let { code ->
             copyToClipboard(context, code)
@@ -50,7 +55,6 @@ fun AdminScreen(
         }
     }
 
-    // Handle success messages
     LaunchedEffect(uiState.successMessage) {
         uiState.successMessage?.let { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -58,7 +62,6 @@ fun AdminScreen(
         }
     }
 
-    // Create Code Dialog
     if (uiState.showCreateCodeDialog) {
         CreateCodeDialog(
             comment = uiState.newCodeComment,
@@ -69,38 +72,14 @@ fun AdminScreen(
         )
     }
 
-    // Delete Code Dialog
     if (uiState.showDeleteCodeDialog && uiState.codeToDelete != null) {
-        AlertDialog(
-            onDismissRequest = viewModel::hideDeleteCodeDialog,
-            title = { Text(stringResource(R.string.dialog_delete_code_title)) },
-            text = {
-                Text(stringResource(R.string.dialog_delete_code_message, uiState.codeToDelete?.code ?: ""))
-            },
-            confirmButton = {
-                Button(
-                    onClick = viewModel::deleteInvitationCode,
-                    enabled = !uiState.isDeletingCode,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorScheme.error
-                    )
-                ) {
-                    if (uiState.isDeletingCode) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = colorScheme.onError
-                        )
-                    } else {
-                        Text(stringResource(R.string.common_delete))
-                    }
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = viewModel::hideDeleteCodeDialog) {
-                    Text(stringResource(R.string.common_cancel))
-                }
-            }
+        HopSpotDeleteConfirmationDialog(
+            title = stringResource(R.string.dialog_delete_code_title),
+            message = stringResource(R.string.dialog_delete_code_message, uiState.codeToDelete?.code ?: ""),
+            onConfirm = viewModel::deleteInvitationCode,
+            onDismiss = viewModel::hideDeleteCodeDialog,
+            icon = Icons.Default.Key,
+            isLoading = uiState.isDeletingCode
         )
     }
 
@@ -129,7 +108,6 @@ fun AdminScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Tab Row
             TabRow(
                 selectedTabIndex = uiState.selectedTabIndex,
                 containerColor = colorScheme.background
@@ -149,7 +127,6 @@ fun AdminScreen(
                 }
             }
 
-            // Tab Content
             when (uiState.selectedTabIndex) {
                 0 -> InvitationCodesTab(
                     codes = uiState.invitationCodes,
@@ -185,55 +162,32 @@ private fun InvitationCodesTab(
     onCopyCode: (String) -> Unit,
     onDeleteCode: (InvitationCode) -> Unit
 ) {
-    val colorScheme = MaterialTheme.colorScheme
-
     when {
         isLoading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+            HopSpotCenteredLoadingIndicator()
         }
         error != null -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text("😕", fontSize = 48.sp)
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(error, color = colorScheme.error, textAlign = TextAlign.Center)
-                Spacer(modifier = Modifier.height(16.dp))
-                TextButton(onClick = onRefresh) {
-                    Text(stringResource(R.string.common_retry))
-                }
-            }
+            HopSpotErrorView(
+                message = error,
+                onRetry = onRefresh,
+                modifier = Modifier.fillMaxSize()
+            )
         }
         codes.isEmpty() -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("🔑", fontSize = 48.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(stringResource(R.string.empty_codes_title), color = colorScheme.onSurfaceVariant)
-                    Text(stringResource(R.string.empty_codes_subtitle), fontSize = 14.sp, color = colorScheme.outline)
-                }
-            }
+            HopSpotEmptyView(
+                icon = Icons.Default.Key,
+                title = stringResource(R.string.empty_codes_title),
+                subtitle = stringResource(R.string.empty_codes_subtitle),
+                modifier = Modifier.fillMaxSize()
+            )
         }
         else -> {
-            // First active codes, then inactive codes
             val sortedCodes = codes.sortedBy { it.isRedeemed }
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(HopSpotDimensions.Screen.padding),
+                verticalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.sm)
             ) {
                 items(sortedCodes) { code ->
                     InvitationCodeCard(
@@ -257,6 +211,7 @@ private fun InvitationCodeCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = HopSpotShapes.card,
         colors = CardDefaults.cardColors(
             containerColor = if (code.isRedeemed) {
                 colorScheme.surfaceVariant.copy(alpha = 0.5f)
@@ -268,7 +223,7 @@ private fun InvitationCodeCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(HopSpotDimensions.Spacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
@@ -279,10 +234,10 @@ private fun InvitationCodeCard(
                         fontSize = 18.sp,
                         color = if (code.isRedeemed) colorScheme.onSurfaceVariant else colorScheme.onPrimaryContainer
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
                     if (code.isRedeemed) {
                         Surface(
-                            shape = RoundedCornerShape(4.dp),
+                            shape = HopSpotShapes.thumbnail,
                             color = colorScheme.outline
                         ) {
                             Text(
@@ -294,7 +249,7 @@ private fun InvitationCodeCard(
                         }
                     } else {
                         Surface(
-                            shape = RoundedCornerShape(4.dp),
+                            shape = HopSpotShapes.thumbnail,
                             color = colorScheme.primary
                         ) {
                             Text(
@@ -308,7 +263,7 @@ private fun InvitationCodeCard(
                 }
 
                 if (!code.comment.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xxs))
                     Text(
                         text = code.comment,
                         fontSize = 14.sp,
@@ -316,7 +271,7 @@ private fun InvitationCodeCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xxs))
 
                 if (code.isRedeemed && code.redeemedBy != null) {
                     Text(
@@ -333,7 +288,6 @@ private fun InvitationCodeCard(
                 }
             }
 
-            // Action Buttons - nur für nicht eingelöste Codes
             if (!code.isRedeemed) {
                 IconButton(onClick = onCopy) {
                     Icon(
@@ -367,74 +321,42 @@ private fun UsersTab(
     val colorScheme = MaterialTheme.colorScheme
     var userToDelete by remember { mutableStateOf<User?>(null) }
 
-    // Delete Confirmation Dialog
     userToDelete?.let { user ->
-        AlertDialog(
-            onDismissRequest = { userToDelete = null },
-            title = { Text(stringResource(R.string.dialog_delete_user_title)) },
-            text = { Text(stringResource(R.string.dialog_delete_user_message, user.displayName)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onDelete(user)
-                        userToDelete = null
-                    },
-                    colors = ButtonDefaults.textButtonColors(contentColor = colorScheme.error)
-                ) {
-                    Text(stringResource(R.string.common_delete))
-                }
+        HopSpotDeleteConfirmationDialog(
+            title = stringResource(R.string.dialog_delete_user_title),
+            message = stringResource(R.string.dialog_delete_user_message, user.displayName),
+            onConfirm = {
+                onDelete(user)
+                userToDelete = null
             },
-            dismissButton = {
-                TextButton(onClick = { userToDelete = null }) {
-                    Text(stringResource(R.string.common_cancel))
-                }
-            }
+            onDismiss = { userToDelete = null },
+            icon = Icons.Default.PersonRemove
         )
     }
 
     when {
         isLoading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+            HopSpotCenteredLoadingIndicator()
         }
         error != null -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text("😕", fontSize = 48.sp)
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(error, color = colorScheme.error, textAlign = TextAlign.Center)
-                Spacer(modifier = Modifier.height(16.dp))
-                TextButton(onClick = onRefresh) {
-                    Text(stringResource(R.string.common_retry))
-                }
-            }
+            HopSpotErrorView(
+                message = error,
+                onRetry = onRefresh,
+                modifier = Modifier.fillMaxSize()
+            )
         }
         users.isEmpty() -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("👥", fontSize = 48.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(stringResource(R.string.empty_users_title), color = colorScheme.onSurfaceVariant)
-                }
-            }
+            HopSpotEmptyView(
+                icon = Icons.Default.People,
+                title = stringResource(R.string.empty_users_title),
+                modifier = Modifier.fillMaxSize()
+            )
         }
         else -> {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(HopSpotDimensions.Screen.padding),
+                verticalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.sm)
             ) {
                 items(users) { user ->
                     UserCard(
@@ -461,6 +383,7 @@ private fun UserCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = HopSpotShapes.card,
         colors = CardDefaults.cardColors(
             containerColor = if (user.isActive) {
                 colorScheme.surfaceVariant
@@ -472,16 +395,14 @@ private fun UserCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(HopSpotDimensions.Spacing.md)
         ) {
-            // Top Row: Avatar + Info
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Avatar
                 Surface(
-                    shape = RoundedCornerShape(50),
+                    shape = HopSpotShapes.chip,
                     color = if (!user.isActive) {
                         colorScheme.outline
                     } else if (isAdmin) {
@@ -501,7 +422,7 @@ private fun UserCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
@@ -517,19 +438,16 @@ private fun UserCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.sm))
 
-            // Bottom Row: Badges + Actions
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Badges
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    // Role Badge
+                Row(horizontalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.xxs)) {
                     Surface(
-                        shape = RoundedCornerShape(4.dp),
+                        shape = HopSpotShapes.thumbnail,
                         color = if (isAdmin) colorScheme.primary else colorScheme.outline
                     ) {
                         Text(
@@ -540,10 +458,9 @@ private fun UserCard(
                         )
                     }
 
-                    // Inactive Badge
                     if (!user.isActive) {
                         Surface(
-                            shape = RoundedCornerShape(4.dp),
+                            shape = HopSpotShapes.thumbnail,
                             color = colorScheme.error
                         ) {
                             Text(
@@ -556,9 +473,7 @@ private fun UserCard(
                     }
                 }
 
-                // Action Buttons
                 Row {
-                    // Toggle Active/Inactive
                     IconButton(
                         onClick = { onToggleActive(!user.isActive) },
                         modifier = Modifier.size(36.dp)
@@ -571,7 +486,6 @@ private fun UserCard(
                         )
                     }
 
-                    // Toggle Role
                     IconButton(
                         onClick = onToggleRole,
                         modifier = Modifier.size(36.dp)
@@ -584,7 +498,6 @@ private fun UserCard(
                         )
                     }
 
-                    // Delete
                     IconButton(
                         onClick = onDelete,
                         modifier = Modifier.size(36.dp)
@@ -610,6 +523,8 @@ private fun CreateCodeDialog(
     onDismiss: () -> Unit,
     isLoading: Boolean
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.dialog_create_code_title)) },
@@ -618,14 +533,15 @@ private fun CreateCodeDialog(
                 Text(
                     text = stringResource(R.string.dialog_create_code_hint),
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = colorScheme.onSurfaceVariant
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.sm))
                 OutlinedTextField(
                     value = comment,
                     onValueChange = onCommentChange,
                     label = { Text(stringResource(R.string.label_comment_optional)) },
                     singleLine = true,
+                    shape = HopSpotShapes.textField,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -633,13 +549,13 @@ private fun CreateCodeDialog(
         confirmButton = {
             Button(
                 onClick = onConfirm,
-                enabled = !isLoading
+                enabled = !isLoading,
+                shape = HopSpotShapes.button
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                    HopSpotLoadingIndicator(
+                        size = LoadingSize.Small,
+                        color = colorScheme.onPrimary
                     )
                 } else {
                     Text(stringResource(R.string.common_create))

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -21,7 +20,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +27,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.Favorite
+import com.kickpaws.hopspot.ui.components.common.HopSpotConfirmationDialog
+import com.kickpaws.hopspot.ui.components.common.HopSpotEmptyView
+import com.kickpaws.hopspot.ui.components.common.HopSpotErrorView
+import com.kickpaws.hopspot.ui.components.common.HopSpotLoadingIndicator
+import com.kickpaws.hopspot.ui.components.common.LoadingSize
+import com.kickpaws.hopspot.ui.theme.HopSpotDimensions
+import com.kickpaws.hopspot.ui.theme.HopSpotElevations
+import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +46,6 @@ fun FavoritesScreen(
     val colorScheme = MaterialTheme.colorScheme
     val listState = rememberLazyListState()
 
-    // Load more when reaching end of list
     val shouldLoadMore = remember {
         derivedStateOf {
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
@@ -54,39 +59,16 @@ fun FavoritesScreen(
         }
     }
 
-    // Remove confirmation dialog
     if (uiState.favoriteToRemove != null) {
-        AlertDialog(
-            onDismissRequest = { viewModel.dismissRemoveDialog() },
-            title = { Text(stringResource(R.string.dialog_remove_favorite_title)) },
-            text = {
-                Text(stringResource(R.string.dialog_remove_favorite_message, uiState.favoriteToRemove!!.benchName))
-            },
-            confirmButton = {
-                Button(
-                    onClick = { viewModel.confirmRemove() },
-                    enabled = !uiState.isRemoving,
-                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error)
-                ) {
-                    if (uiState.isRemoving) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            color = colorScheme.onError,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(stringResource(R.string.common_remove))
-                    }
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { viewModel.dismissRemoveDialog() },
-                    enabled = !uiState.isRemoving
-                ) {
-                    Text(stringResource(R.string.common_cancel))
-                }
-            }
+        HopSpotConfirmationDialog(
+            title = stringResource(R.string.dialog_remove_favorite_title),
+            message = stringResource(R.string.dialog_remove_favorite_message, uiState.favoriteToRemove!!.benchName),
+            confirmText = stringResource(R.string.common_remove),
+            onConfirm = { viewModel.confirmRemove() },
+            onDismiss = { viewModel.dismissRemoveDialog() },
+            icon = Icons.Default.HeartBroken,
+            isLoading = uiState.isRemoving,
+            isDestructive = true
         )
     }
 
@@ -112,7 +94,7 @@ fun FavoritesScreen(
                 }
 
                 uiState.errorMessage != null && uiState.favorites.isEmpty() -> {
-                    ErrorView(
+                    HopSpotErrorView(
                         message = uiState.errorMessage!!,
                         onRetry = viewModel::loadFavorites,
                         modifier = Modifier.align(Alignment.Center)
@@ -120,7 +102,12 @@ fun FavoritesScreen(
                 }
 
                 uiState.favorites.isEmpty() -> {
-                    EmptyFavoritesView(modifier = Modifier.align(Alignment.Center))
+                    HopSpotEmptyView(
+                        icon = Icons.Default.FavoriteBorder,
+                        title = stringResource(R.string.empty_favorites_title),
+                        subtitle = stringResource(R.string.empty_favorites_subtitle),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
                 else -> {
@@ -130,8 +117,8 @@ fun FavoritesScreen(
                     ) {
                         LazyColumn(
                             state = listState,
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            contentPadding = PaddingValues(HopSpotDimensions.Screen.padding),
+                            verticalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.sm)
                         ) {
                             items(
                                 items = uiState.favorites,
@@ -144,19 +131,15 @@ fun FavoritesScreen(
                                 )
                             }
 
-                            // Loading more indicator
                             if (uiState.isLoadingMore) {
                                 item {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(16.dp),
+                                            .padding(HopSpotDimensions.Spacing.md),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(32.dp),
-                                            color = colorScheme.primary
-                                        )
+                                        HopSpotLoadingIndicator(size = LoadingSize.Center)
                                     }
                                 }
                             }
@@ -180,7 +163,7 @@ private fun SwipeableFavoriteItem(
         confirmValueChange = { dismissValue ->
             if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
                 onRemove()
-                false // Don't dismiss yet, wait for dialog confirmation
+                false
             } else {
                 false
             }
@@ -201,7 +184,7 @@ private fun SwipeableFavoriteItem(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(backgroundColor, RoundedCornerShape(12.dp))
+                    .background(backgroundColor, HopSpotShapes.card)
                     .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
@@ -232,21 +215,20 @@ private fun FavoriteListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
+        shape = HopSpotShapes.card,
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = HopSpotElevations.low)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(HopSpotDimensions.Spacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Bench photo or placeholder
             Box(
                 modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .size(HopSpotDimensions.ListItem.thumbnailSize)
+                    .clip(HopSpotShapes.thumbnail)
                     .background(colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
@@ -269,7 +251,7 @@ private fun FavoriteListItem(
                 }
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.md))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -281,10 +263,9 @@ private fun FavoriteListItem(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xxs))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Rating
                     if (favorite.benchRating != null) {
                         Icon(
                             imageVector = Icons.Default.Star,
@@ -298,10 +279,9 @@ private fun FavoriteListItem(
                             fontSize = 12.sp,
                             color = colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
                     }
 
-                    // Amenities icons
                     if (favorite.benchHasToilet) {
                         Icon(
                             imageVector = Icons.Default.Wc,
@@ -309,7 +289,7 @@ private fun FavoriteListItem(
                             tint = colorScheme.primary,
                             modifier = Modifier.size(14.dp)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xxs))
                     }
                     if (favorite.benchHasTrashBin) {
                         Icon(
@@ -329,7 +309,7 @@ private fun FavoriteListItem(
                 modifier = Modifier.size(20.dp)
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
 
             Icon(
                 imageVector = Icons.Default.ChevronRight,
@@ -341,121 +321,50 @@ private fun FavoriteListItem(
 }
 
 @Composable
-private fun EmptyFavoritesView(modifier: Modifier = Modifier) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Column(
-        modifier = modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = Icons.Default.FavoriteBorder,
-            contentDescription = null,
-            tint = colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(64.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = stringResource(R.string.empty_favorites_title),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = stringResource(R.string.empty_favorites_subtitle),
-            color = colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-@Composable
-private fun ErrorView(
-    message: String,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Column(
-        modifier = modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = Icons.Default.ErrorOutline,
-            contentDescription = null,
-            tint = colorScheme.error,
-            modifier = Modifier.size(48.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = stringResource(R.string.common_error),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = message,
-            color = colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onRetry) {
-            Text(stringResource(R.string.common_retry))
-        }
-    }
-}
-
-@Composable
 private fun FavoritesListSkeleton() {
     val colorScheme = MaterialTheme.colorScheme
 
     LazyColumn(
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(HopSpotDimensions.Screen.padding),
+        verticalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.sm)
     ) {
         items(5) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = HopSpotShapes.card,
                 colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(HopSpotDimensions.Spacing.md),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Photo placeholder
                     Box(
                         modifier = Modifier
-                            .size(56.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .size(HopSpotDimensions.ListItem.thumbnailSize)
+                            .clip(HopSpotShapes.thumbnail)
                             .background(colorScheme.surfaceVariant)
                     )
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.md))
 
                     Column(modifier = Modifier.weight(1f)) {
-                        // Name placeholder
                         Box(
                             modifier = Modifier
                                 .width(120.dp)
                                 .height(16.dp)
-                                .clip(RoundedCornerShape(4.dp))
+                                .clip(HopSpotShapes.thumbnail)
                                 .background(colorScheme.surfaceVariant)
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
 
-                        // Rating placeholder
                         Box(
                             modifier = Modifier
                                 .width(80.dp)
                                 .height(12.dp)
-                                .clip(RoundedCornerShape(4.dp))
+                                .clip(HopSpotShapes.thumbnail)
                                 .background(colorScheme.surfaceVariant)
                         )
                     }

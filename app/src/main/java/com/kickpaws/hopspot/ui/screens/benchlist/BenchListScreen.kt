@@ -40,6 +40,14 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.Bench
 import com.kickpaws.hopspot.ui.components.BenchListSkeleton
+import com.kickpaws.hopspot.ui.components.common.HopSpotDeleteConfirmationDialog
+import com.kickpaws.hopspot.ui.components.common.HopSpotEmptyView
+import com.kickpaws.hopspot.ui.components.common.HopSpotErrorView
+import com.kickpaws.hopspot.ui.components.common.HopSpotLoadingIndicator
+import com.kickpaws.hopspot.ui.components.common.LoadingSize
+import com.kickpaws.hopspot.ui.theme.HopSpotDimensions
+import com.kickpaws.hopspot.ui.theme.HopSpotElevations
+import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -135,11 +143,13 @@ fun BenchListScreen(
 
     // Delete Confirmation Dialog
     if (uiState.benchToDelete != null) {
-        DeleteConfirmationDialog(
-            benchName = uiState.benchToDelete!!.name,
-            isDeleting = uiState.isDeleting,
+        HopSpotDeleteConfirmationDialog(
+            title = stringResource(R.string.dialog_delete_bench_title),
+            message = stringResource(R.string.dialog_delete_bench_message, uiState.benchToDelete!!.name),
             onConfirm = viewModel::deleteBench,
-            onDismiss = viewModel::hideDeleteConfirmation
+            onDismiss = viewModel::hideDeleteConfirmation,
+            icon = Icons.Default.Delete,
+            isLoading = uiState.isDeleting
         )
     }
 
@@ -206,7 +216,7 @@ fun BenchListScreen(
                 }
 
                 uiState.errorMessage != null && uiState.benches.isEmpty() -> {
-                    ErrorView(
+                    HopSpotErrorView(
                         message = uiState.errorMessage!!,
                         onRetry = viewModel::loadBenches,
                         modifier = Modifier.align(Alignment.Center)
@@ -214,7 +224,10 @@ fun BenchListScreen(
                 }
 
                 uiState.benches.isEmpty() -> {
-                    EmptyView(
+                    HopSpotEmptyView(
+                        icon = Icons.Default.Chair,
+                        title = stringResource(R.string.empty_benches_title),
+                        subtitle = stringResource(R.string.empty_benches_subtitle),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -246,13 +259,10 @@ fun BenchListScreen(
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(16.dp),
+                                            .padding(HopSpotDimensions.Spacing.md),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(32.dp),
-                                            color = colorScheme.primary
-                                        )
+                                        HopSpotLoadingIndicator(size = LoadingSize.Center)
                                     }
                                 }
                             }
@@ -512,61 +522,6 @@ private fun BenchListItem(
     }
 }
 
-@Composable
-private fun DeleteConfirmationDialog(
-    benchName: String,
-    isDeleting: Boolean,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    AlertDialog(
-        onDismissRequest = { if (!isDeleting) onDismiss() },
-        icon = {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = null,
-                tint = colorScheme.error
-            )
-        },
-        title = {
-            Text(stringResource(R.string.dialog_delete_bench_title))
-        },
-        text = {
-            Text(stringResource(R.string.dialog_delete_bench_message, benchName))
-        },
-        confirmButton = {
-            Button(
-                onClick = onConfirm,
-                enabled = !isDeleting,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorScheme.error,
-                    contentColor = colorScheme.onError
-                )
-            ) {
-                if (isDeleting) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        color = colorScheme.onError,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(stringResource(R.string.common_delete))
-                }
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                enabled = !isDeleting
-            ) {
-                Text(stringResource(R.string.common_cancel))
-            }
-        }
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FilterBottomSheet(
@@ -768,65 +723,6 @@ private fun FilterBottomSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
         }
-    }
-}
-
-@Composable
-private fun ErrorView(
-    message: String,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Column(
-        modifier = modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "\uD83D\uDE15",
-            fontSize = 48.sp
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = message,
-            color = colorScheme.error,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        TextButton(onClick = onRetry) {
-            Text(stringResource(R.string.common_retry), color = colorScheme.primary)
-        }
-    }
-}
-
-@Composable
-private fun EmptyView(
-    modifier: Modifier = Modifier
-) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Column(
-        modifier = modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "\uD83E\uDE91",
-            fontSize = 64.sp
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = stringResource(R.string.empty_benches_title),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = stringResource(R.string.empty_benches_subtitle),
-            color = colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
     }
 }
 

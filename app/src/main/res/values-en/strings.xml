@@ -1,0 +1,291 @@
+<resources>
+    <string name="app_name">HopSpot</string>
+
+    <!-- Network Errors -->
+    <string name="error_no_network">No internet connection.</string>
+    <string name="error_timeout">Request timed out. Please try again.</string>
+    <string name="error_unknown">An unexpected error occurred.</string>
+
+    <!-- Authentication Errors (AUTH_*) -->
+    <string name="error_auth_invalid_credentials">Email or password is incorrect.</string>
+    <string name="error_auth_invalid_token">Session invalid. Please log in again.</string>
+    <string name="error_auth_token_expired">Session expired. Please log in again.</string>
+    <string name="error_auth_invalid_refresh_token">Session expired. Please log in again.</string>
+    <string name="error_auth_account_deactivated">Your account has been deactivated.</string>
+    <string name="error_auth_forbidden">No permission for this action.</string>
+    <string name="error_auth_admin_required">Admin privileges required.</string>
+
+    <!-- User Errors (USER_*) -->
+    <string name="error_user_not_found">User not found.</string>
+    <string name="error_user_email_exists">This email is already registered.</string>
+    <string name="error_user_cannot_delete_self">You cannot delete yourself.</string>
+
+    <!-- Invitation Errors (INVITATION_*) -->
+    <string name="error_invitation_invalid_code">The invitation code is invalid.</string>
+    <string name="error_invitation_already_redeemed">This code has already been redeemed.</string>
+    <string name="error_invitation_not_found">Invitation code not found.</string>
+    <string name="error_invitation_cannot_delete_redeemed">Redeemed codes cannot be deleted.</string>
+
+    <!-- Bench Errors (BENCH_*) -->
+    <string name="error_bench_not_found">The bench was not found.</string>
+    <string name="error_bench_forbidden">No permission for this bench.</string>
+
+    <!-- Photo Errors (PHOTO_*) -->
+    <string name="error_photo_not_found">Photo not found.</string>
+    <string name="error_photo_max_reached">Maximum 10 photos per bench allowed.</string>
+    <string name="error_photo_file_too_large">File is too large (max. 10 MB).</string>
+    <string name="error_photo_invalid_type">Only JPEG, PNG and WebP allowed.</string>
+    <string name="error_photo_forbidden">No permission for this photo.</string>
+
+    <!-- Visit Errors (VISIT_*) -->
+    <string name="error_visit_not_found">Visit not found.</string>
+    <string name="error_visit_forbidden">You can only delete your own visits.</string>
+
+    <!-- Favorite Errors (FAVORITE_*) -->
+    <string name="error_favorite_not_found">Favorite not found.</string>
+    <string name="error_favorite_already_exists">Already in your favorites.</string>
+
+    <!-- Validation Errors (VALIDATION_*) -->
+    <string name="error_validation_invalid_request">Invalid request.</string>
+    <string name="error_validation_invalid_id">Invalid ID.</string>
+    <string name="error_validation_invalid_email">Invalid email address.</string>
+    <string name="error_validation_password_too_short">Password must be at least 8 characters.</string>
+    <string name="error_validation_field_required">Required field missing.</string>
+
+    <!-- System Errors (SYSTEM_*) -->
+    <string name="error_system_internal">A server error occurred.</string>
+    <string name="error_system_database">Database error. Please try again later.</string>
+    <string name="error_system_rate_limited">Too many requests. Please wait a moment.</string>
+
+    <!-- Common Actions -->
+    <string name="common_cancel">Cancel</string>
+    <string name="common_save">Save</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_retry">Try again</string>
+    <string name="common_ok">OK</string>
+    <string name="common_close">Close</string>
+    <string name="common_edit">Edit</string>
+    <string name="common_remove">Remove</string>
+    <string name="common_create">Create</string>
+    <string name="common_change">Change</string>
+    <string name="common_set">Set</string>
+    <string name="common_apply">Apply</string>
+    <string name="common_reset">Reset</string>
+    <string name="common_error">Error</string>
+
+    <!-- Labels -->
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="label_name">Name</string>
+    <string name="label_name_required">Name *</string>
+    <string name="label_your_name">Your name</string>
+    <string name="label_description">Description</string>
+    <string name="label_rating">Rating</string>
+    <string name="label_location">Location</string>
+    <string name="label_location_required">Location *</string>
+    <string name="label_photo">Photo</string>
+    <string name="label_photos">Photos</string>
+    <string name="label_invitation_code">Invitation code</string>
+    <string name="label_comment">Comment</string>
+    <string name="label_comment_optional">Comment (optional)</string>
+    <string name="label_latitude">Latitude</string>
+    <string name="label_longitude">Longitude</string>
+    <string name="label_role">Role</string>
+
+    <!-- Buttons -->
+    <string name="btn_login">Cheers!</string>
+    <string name="btn_register">Join!</string>
+    <string name="btn_logout">Log out</string>
+    <string name="btn_i_was_here">I was here!</string>
+    <string name="btn_open_in_maps">Open in Google Maps</string>
+    <string name="btn_add_photo">Add photo</string>
+    <string name="btn_choose_other_photo">Choose different photo</string>
+    <string name="btn_delete_bench">Delete bench</string>
+
+    <!-- Hints / Placeholders -->
+    <string name="hint_search">Search…</string>
+    <string name="hint_bench_name">e.g. Beautiful forest bench</string>
+    <string name="hint_bench_description">What makes this bench special?</string>
+    <string name="hint_latitude">e.g. 47.3769</string>
+    <string name="hint_longitude">e.g. 8.5417</string>
+    <string name="hint_comment_example">e.g. \"For Max\"</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_back">Back</string>
+    <string name="cd_edit">Edit</string>
+    <string name="cd_delete">Delete</string>
+    <string name="cd_close">Close</string>
+    <string name="cd_clear_search">Clear search</string>
+    <string name="cd_filter">Filter</string>
+    <string name="cd_random_bench">Random bench</string>
+    <string name="cd_add_bench">Add bench</string>
+    <string name="cd_add_photo">Add photo</string>
+    <string name="cd_remove_photo">Remove photo</string>
+    <string name="cd_remove_from_favorites">Remove from favorites</string>
+    <string name="cd_add_to_favorites">Add to favorites</string>
+    <string name="cd_show_password">Show password</string>
+    <string name="cd_hide_password">Hide password</string>
+    <string name="cd_my_location">My location</string>
+    <string name="cd_new_bench">New bench</string>
+    <string name="cd_details">Details</string>
+    <string name="cd_toilet">Toilet</string>
+    <string name="cd_trash_bin">Trash bin</string>
+    <string name="cd_distance">Distance</string>
+    <string name="cd_create_code">Create code</string>
+    <string name="cd_copy_code">Copy code</string>
+    <string name="cd_delete_code">Delete code</string>
+    <string name="cd_set_as_main">Set as main</string>
+    <string name="cd_main_image">Main image</string>
+    <string name="cd_photo">Photo</string>
+    <string name="cd_photo_fullscreen">Photo fullscreen</string>
+    <string name="cd_selected_photo">Selected photo</string>
+    <string name="cd_photo_large">Photo large</string>
+    <string name="cd_deactivate">Deactivate</string>
+    <string name="cd_activate">Activate</string>
+    <string name="cd_make_user">Make user</string>
+    <string name="cd_make_admin">Make admin</string>
+    <string name="cd_stars" formatted="false">%d stars</string>
+
+    <!-- Dialog Titles -->
+    <string name="dialog_delete_bench_title">Delete bench?</string>
+    <string name="dialog_delete_bench_message">Do you really want to delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="dialog_delete_photo_title">Delete photo?</string>
+    <string name="dialog_delete_photo_message">Do you really want to delete this photo?</string>
+    <string name="dialog_delete_visit_title">Delete visit?</string>
+    <string name="dialog_delete_visit_message">Do you really want to delete the visit at \"%1$s\"?</string>
+    <string name="dialog_remove_favorite_title">Remove favorite?</string>
+    <string name="dialog_remove_favorite_message">Do you really want to remove \"%1$s\" from your favorites?</string>
+    <string name="dialog_delete_code_title">Delete code?</string>
+    <string name="dialog_delete_code_message">Do you really want to delete the code \"%1$s\"?</string>
+    <string name="dialog_delete_user_title">Delete user?</string>
+    <string name="dialog_delete_user_message">Do you really want to delete %1$s? This action cannot be undone.</string>
+    <string name="dialog_edit_name_title">Change name</string>
+    <string name="dialog_enter_coordinates_title">Enter coordinates</string>
+    <string name="dialog_enter_coordinates_hint">Enter the GPS coordinates (e.g. from Google Maps)</string>
+    <string name="dialog_create_code_title">Create new code</string>
+    <string name="dialog_create_code_hint">Optionally add a comment (e.g. \"For Max\"):</string>
+
+    <!-- Empty States -->
+    <string name="empty_benches_title">No benches yet</string>
+    <string name="empty_benches_subtitle">Add the first bench!</string>
+    <string name="empty_visits_title">No visits yet</string>
+    <string name="empty_visits_subtitle">Visit a bench and mark your visit!</string>
+    <string name="empty_favorites_title">No favorites yet</string>
+    <string name="empty_favorites_subtitle">Tap the heart on a bench to add it to your favorites!</string>
+    <string name="empty_codes_title">No invitation codes</string>
+    <string name="empty_codes_subtitle">Create one with the + button</string>
+    <string name="empty_users_title">No users</string>
+    <string name="empty_photos_title">No photos</string>
+
+    <!-- Auth Screens -->
+    <string name="auth_slogan">Find your favorite bench</string>
+    <string name="auth_welcome">Welcome!</string>
+    <string name="auth_join_community">Join the HopSpot Community</string>
+    <string name="auth_no_account">Don\'t have an account? Register</string>
+    <string name="auth_have_account">Already have an account? Log in</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_admin_badge">Admin</string>
+    <string name="profile_role_admin">Administrator</string>
+    <string name="profile_role_user">User</string>
+
+    <!-- Bench List Screen -->
+    <string name="bench_list_filter_title">Filter &amp; Sort</string>
+    <string name="bench_list_sort_by">Sort by</string>
+    <string name="bench_list_filter_toilet">Only with toilet</string>
+    <string name="bench_list_filter_trash">Only with trash bin</string>
+    <string name="bench_list_filter_min_rating">Minimum rating</string>
+    <string name="bench_list_filter_all">All</string>
+
+    <!-- Bench Detail Screen -->
+    <string name="bench_detail_title">Bench Details</string>
+    <string name="bench_detail_no_photos">No photos</string>
+    <string name="bench_detail_main_image">Main image</string>
+    <string name="bench_detail_more_photos">More photos</string>
+    <string name="bench_detail_location">Location</string>
+    <string name="bench_detail_visits">Visits</string>
+    <string name="bench_detail_visits_count">%1$d visits total</string>
+    <string name="bench_detail_visit_saved">Visit saved!</string>
+    <string name="bench_detail_current_weather">Current weather</string>
+    <string name="bench_detail_temperature">Temperature</string>
+    <string name="bench_detail_rating_format">%1$d/5</string>
+
+    <!-- Bench Create/Edit Screen -->
+    <string name="bench_create_title">New Bench</string>
+    <string name="bench_edit_title">Edit</string>
+    <string name="bench_form_amenities">Amenities</string>
+    <string name="bench_form_toilet_nearby">Toilet nearby</string>
+    <string name="bench_form_trash_nearby">Trash bin available</string>
+    <string name="bench_form_location_not_set">Not set yet</string>
+    <string name="bench_form_location_hint">GPS feature coming soon! For now, enter coordinates manually.</string>
+    <string name="bench_form_rating_format">%1$d of 5 stars</string>
+    <string name="bench_form_uploading">Uploading…</string>
+    <string name="bench_form_set_main_hint">Tap ☆ to set a photo as main image</string>
+
+    <!-- Visits Screen -->
+    <string name="visits_title">My Visits</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_title">My Favorites</string>
+
+    <!-- Admin Screen -->
+    <string name="admin_title">Admin Panel</string>
+    <string name="admin_tab_codes">Invitation Codes</string>
+    <string name="admin_tab_users">Users</string>
+    <string name="admin_code_redeemed">Redeemed</string>
+    <string name="admin_code_active">Active</string>
+    <string name="admin_code_redeemed_by">Redeemed by: %1$s</string>
+    <string name="admin_code_created_by">Created by: %1$s</string>
+    <string name="admin_code_copied">Code copied!</string>
+    <string name="admin_code_copied_format">Code copied: %1$s</string>
+    <string name="admin_user_badge_admin">Admin</string>
+    <string name="admin_user_badge_user">User</string>
+    <string name="admin_user_deactivated">Deactivated</string>
+
+    <!-- Map Screen -->
+    <string name="map_benches_count">%1$d benches</string>
+
+    <!-- Offline Banner -->
+    <string name="offline_banner_message">Offline mode - Changes will be synced</string>
+
+    <!-- Amenities -->
+    <string name="amenity_toilet">Toilet</string>
+    <string name="amenity_trash_bin">Trash bin</string>
+    <string name="amenity_wc">WC</string>
+    <string name="amenity_trash">Trash</string>
+
+    <!-- Sort Options -->
+    <string name="sort_newest">Newest</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_rating">Rating</string>
+    <string name="sort_distance">Distance</string>
+
+    <!-- Weather Descriptions -->
+    <string name="weather_clear">Clear</string>
+    <string name="weather_fair">Fair</string>
+    <string name="weather_partly_cloudy">Partly cloudy</string>
+    <string name="weather_cloudy">Cloudy</string>
+    <string name="weather_fog">Fog</string>
+    <string name="weather_drizzle">Drizzle</string>
+    <string name="weather_freezing_drizzle">Freezing drizzle</string>
+    <string name="weather_rain">Rain</string>
+    <string name="weather_freezing_rain">Freezing rain</string>
+    <string name="weather_snow">Snow</string>
+    <string name="weather_snow_grains">Snow grains</string>
+    <string name="weather_rain_showers">Rain showers</string>
+    <string name="weather_snow_showers">Snow showers</string>
+    <string name="weather_thunderstorm">Thunderstorm</string>
+    <string name="weather_thunderstorm_hail">Thunderstorm with hail</string>
+    <string name="weather_unknown">Unknown</string>
+
+    <!-- Wind Directions -->
+    <string name="wind_n">N</string>
+    <string name="wind_ne">NE</string>
+    <string name="wind_e">E</string>
+    <string name="wind_se">SE</string>
+    <string name="wind_s">S</string>
+    <string name="wind_sw">SW</string>
+    <string name="wind_w">W</string>
+    <string name="wind_nw">NW</string>
+    <string name="wind_format">Wind %1$s</string>
+</resources>

@@ -2,14 +2,11 @@ package com.kickpaws.hopspot.ui.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,13 +21,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kickpaws.hopspot.R
+import com.kickpaws.hopspot.ui.components.common.HopSpotButton
+import com.kickpaws.hopspot.ui.components.common.HopSpotTextField
+import com.kickpaws.hopspot.ui.theme.HopSpotDimensions
+import com.kickpaws.hopspot.ui.theme.HopSpotElevations
+import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 
 @Composable
 fun LoginScreen(
@@ -42,7 +42,6 @@ fun LoginScreen(
     val focusManager = LocalFocusManager.current
     val colorScheme = MaterialTheme.colorScheme
 
-    // Navigate when login successful
     LaunchedEffect(uiState.isLoggedIn) {
         if (uiState.isLoggedIn) {
             onLoginSuccess()
@@ -64,17 +63,16 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(HopSpotDimensions.Spacing.lg),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo / Title
             Text(
                 text = "\uD83C\uDF7A",
                 fontSize = 64.sp
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
 
             Text(
                 text = stringResource(R.string.app_name),
@@ -91,24 +89,18 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Login Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = colorScheme.background
-                ),
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 8.dp
-                )
+                shape = HopSpotShapes.dialog,
+                colors = CardDefaults.cardColors(containerColor = colorScheme.background),
+                elevation = CardDefaults.cardElevation(defaultElevation = HopSpotElevations.high)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(HopSpotDimensions.Spacing.lg),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Email Field
                     HopSpotTextField(
                         value = uiState.email,
                         onValueChange = viewModel::onEmailChange,
@@ -123,9 +115,8 @@ fun LoginScreen(
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
 
-                    // Password Field
                     HopSpotTextField(
                         value = uiState.password,
                         onValueChange = viewModel::onPasswordChange,
@@ -146,9 +137,8 @@ fun LoginScreen(
                         )
                     )
 
-                    // Error Message
                     if (uiState.errorMessage != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
                         Text(
                             text = uiState.errorMessage!!,
                             color = colorScheme.error,
@@ -157,9 +147,8 @@ fun LoginScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.lg))
 
-                    // Login Button
                     HopSpotButton(
                         text = stringResource(R.string.btn_login),
                         onClick = viewModel::login,
@@ -167,9 +156,8 @@ fun LoginScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
 
-                    // Register Link
                     TextButton(onClick = onNavigateToRegister) {
                         Text(
                             text = stringResource(R.string.auth_no_account),
@@ -178,123 +166,6 @@ fun LoginScreen(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun HopSpotTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    leadingIcon: androidx.compose.ui.graphics.vector.ImageVector,
-    modifier: Modifier = Modifier,
-    isPassword: Boolean = false,
-    isPasswordVisible: Boolean = false,
-    onTogglePasswordVisibility: (() -> Unit)? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
-) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        leadingIcon = {
-            Icon(
-                imageVector = leadingIcon,
-                contentDescription = null,
-                tint = colorScheme.primary
-            )
-        },
-        trailingIcon = if (isPassword) {
-            {
-                IconButton(onClick = { onTogglePasswordVisibility?.invoke() }) {
-                    Icon(
-                        imageVector = if (isPasswordVisible) {
-                            Icons.Default.VisibilityOff
-                        } else {
-                            Icons.Default.Visibility
-                        },
-                        contentDescription = if (isPasswordVisible) {
-                            stringResource(R.string.cd_hide_password)
-                        } else {
-                            stringResource(R.string.cd_show_password)
-                        },
-                        tint = colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        } else null,
-        visualTransformation = if (isPassword && !isPasswordVisible) {
-            PasswordVisualTransformation()
-        } else {
-            VisualTransformation.None
-        },
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            // Border
-            focusedBorderColor = colorScheme.primary,
-            unfocusedBorderColor = colorScheme.outline,
-            // Label
-            focusedLabelColor = colorScheme.primary,
-            unfocusedLabelColor = colorScheme.onSurfaceVariant,
-            // Text
-            focusedTextColor = colorScheme.onSurface,
-            unfocusedTextColor = colorScheme.onSurface,
-            // Cursor
-            cursorColor = colorScheme.primary,
-            // Container
-            focusedContainerColor = colorScheme.surface,
-            unfocusedContainerColor = colorScheme.surface
-        ),
-        modifier = modifier.fillMaxWidth()
-    )
-}
-
-@Composable
-fun HopSpotButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isLoading: Boolean = false,
-    enabled: Boolean = true
-) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Button(
-        onClick = onClick,
-        enabled = enabled && !isLoading,
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = colorScheme.primary,
-            contentColor = colorScheme.onPrimary,
-            disabledContainerColor = colorScheme.primary.copy(alpha = 0.5f),
-            disabledContentColor = colorScheme.onPrimary.copy(alpha = 0.7f)
-        ),
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 2.dp
-        ),
-        contentPadding = PaddingValues(vertical = 16.dp),
-        modifier = modifier
-    ) {
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
-                color = colorScheme.onPrimary,
-                strokeWidth = 2.dp
-            )
-        } else {
-            Text(
-                text = text,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
         }
     }
 }

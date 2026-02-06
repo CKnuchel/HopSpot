@@ -33,6 +33,10 @@ import coil.request.ImageRequest
 import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.ui.components.LocationPickerCard
 import com.kickpaws.hopspot.ui.components.PhotoPickerDialog
+import com.kickpaws.hopspot.ui.components.common.HopSpotLoadingIndicator
+import com.kickpaws.hopspot.ui.components.common.LoadingSize
+import com.kickpaws.hopspot.ui.theme.HopSpotDimensions
+import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,9 +85,9 @@ fun BenchCreateScreen(
                         enabled = !uiState.isSaving && !uiState.isUploadingPhoto
                     ) {
                         if (uiState.isSaving || uiState.isUploadingPhoto) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                strokeWidth = 2.dp
+                            HopSpotLoadingIndicator(
+                                size = LoadingSize.Button,
+                                color = colorScheme.primary
                             )
                         } else {
                             Text(
@@ -106,8 +110,8 @@ fun BenchCreateScreen(
                 .padding(innerPadding)
                 .background(colorScheme.background)
                 .verticalScroll(scrollState)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(HopSpotDimensions.Screen.padding),
+            verticalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.md)
         ) {
             // Photo Card
             PhotoCard(
@@ -131,7 +135,7 @@ fun BenchCreateScreen(
                     )
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
+                shape = HopSpotShapes.textField,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = colorScheme.primary,
                     unfocusedBorderColor = colorScheme.outline,
@@ -166,7 +170,7 @@ fun BenchCreateScreen(
                 },
                 minLines = 3,
                 maxLines = 5,
-                shape = RoundedCornerShape(12.dp),
+                shape = HopSpotShapes.textField,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = colorScheme.primary,
                     unfocusedBorderColor = colorScheme.outline,
@@ -198,12 +202,12 @@ fun BenchCreateScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = colorScheme.errorContainer
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = HopSpotShapes.card
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(HopSpotDimensions.Spacing.md),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -211,7 +215,7 @@ fun BenchCreateScreen(
                             contentDescription = null,
                             tint = colorScheme.error
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
                         Text(
                             text = uiState.errorMessage!!,
                             color = colorScheme.error
@@ -220,7 +224,7 @@ fun BenchCreateScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
         }
     }
 }
@@ -237,7 +241,7 @@ private fun PhotoCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = HopSpotShapes.card,
         colors = CardDefaults.cardColors(
             containerColor = colorScheme.surface
         )
@@ -245,7 +249,7 @@ private fun PhotoCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(HopSpotDimensions.Spacing.md)
         ) {
             Text(
                 text = stringResource(R.string.label_photo),
@@ -253,7 +257,7 @@ private fun PhotoCard(
                 color = colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.sm))
 
             if (photoUri != null) {
                 // Show selected photo
@@ -261,7 +265,7 @@ private fun PhotoCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(HopSpotShapes.thumbnail)
                 ) {
                     AsyncImage(
                         model = ImageRequest.Builder(context)
@@ -283,10 +287,11 @@ private fun PhotoCard(
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                CircularProgressIndicator(
+                                HopSpotLoadingIndicator(
+                                    size = LoadingSize.Center,
                                     color = colorScheme.primary
                                 )
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
                                 Text(
                                     text = stringResource(R.string.bench_form_uploading),
                                     color = colorScheme.onSurface
@@ -321,11 +326,11 @@ private fun PhotoCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(HopSpotShapes.thumbnail)
                         .border(
                             width = 2.dp,
                             color = colorScheme.outline.copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = HopSpotShapes.thumbnail
                         )
                         .clickable(onClick = onSelectPhoto),
                     contentAlignment = Alignment.Center
@@ -337,9 +342,9 @@ private fun PhotoCard(
                             imageVector = Icons.Default.AddAPhoto,
                             contentDescription = null,
                             tint = colorScheme.primary,
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(HopSpotDimensions.Icon.large)
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
                         Text(
                             text = stringResource(R.string.btn_add_photo),
                             color = colorScheme.onSurfaceVariant
@@ -349,7 +354,7 @@ private fun PhotoCard(
             }
 
             if (photoUri != null && !isUploading) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
                 TextButton(
                     onClick = onSelectPhoto,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -357,9 +362,9 @@ private fun PhotoCard(
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(HopSpotDimensions.Icon.small)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xxs))
                     Text(stringResource(R.string.btn_choose_other_photo))
                 }
             }
@@ -378,7 +383,7 @@ private fun LocationCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = HopSpotShapes.card,
         colors = CardDefaults.cardColors(
             containerColor = colorScheme.surface
         )
@@ -386,7 +391,7 @@ private fun LocationCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(HopSpotDimensions.Spacing.md)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -401,7 +406,7 @@ private fun LocationCard(
                         contentDescription = null,
                         tint = if (hasLocation) colorScheme.primary else colorScheme.error
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
                     Column {
                         Text(
                             text = stringResource(R.string.label_location_required),
@@ -418,7 +423,7 @@ private fun LocationCard(
 
                 Button(
                     onClick = { showDialog = true },
-                    shape = RoundedCornerShape(8.dp),
+                    shape = HopSpotShapes.button,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorScheme.primary
                     )
@@ -427,7 +432,7 @@ private fun LocationCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
 
             Text(
                 text = stringResource(R.string.bench_form_location_hint),
@@ -517,7 +522,7 @@ private fun RatingSelector(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = HopSpotShapes.card,
         colors = CardDefaults.cardColors(
             containerColor = colorScheme.surface
         )
@@ -525,7 +530,7 @@ private fun RatingSelector(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(HopSpotDimensions.Spacing.md)
         ) {
             Text(
                 text = stringResource(R.string.label_rating),
@@ -533,7 +538,7 @@ private fun RatingSelector(
                 color = colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.sm))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -587,7 +592,7 @@ private fun AmenitiesCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = HopSpotShapes.card,
         colors = CardDefaults.cardColors(
             containerColor = colorScheme.surface
         )
@@ -595,7 +600,7 @@ private fun AmenitiesCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(HopSpotDimensions.Spacing.md)
         ) {
             Text(
                 text = stringResource(R.string.bench_form_amenities),
@@ -603,7 +608,7 @@ private fun AmenitiesCard(
                 color = colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
 
             // Toilet
             Row(
@@ -619,7 +624,7 @@ private fun AmenitiesCard(
                         contentDescription = null,
                         tint = colorScheme.primary
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
                     Text(stringResource(R.string.bench_form_toilet_nearby))
                 }
 
@@ -634,7 +639,7 @@ private fun AmenitiesCard(
             }
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.padding(vertical = HopSpotDimensions.Spacing.xs),
                 color = colorScheme.outlineVariant
             )
 
@@ -652,7 +657,7 @@ private fun AmenitiesCard(
                         contentDescription = null,
                         tint = colorScheme.primary
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
                     Text(stringResource(R.string.bench_form_trash_nearby))
                 }
 

@@ -8,7 +8,6 @@ import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -46,6 +45,11 @@ import com.kickpaws.hopspot.R
 import com.kickpaws.hopspot.domain.model.Photo
 import com.kickpaws.hopspot.ui.components.BenchListItemSkeleton
 import com.kickpaws.hopspot.ui.components.WeatherIcons
+import com.kickpaws.hopspot.ui.components.common.HopSpotErrorView
+import com.kickpaws.hopspot.ui.components.common.HopSpotLoadingIndicator
+import com.kickpaws.hopspot.ui.components.common.LoadingSize
+import com.kickpaws.hopspot.ui.theme.HopSpotDimensions
+import com.kickpaws.hopspot.ui.theme.HopSpotShapes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,22 +64,18 @@ fun BenchDetailScreen(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    // Fullscreen image viewer - track index for swipe support
     var selectedPhotoIndex by remember { mutableIntStateOf(-1) }
 
-    // Load bench on first composition
     LaunchedEffect(benchId) {
         viewModel.loadBench(benchId)
     }
 
-    // Show snackbar when visit added
     LaunchedEffect(uiState.visitAdded) {
         if (uiState.visitAdded) {
             viewModel.resetVisitAdded()
         }
     }
 
-    // Fullscreen Photo Dialog with Zoom & Swipe
     if (selectedPhotoIndex >= 0 && uiState.photos.isNotEmpty()) {
         FullscreenImageViewer(
             photos = uiState.photos,
@@ -98,37 +98,27 @@ fun BenchDetailScreen(
                 },
                 actions = {
                     if (uiState.bench != null) {
-                        // Favorite Button
                         IconButton(
                             onClick = { viewModel.toggleFavorite(benchId) },
                             enabled = !uiState.isTogglingFavorite
                         ) {
                             if (uiState.isTogglingFavorite) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
-                                    strokeWidth = 2.dp
+                                HopSpotLoadingIndicator(
+                                    size = LoadingSize.Button,
+                                    color = colorScheme.onSurface
                                 )
                             } else {
                                 Icon(
-                                    imageVector = if (uiState.isFavorite) {
-                                        Icons.Default.Favorite
-                                    } else {
-                                        Icons.Default.FavoriteBorder
-                                    },
+                                    imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                     contentDescription = if (uiState.isFavorite) {
                                         stringResource(R.string.cd_remove_from_favorites)
                                     } else {
                                         stringResource(R.string.cd_add_to_favorites)
                                     },
-                                    tint = if (uiState.isFavorite) {
-                                        Color.Red
-                                    } else {
-                                        colorScheme.onSurface
-                                    }
+                                    tint = if (uiState.isFavorite) Color.Red else colorScheme.onSurface
                                 )
                             }
                         }
-                        // Edit Button
                         IconButton(onClick = { onEditClick(benchId) }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
@@ -151,45 +141,28 @@ fun BenchDetailScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    // Skeleton loading
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(16.dp)
+                            .padding(HopSpotDimensions.Screen.padding)
                     ) {
-                        // Photo skeleton
                         com.kickpaws.hopspot.ui.components.ShimmerBox(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = HopSpotShapes.card
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
                         BenchListItemSkeleton()
                     }
                 }
 
                 uiState.errorMessage != null && uiState.bench == null -> {
-                    // Error state
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text("😕", fontSize = 48.sp)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = uiState.errorMessage!!,
-                            color = colorScheme.error,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        TextButton(onClick = { viewModel.loadBench(benchId) }) {
-                            Text(stringResource(R.string.common_retry))
-                        }
-                    }
+                    HopSpotErrorView(
+                        message = uiState.errorMessage!!,
+                        onRetry = { viewModel.loadBench(benchId) },
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
                 uiState.bench != null -> {
@@ -204,101 +177,112 @@ fun BenchDetailScreen(
                         if (uiState.photos.isNotEmpty()) {
                             PhotoGallery(
                                 photos = uiState.photos,
-                                onPhotoClick = { index ->
-                                    selectedPhotoIndex = index
-                                }
+                                onPhotoClick = { index -> selectedPhotoIndex = index }
                             )
                         } else if (!uiState.isLoadingPhotos) {
-                            // No photos placeholder
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .padding(16.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(colorScheme.primaryContainer),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.PhotoCamera,
-                                        contentDescription = null,
-                                        tint = colorScheme.onPrimaryContainer,
-                                        modifier = Modifier.size(48.dp)
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(
-                                        text = stringResource(R.string.bench_detail_no_photos),
-                                        color = colorScheme.onPrimaryContainer
-                                    )
-                                }
-                            }
+                            NoPhotosPlaceholder()
                         }
 
-                        // Info Section
                         Column(
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(HopSpotDimensions.Screen.padding)
                         ) {
-                            // Name & Rating
-                            Text(
-                                text = bench.name,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = colorScheme.onBackground
-                            )
+                            // Name & Rating Row with "Ich war hier" Button
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = bench.name,
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colorScheme.onBackground
+                                    )
 
-                            if (bench.rating != null) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
+                                    if (bench.rating != null) {
+                                        Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xxs))
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            repeat(5) { index ->
+                                                Icon(
+                                                    imageVector = if (index < bench.rating) Icons.Default.Star else Icons.Default.StarBorder,
+                                                    contentDescription = null,
+                                                    tint = if (index < bench.rating) colorScheme.primary else colorScheme.outline,
+                                                    modifier = Modifier.size(HopSpotDimensions.Icon.medium)
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
+                                            Text(
+                                                text = stringResource(R.string.bench_detail_rating_format, bench.rating),
+                                                color = colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.sm))
+
+                                // Compact "Ich war hier" Button
+                                Button(
+                                    onClick = { viewModel.addVisit(benchId) },
+                                    enabled = !uiState.isAddingVisit,
+                                    shape = HopSpotShapes.button,
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                                 ) {
-                                    repeat(5) { index ->
+                                    if (uiState.isAddingVisit) {
+                                        HopSpotLoadingIndicator(
+                                            size = LoadingSize.Small,
+                                            color = colorScheme.onPrimary
+                                        )
+                                    } else {
                                         Icon(
-                                            imageVector = if (index < bench.rating) {
-                                                Icons.Default.Star
-                                            } else {
-                                                Icons.Default.StarBorder
-                                            },
+                                            imageVector = Icons.Default.CheckCircle,
                                             contentDescription = null,
-                                            tint = if (index < bench.rating) {
-                                                colorScheme.primary
-                                            } else {
-                                                colorScheme.outline
-                                            },
-                                            modifier = Modifier.size(24.dp)
+                                            modifier = Modifier.size(HopSpotDimensions.Icon.small)
+                                        )
+                                        Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xxs))
+                                        Text(
+                                            text = stringResource(R.string.btn_i_was_here),
+                                            fontSize = 14.sp
                                         )
                                     }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = stringResource(R.string.bench_detail_rating_format, bench.rating),
-                                        color = colorScheme.onSurfaceVariant
-                                    )
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            // Amenities
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                AmenityChip(
-                                    icon = Icons.Default.Wc,
-                                    label = stringResource(R.string.amenity_toilet),
-                                    available = bench.hasToilet
-                                )
-                                AmenityChip(
-                                    icon = Icons.Default.Delete,
-                                    label = stringResource(R.string.amenity_trash_bin),
-                                    available = bench.hasTrashBin
+                            // Visit success message
+                            if (uiState.visitAdded) {
+                                Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
+                                Text(
+                                    text = stringResource(R.string.bench_detail_visit_saved),
+                                    color = colorScheme.primary,
+                                    fontSize = 14.sp
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
-                            HorizontalDivider()
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
+
+                            // Info Grid: Weather + Amenities (2 columns)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(IntrinsicSize.Min),
+                                horizontalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.sm)
+                            ) {
+                                // Weather Card
+                                WeatherInfoCard(
+                                    weather = uiState.weather,
+                                    isLoading = uiState.isLoadingWeather,
+                                    modifier = Modifier.weight(1f)
+                                )
+
+                                // Amenities Card
+                                AmenitiesCard(
+                                    hasToilet = bench.hasToilet,
+                                    hasTrashBin = bench.hasTrashBin,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
 
                             // Location with Mini Map
                             LocationSection(
@@ -312,108 +296,235 @@ fun BenchDetailScreen(
                                 }
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
-                            HorizontalDivider()
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            // Description
+                            // Description - only show if not blank
                             if (!bench.description.isNullOrBlank()) {
+                                Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
+                                HorizontalDivider()
+                                Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
+
                                 Text(
                                     text = stringResource(R.string.label_description),
                                     fontWeight = FontWeight.Medium,
                                     color = colorScheme.onBackground
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xxs))
                                 Text(
                                     text = bench.description,
                                     color = colorScheme.onSurfaceVariant
                                 )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                HorizontalDivider()
-                                Spacer(modifier = Modifier.height(16.dp))
                             }
 
-                            // Weather Section
-                            if (uiState.weather != null || uiState.isLoadingWeather) {
-                                WeatherCard(
-                                    weather = uiState.weather,
-                                    isLoading = uiState.isLoadingWeather
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                HorizontalDivider()
-                                Spacer(modifier = Modifier.height(16.dp))
-                            }
-
-                            // Visit Section
+                            // Compact Visit Counter
+                            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.md))
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Groups,
                                     contentDescription = null,
-                                    tint = colorScheme.primary
+                                    tint = colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(HopSpotDimensions.Icon.small)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.bench_detail_visits),
-                                        fontWeight = FontWeight.Medium,
-                                        color = colorScheme.onBackground
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.bench_detail_visits_count, uiState.visitCount),
-                                        fontSize = 14.sp,
-                                        color = colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            // "Ich war hier" Button
-                            Button(
-                                onClick = { viewModel.addVisit(benchId) },
-                                enabled = !uiState.isAddingVisit,
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = colorScheme.primary
-                                )
-                            ) {
-                                if (uiState.isAddingVisit) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(20.dp),
-                                        color = colorScheme.onPrimary,
-                                        strokeWidth = 2.dp
-                                    )
-                                } else {
-                                    Icon(
-                                        imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = null
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(stringResource(R.string.btn_i_was_here))
-                                }
-                            }
-
-                            // Show success message
-                            if (uiState.visitAdded) {
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
                                 Text(
-                                    text = stringResource(R.string.bench_detail_visit_saved),
-                                    color = colorScheme.primary,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center
+                                    text = stringResource(R.string.bench_detail_visits_count, uiState.visitCount),
+                                    fontSize = 14.sp,
+                                    color = colorScheme.onSurfaceVariant
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(32.dp))
+                            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xl))
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun NoPhotosPlaceholder() {
+    val colorScheme = MaterialTheme.colorScheme
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .padding(HopSpotDimensions.Screen.padding)
+            .clip(HopSpotShapes.card)
+            .background(colorScheme.primaryContainer),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.PhotoCamera,
+                contentDescription = null,
+                tint = colorScheme.onPrimaryContainer,
+                modifier = Modifier.size(HopSpotDimensions.Icon.large)
+            )
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
+            Text(
+                text = stringResource(R.string.bench_detail_no_photos),
+                color = colorScheme.onPrimaryContainer
+            )
+        }
+    }
+}
+
+@Composable
+private fun WeatherInfoCard(
+    weather: WeatherInfo?,
+    isLoading: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val weatherIconFont = WeatherIcons.fontFamily
+
+    Card(
+        modifier = modifier.fillMaxHeight(),
+        shape = HopSpotShapes.card,
+        colors = CardDefaults.cardColors(
+            containerColor = colorScheme.primaryContainer.copy(alpha = 0.3f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(HopSpotDimensions.Spacing.sm),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.WbSunny,
+                    contentDescription = null,
+                    tint = colorScheme.primary,
+                    modifier = Modifier.size(HopSpotDimensions.Icon.small)
+                )
+                Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xxs))
+                Text(
+                    text = stringResource(R.string.bench_detail_current_weather),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = colorScheme.onSurfaceVariant
+                )
+            }
+
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
+
+            when {
+                isLoading -> {
+                    HopSpotLoadingIndicator(size = LoadingSize.Button)
+                }
+                weather != null -> {
+                    Text(
+                        text = WeatherIcons.getIconForCode(weather.weathercode).toString(),
+                        fontFamily = weatherIconFont,
+                        fontSize = 32.sp,
+                        color = getWeatherColor(weather.weathercode, colorScheme)
+                    )
+                    Row(verticalAlignment = Alignment.Top) {
+                        Text(
+                            text = "${weather.temperature.toInt()}",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.onBackground
+                        )
+                        Text(
+                            text = "°C",
+                            fontSize = 14.sp,
+                            color = colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Text(
+                        text = getWeatherDescription(weather.weathercode),
+                        fontSize = 12.sp,
+                        color = colorScheme.onSurfaceVariant
+                    )
+                }
+                else -> {
+                    Text(
+                        text = "—",
+                        fontSize = 24.sp,
+                        color = colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AmenitiesCard(
+    hasToilet: Boolean,
+    hasTrashBin: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val colorScheme = MaterialTheme.colorScheme
+
+    Card(
+        modifier = modifier.fillMaxHeight(),
+        shape = HopSpotShapes.card,
+        colors = CardDefaults.cardColors(
+            containerColor = colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(HopSpotDimensions.Spacing.sm),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = stringResource(R.string.bench_form_amenities),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.sm)
+            ) {
+                AmenityIndicator(
+                    icon = Icons.Default.Wc,
+                    available = hasToilet
+                )
+                AmenityIndicator(
+                    icon = Icons.Default.Delete,
+                    available = hasTrashBin
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AmenityIndicator(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    available: Boolean
+) {
+    val colorScheme = MaterialTheme.colorScheme
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = if (available) colorScheme.primary else colorScheme.outline,
+            modifier = Modifier.size(HopSpotDimensions.Icon.medium)
+        )
+        Icon(
+            imageVector = if (available) Icons.Default.Check else Icons.Default.Close,
+            contentDescription = null,
+            tint = if (available) colorScheme.primary else colorScheme.outline,
+            modifier = Modifier.size(14.dp)
+        )
     }
 }
 
@@ -427,9 +538,7 @@ private fun LocationSection(
     val colorScheme = MaterialTheme.colorScheme
     val position = LatLng(latitude, longitude)
 
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -437,9 +546,10 @@ private fun LocationSection(
             Icon(
                 imageVector = Icons.Default.LocationOn,
                 contentDescription = null,
-                tint = colorScheme.primary
+                tint = colorScheme.primary,
+                modifier = Modifier.size(HopSpotDimensions.Icon.medium)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
             Text(
                 text = stringResource(R.string.bench_detail_location),
                 fontWeight = FontWeight.Medium,
@@ -447,14 +557,13 @@ private fun LocationSection(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.sm))
 
-        // Mini Map
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .clip(HopSpotShapes.card)
         ) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
@@ -476,20 +585,19 @@ private fun LocationSection(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.sm))
 
-        // Open in Google Maps Button
         OutlinedButton(
             onClick = onOpenInMaps,
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp)
+            shape = HopSpotShapes.button
         ) {
             Icon(
                 imageVector = Icons.Default.OpenInNew,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(HopSpotDimensions.Icon.small)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(HopSpotDimensions.Spacing.xs))
             Text(stringResource(R.string.btn_open_in_maps))
         }
     }
@@ -507,15 +615,14 @@ private fun PhotoGallery(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(HopSpotDimensions.Screen.padding)
     ) {
-        // Main Photo (large)
         if (mainPhoto != null) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(HopSpotShapes.card)
                     .clickable { onPhotoClick(mainPhotoIndex) }
             ) {
                 AsyncImage(
@@ -527,11 +634,10 @@ private fun PhotoGallery(
                     error = painterResource(R.drawable.placeholder_bench)
                 )
 
-                // Main badge
                 Surface(
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(8.dp),
+                        .padding(HopSpotDimensions.Spacing.xs),
                     shape = RoundedCornerShape(4.dp),
                     color = colorScheme.primary
                 ) {
@@ -556,12 +662,11 @@ private fun PhotoGallery(
             }
         }
 
-        // Other photos (horizontal scroll)
         val otherPhotosWithIndex = photos.mapIndexed { index, photo -> index to photo }
             .filter { !it.second.isMain }
 
         if (otherPhotosWithIndex.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.sm))
 
             Text(
                 text = stringResource(R.string.bench_detail_more_photos),
@@ -570,10 +675,10 @@ private fun PhotoGallery(
                 color = colorScheme.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(HopSpotDimensions.Spacing.xs))
 
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.xs)
             ) {
                 items(otherPhotosWithIndex.size) { i ->
                     val (index, photo) = otherPhotosWithIndex[i]
@@ -582,66 +687,13 @@ private fun PhotoGallery(
                         contentDescription = stringResource(R.string.cd_photo),
                         modifier = Modifier
                             .size(80.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(HopSpotShapes.thumbnail)
                             .clickable { onPhotoClick(index) },
                         contentScale = ContentScale.Crop,
                         placeholder = painterResource(R.drawable.placeholder_bench),
                         error = painterResource(R.drawable.placeholder_bench)
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AmenityChip(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    label: String,
-    available: Boolean
-) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = if (available) {
-            colorScheme.primaryContainer
-        } else {
-            colorScheme.surfaceVariant
-        }
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = if (available) {
-                    colorScheme.onPrimaryContainer
-                } else {
-                    colorScheme.onSurfaceVariant
-                },
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = label,
-                fontSize = 14.sp,
-                color = if (available) {
-                    colorScheme.onPrimaryContainer
-                } else {
-                    colorScheme.onSurfaceVariant
-                }
-            )
-            if (available) {
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                    tint = colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(16.dp)
-                )
             }
         }
     }
@@ -670,7 +722,6 @@ private fun FullscreenImageViewer(
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = 0.95f))
         ) {
-            // Pager for swiping between images
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
@@ -681,12 +732,11 @@ private fun FullscreenImageViewer(
                 )
             }
 
-            // Close button (top right)
             IconButton(
                 onClick = onDismiss,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(16.dp)
+                    .padding(HopSpotDimensions.Spacing.md)
                     .size(48.dp)
                     .background(Color.Black.copy(alpha = 0.5f), CircleShape)
             ) {
@@ -698,7 +748,6 @@ private fun FullscreenImageViewer(
                 )
             }
 
-            // Page indicator (bottom center)
             if (photos.size > 1) {
                 Row(
                     modifier = Modifier
@@ -706,18 +755,14 @@ private fun FullscreenImageViewer(
                         .padding(bottom = 32.dp)
                         .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
                         .padding(horizontal = 12.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(HopSpotDimensions.Spacing.xs)
                 ) {
                     repeat(photos.size) { index ->
                         Box(
                             modifier = Modifier
                                 .size(8.dp)
                                 .background(
-                                    color = if (index == pagerState.currentPage) {
-                                        Color.White
-                                    } else {
-                                        Color.White.copy(alpha = 0.4f)
-                                    },
+                                    color = if (index == pagerState.currentPage) Color.White else Color.White.copy(alpha = 0.4f),
                                     shape = CircleShape
                                 )
                         )
@@ -738,8 +783,6 @@ private fun ZoomableImage(
 
     val transformableState = rememberTransformableState { zoomChange, panChange, _ ->
         scale = (scale * zoomChange).coerceIn(1f, 5f)
-
-        // Only allow panning when zoomed in
         if (scale > 1f) {
             offset += panChange
         } else {
@@ -747,7 +790,6 @@ private fun ZoomableImage(
         }
     }
 
-    // Reset zoom on double tap or when switching pages
     LaunchedEffect(imageUrl) {
         scale = 1f
         offset = Offset.Zero
@@ -760,11 +802,9 @@ private fun ZoomableImage(
                 interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                 indication = null
             ) {
-                // Tap to close only when not zoomed
                 if (scale <= 1f) {
                     onTap()
                 } else {
-                    // Reset zoom on tap when zoomed
                     scale = 1f
                     offset = Offset.Zero
                 }
@@ -788,157 +828,15 @@ private fun ZoomableImage(
     }
 }
 
-@Composable
-private fun WeatherCard(
-    weather: WeatherInfo?,
-    isLoading: Boolean
-) {
-    val colorScheme = MaterialTheme.colorScheme
-    val weatherIconFont = WeatherIcons.fontFamily
-
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.WbSunny,
-                contentDescription = null,
-                tint = colorScheme.primary
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.bench_detail_current_weather),
-                fontWeight = FontWeight.Medium,
-                color = colorScheme.onBackground
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (isLoading) {
-            // Loading skeleton
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                repeat(3) {
-                    Box(
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(colorScheme.surfaceVariant)
-                    )
-                }
-            }
-        } else if (weather != null) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = colorScheme.primaryContainer.copy(alpha = 0.3f)
-                )
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Weather Icon & Condition
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = WeatherIcons.getIconForCode(weather.weathercode).toString(),
-                            fontFamily = weatherIconFont,
-                            fontSize = 42.sp,
-                            color = getWeatherColor(weather.weathercode, colorScheme)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = getWeatherDescription(weather.weathercode),
-                            fontSize = 12.sp,
-                            color = colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    // Temperature
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.Top
-                        ) {
-                            Text(
-                                text = "${weather.temperature.toInt()}",
-                                fontSize = 32.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = colorScheme.onBackground
-                            )
-                            Text(
-                                text = "°C",
-                                fontSize = 16.sp,
-                                color = colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Text(
-                            text = stringResource(R.string.bench_detail_temperature),
-                            fontSize = 12.sp,
-                            color = colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    // Wind
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = WeatherIcons.getWindDirectionIcon(weather.winddirection).toString(),
-                                fontFamily = weatherIconFont,
-                                fontSize = 24.sp,
-                                color = colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "${weather.windspeed.toInt()}",
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = colorScheme.onBackground
-                            )
-                            Text(
-                                text = "km/h",
-                                fontSize = 12.sp,
-                                color = colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Text(
-                            text = stringResource(R.string.wind_format, getWindDirectionText(weather.winddirection)),
-                            fontSize = 12.sp,
-                            color = colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
 private fun getWeatherColor(code: Int, colorScheme: ColorScheme): Color {
     return when (code) {
-        0, 1 -> Color(0xFFFFB300)         // Sunny - amber/gold
-        2, 3 -> Color(0xFF78909C)          // Cloudy - blue grey
-        45, 48 -> Color(0xFF90A4AE)        // Fog - light grey
-        51, 53, 55, 61, 63, 65, 80, 81, 82 -> Color(0xFF42A5F5)  // Rain - blue
-        56, 57, 66, 67 -> Color(0xFF4FC3F7) // Freezing rain - light blue
-        71, 73, 75, 77, 85, 86 -> Color(0xFF81D4FA) // Snow - very light blue
-        95, 96, 99 -> Color(0xFFFFCA28)    // Thunderstorm - yellow
+        0, 1 -> Color(0xFFFFB300)
+        2, 3 -> Color(0xFF78909C)
+        45, 48 -> Color(0xFF90A4AE)
+        51, 53, 55, 61, 63, 65, 80, 81, 82 -> Color(0xFF42A5F5)
+        56, 57, 66, 67 -> Color(0xFF4FC3F7)
+        71, 73, 75, 77, 85, 86 -> Color(0xFF81D4FA)
+        95, 96, 99 -> Color(0xFFFFCA28)
         else -> colorScheme.primary
     }
 }
@@ -961,17 +859,4 @@ private fun getWeatherDescription(code: Int): String = when (code) {
     95 -> stringResource(R.string.weather_thunderstorm)
     96, 99 -> stringResource(R.string.weather_thunderstorm_hail)
     else -> stringResource(R.string.weather_unknown)
-}
-
-@Composable
-private fun getWindDirectionText(degrees: Int): String = when ((degrees + 22) % 360 / 45) {
-    0 -> stringResource(R.string.wind_n)
-    1 -> stringResource(R.string.wind_ne)
-    2 -> stringResource(R.string.wind_e)
-    3 -> stringResource(R.string.wind_se)
-    4 -> stringResource(R.string.wind_s)
-    5 -> stringResource(R.string.wind_sw)
-    6 -> stringResource(R.string.wind_w)
-    7 -> stringResource(R.string.wind_nw)
-    else -> ""
 }
