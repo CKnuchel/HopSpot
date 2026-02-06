@@ -35,7 +35,7 @@ sealed class BottomNavItem(
     object Favorites : BottomNavItem(
         route = Route.Favorites.route,
         icon = Icons.Default.Favorite,
-        label = "Favoriten"
+        label = "Favs"
     )
 
     object Profile : BottomNavItem(
