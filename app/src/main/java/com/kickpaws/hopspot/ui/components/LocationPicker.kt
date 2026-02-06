@@ -428,7 +428,7 @@ private suspend fun getCurrentLocation(context: Context): Pair<Double, Double>? 
                 null
             }
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 }

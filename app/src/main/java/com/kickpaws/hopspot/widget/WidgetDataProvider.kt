@@ -44,8 +44,8 @@ class WidgetDataProvider @Inject constructor(
                     lat = location.first,
                     lon = location.second
                 )
-                response.data?.spots?.firstOrNull()?.toDomain()
-            } catch (e: Exception) {
+                response.data.spots.firstOrNull()?.toDomain()
+            } catch (_: Exception) {
                 // Fallback to local
                 getNearestLocalSpot(location)
             }
@@ -62,7 +62,7 @@ class WidgetDataProvider @Inject constructor(
             } else {
                 null
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
 
@@ -141,7 +141,7 @@ class WidgetDataProvider @Inject constructor(
             ).await()
 
             currentLocation?.let { Pair(it.latitude, it.longitude) }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }

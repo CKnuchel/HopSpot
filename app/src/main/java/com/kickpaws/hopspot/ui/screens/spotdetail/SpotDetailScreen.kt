@@ -1,7 +1,7 @@
 package com.kickpaws.hopspot.ui.screens.spotdetail
 
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -291,7 +290,7 @@ fun SpotDetailScreen(
                                 longitude = spot.longitude,
                                 spotName = spot.name,
                                 onOpenInMaps = {
-                                    val uri = Uri.parse("geo:${spot.latitude},${spot.longitude}?q=${spot.latitude},${spot.longitude}(${Uri.encode(spot.name)})")
+                                    val uri = "geo:${spot.latitude},${spot.longitude}?q=${spot.latitude},${spot.longitude}(${java.net.URLEncoder.encode(spot.name, "UTF-8")})".toUri()
                                     val intent = Intent(Intent.ACTION_VIEW, uri)
                                     context.startActivity(intent)
                                 }
