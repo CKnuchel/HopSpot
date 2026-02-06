@@ -3,6 +3,7 @@ package com.kickpaws.hopspot.ui.screens.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.analytics.AnalyticsManager
+import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
 import com.kickpaws.hopspot.domain.model.Bench
 import com.kickpaws.hopspot.domain.repository.BenchFilter
 import com.kickpaws.hopspot.domain.repository.BenchRepository
@@ -24,7 +25,8 @@ data class MapUiState(
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val benchRepository: BenchRepository,
-    private val analyticsManager: AnalyticsManager
+    private val analyticsManager: AnalyticsManager,
+    private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
@@ -56,7 +58,7 @@ class MapViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = exception.message ?: "Fehler beim Laden"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }

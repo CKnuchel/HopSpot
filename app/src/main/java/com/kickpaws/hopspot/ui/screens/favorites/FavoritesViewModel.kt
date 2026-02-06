@@ -3,6 +3,7 @@ package com.kickpaws.hopspot.ui.screens.favorites
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.analytics.AnalyticsManager
+import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
 import com.kickpaws.hopspot.domain.model.Favorite
 import com.kickpaws.hopspot.domain.repository.FavoriteFilter
 import com.kickpaws.hopspot.domain.repository.FavoriteRepository
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
-    private val analyticsManager: AnalyticsManager
+    private val analyticsManager: AnalyticsManager,
+    private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavoritesUiState())
@@ -51,7 +53,7 @@ class FavoritesViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = exception.message ?: "Fehler beim Laden"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }
@@ -83,7 +85,7 @@ class FavoritesViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isRefreshing = false,
-                            errorMessage = exception.message ?: "Fehler beim Laden"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }
@@ -152,7 +154,7 @@ class FavoritesViewModel @Inject constructor(
                         it.copy(
                             isRemoving = false,
                             favoriteToRemove = null,
-                            errorMessage = exception.message ?: "Fehler beim Entfernen"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }

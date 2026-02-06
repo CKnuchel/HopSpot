@@ -3,6 +3,7 @@ package com.kickpaws.hopspot.ui.screens.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.analytics.AnalyticsManager
+import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
 import com.kickpaws.hopspot.domain.repository.AuthRepository
 import com.kickpaws.hopspot.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,8 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
-    private val analyticsManager: AnalyticsManager
+    private val analyticsManager: AnalyticsManager,
+    private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -44,7 +46,7 @@ class ProfileViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = exception.message ?: "Profil konnte nicht geladen werden"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }
@@ -120,7 +122,7 @@ class ProfileViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isSaving = false,
-                            saveError = exception.message ?: "Speichern fehlgeschlagen"
+                            saveError = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }

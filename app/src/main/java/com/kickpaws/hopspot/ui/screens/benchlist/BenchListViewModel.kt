@@ -3,6 +3,7 @@ package com.kickpaws.hopspot.ui.screens.benchlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.analytics.AnalyticsManager
+import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
 import com.kickpaws.hopspot.domain.model.Bench
 import com.kickpaws.hopspot.domain.repository.BenchFilter
 import com.kickpaws.hopspot.domain.repository.BenchRepository
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class BenchListViewModel @Inject constructor(
     private val benchRepository: BenchRepository,
-    private val analyticsManager: AnalyticsManager
+    private val analyticsManager: AnalyticsManager,
+    private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BenchListUiState())
@@ -55,7 +57,7 @@ class BenchListViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = exception.message ?: "Fehler beim Laden"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }
@@ -87,7 +89,7 @@ class BenchListViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isRefreshing = false,
-                            errorMessage = exception.message ?: "Fehler beim Laden"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }
@@ -221,7 +223,7 @@ class BenchListViewModel @Inject constructor(
                         it.copy(
                             isDeleting = false,
                             benchToDelete = null,
-                            errorMessage = exception.message ?: "Löschen fehlgeschlagen"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }
@@ -249,7 +251,7 @@ class BenchListViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoadingRandom = false,
-                            errorMessage = exception.message ?: "Keine Bank gefunden"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }

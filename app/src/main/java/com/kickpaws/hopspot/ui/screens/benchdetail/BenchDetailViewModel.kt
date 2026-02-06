@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.analytics.AnalyticsManager
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
 import com.kickpaws.hopspot.data.remote.dto.CreateVisitRequest
+import com.kickpaws.hopspot.data.remote.error.ApiErrorParser
+import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
 import com.kickpaws.hopspot.domain.model.Bench
 import com.kickpaws.hopspot.domain.model.Photo
@@ -41,7 +43,8 @@ data class BenchDetailUiState(
 @HiltViewModel
 class BenchDetailViewModel @Inject constructor(
     private val api: HopSpotApi,
-    private val analyticsManager: AnalyticsManager
+    private val analyticsManager: AnalyticsManager,
+    private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BenchDetailUiState())
@@ -74,7 +77,7 @@ class BenchDetailViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "Fehler beim Laden: ${e.message}"
+                        errorMessage = errorMessageMapper.getMessage(ApiErrorParser.parse(e))
                     )
                 }
             }
@@ -167,7 +170,7 @@ class BenchDetailViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isTogglingFavorite = false,
-                        errorMessage = "Favorit konnte nicht geändert werden"
+                        errorMessage = errorMessageMapper.getMessage(ApiErrorParser.parse(e))
                     )
                 }
             }
@@ -200,7 +203,7 @@ class BenchDetailViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isAddingVisit = false,
-                        errorMessage = "Besuch konnte nicht gespeichert werden"
+                        errorMessage = errorMessageMapper.getMessage(ApiErrorParser.parse(e))
                     )
                 }
             }

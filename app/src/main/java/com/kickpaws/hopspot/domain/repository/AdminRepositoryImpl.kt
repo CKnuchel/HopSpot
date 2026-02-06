@@ -5,6 +5,7 @@ import com.kickpaws.hopspot.data.mapper.toDomain
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
 import com.kickpaws.hopspot.data.remote.dto.AdminUpdateUserRequest
 import com.kickpaws.hopspot.data.remote.dto.CreateInvitationCodeRequest
+import com.kickpaws.hopspot.data.remote.error.ApiErrorParser
 import com.kickpaws.hopspot.domain.model.InvitationCode
 import com.kickpaws.hopspot.domain.model.User
 import com.kickpaws.hopspot.domain.repository.AdminRepository
@@ -21,7 +22,7 @@ class AdminRepositoryImpl @Inject constructor(
             val response = api.getUsers(page = page, limit = limit)
             Result.success(response.users.map { it.toDomain() })
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -31,7 +32,7 @@ class AdminRepositoryImpl @Inject constructor(
             val response = api.updateUser(id, request)
             Result.success(response.toDomain())
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -40,7 +41,7 @@ class AdminRepositoryImpl @Inject constructor(
             api.deleteUser(id)
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -49,7 +50,7 @@ class AdminRepositoryImpl @Inject constructor(
             val response = api.getInvitationCodes(page = page, limit = limit)
             Result.success(response.codes.map { it.toDomain() })
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -59,7 +60,7 @@ class AdminRepositoryImpl @Inject constructor(
             val response = api.createInvitationCode(request)
             Result.success(response.toDomain())
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -69,10 +70,10 @@ class AdminRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                Result.failure(Exception("Failed to delete invitation code"))
+                Result.failure(ApiErrorParser.parse(Exception("Failed to delete invitation code")))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 }

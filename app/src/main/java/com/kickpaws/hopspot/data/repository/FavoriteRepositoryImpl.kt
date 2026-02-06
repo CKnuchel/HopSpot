@@ -1,6 +1,7 @@
 package com.kickpaws.hopspot.data.repository
 
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
+import com.kickpaws.hopspot.data.remote.error.ApiErrorParser
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
 import com.kickpaws.hopspot.domain.repository.FavoriteFilter
 import com.kickpaws.hopspot.domain.repository.FavoriteRepository
@@ -32,7 +33,7 @@ class FavoriteRepositoryImpl @Inject constructor(
                 )
             )
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -41,7 +42,7 @@ class FavoriteRepositoryImpl @Inject constructor(
             val response = api.addFavorite(benchId)
             Result.success(response["is_favorite"] == true)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -50,7 +51,7 @@ class FavoriteRepositoryImpl @Inject constructor(
             val response = api.removeFavorite(benchId)
             Result.success(response["is_favorite"] == false)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -59,7 +60,7 @@ class FavoriteRepositoryImpl @Inject constructor(
             val response = api.checkFavorite(benchId)
             Result.success(response["is_favorite"] == true)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 }

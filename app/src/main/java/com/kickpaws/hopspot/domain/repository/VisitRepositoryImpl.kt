@@ -2,6 +2,7 @@ package com.kickpaws.hopspot.data.repository
 
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
 import com.kickpaws.hopspot.data.remote.dto.CreateVisitRequest
+import com.kickpaws.hopspot.data.remote.error.ApiErrorParser
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
 import com.kickpaws.hopspot.domain.model.Visit
 import com.kickpaws.hopspot.domain.repository.PaginatedVisits
@@ -35,7 +36,7 @@ class VisitRepositoryImpl @Inject constructor(
                 )
             )
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -49,7 +50,7 @@ class VisitRepositoryImpl @Inject constructor(
             val response = api.createVisit(request)
             Result.success(response.toDomain())
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -58,7 +59,7 @@ class VisitRepositoryImpl @Inject constructor(
             api.deleteVisit(visitId)
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -67,7 +68,7 @@ class VisitRepositoryImpl @Inject constructor(
             val response = api.getVisitCount(benchId)
             Result.success(response.count)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 }

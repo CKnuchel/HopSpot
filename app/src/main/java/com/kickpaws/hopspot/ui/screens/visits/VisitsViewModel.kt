@@ -3,6 +3,7 @@ package com.kickpaws.hopspot.ui.screens.visits
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.analytics.AnalyticsManager
+import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
 import com.kickpaws.hopspot.domain.repository.VisitFilter
 import com.kickpaws.hopspot.domain.repository.VisitRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class VisitsViewModel @Inject constructor(
     private val visitRepository: VisitRepository,
-    private val analyticsManager: AnalyticsManager
+    private val analyticsManager: AnalyticsManager,
+    private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(VisitsUiState())
@@ -50,7 +52,7 @@ class VisitsViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = exception.message ?: "Fehler beim Laden"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }
@@ -82,7 +84,7 @@ class VisitsViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isRefreshing = false,
-                            errorMessage = exception.message ?: "Fehler beim Laden"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }
@@ -151,7 +153,7 @@ class VisitsViewModel @Inject constructor(
                         it.copy(
                             isDeleting = false,
                             visitToDelete = null,
-                            errorMessage = exception.message ?: "Fehler beim Loeschen"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }

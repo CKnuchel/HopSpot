@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
 import com.kickpaws.hopspot.data.remote.dto.UpdateBenchRequest
+import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
 import com.kickpaws.hopspot.domain.model.Photo
 import com.kickpaws.hopspot.domain.repository.PhotoRepository
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class BenchEditViewModel @Inject constructor(
     private val api: HopSpotApi,
-    private val photoRepository: PhotoRepository
+    private val photoRepository: PhotoRepository,
+    private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BenchEditUiState())
@@ -58,7 +60,7 @@ class BenchEditViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "Fehler beim Laden: ${e.message}"
+                        errorMessage = errorMessageMapper.getMessage(e)
                     )
                 }
             }
@@ -143,7 +145,7 @@ class BenchEditViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isUploadingPhoto = false,
-                            errorMessage = "Foto-Upload fehlgeschlagen: ${e.message}"
+                            errorMessage = errorMessageMapper.getMessage(e)
                         )
                     }
                 }
@@ -163,7 +165,7 @@ class BenchEditViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isSettingMainPhoto = false,
-                        errorMessage = "Hauptbild setzen fehlgeschlagen"
+                        errorMessage = errorMessageMapper.getMessage(e)
                     )
                 }
             }
@@ -182,7 +184,7 @@ class BenchEditViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isDeletingPhoto = false,
-                        errorMessage = "Foto löschen fehlgeschlagen"
+                        errorMessage = errorMessageMapper.getMessage(e)
                     )
                 }
             }
@@ -225,7 +227,7 @@ class BenchEditViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isSaving = false,
-                        errorMessage = "Speichern fehlgeschlagen: ${e.message}"
+                        errorMessage = errorMessageMapper.getMessage(e)
                     )
                 }
             }
@@ -249,7 +251,7 @@ class BenchEditViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isDeleting = false,
-                        errorMessage = "Löschen fehlgeschlagen: ${e.message}"
+                        errorMessage = errorMessageMapper.getMessage(e)
                     )
                 }
             }

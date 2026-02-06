@@ -2,6 +2,7 @@ package com.kickpaws.hopspot.ui.screens.admin
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
 import com.kickpaws.hopspot.domain.model.InvitationCode
 import com.kickpaws.hopspot.domain.model.User
 import com.kickpaws.hopspot.domain.repository.AdminRepository
@@ -40,7 +41,8 @@ data class AdminUiState(
 
 @HiltViewModel
 class AdminViewModel @Inject constructor(
-    private val adminRepository: AdminRepository
+    private val adminRepository: AdminRepository,
+    private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AdminUiState())
@@ -70,7 +72,7 @@ class AdminViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     _uiState.update { it.copy(
-                        codesError = e.message ?: "Fehler beim Laden",
+                        codesError = errorMessageMapper.getMessage(e),
                         isLoadingCodes = false
                     )}
                 }
@@ -108,7 +110,7 @@ class AdminViewModel @Inject constructor(
                 .onFailure { e ->
                     _uiState.update { it.copy(
                         isCreatingCode = false,
-                        codesError = e.message ?: "Fehler beim Erstellen"
+                        codesError = errorMessageMapper.getMessage(e)
                     )}
                 }
         }
@@ -147,7 +149,7 @@ class AdminViewModel @Inject constructor(
                 .onFailure { e ->
                     _uiState.update { it.copy(
                         isDeletingCode = false,
-                        codesError = e.message ?: "Fehler beim Löschen"
+                        codesError = errorMessageMapper.getMessage(e)
                     )}
                 }
         }
@@ -168,7 +170,7 @@ class AdminViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     _uiState.update { it.copy(
-                        usersError = e.message ?: "Fehler beim Laden",
+                        usersError = errorMessageMapper.getMessage(e),
                         isLoadingUsers = false
                     )}
                 }
@@ -188,7 +190,7 @@ class AdminViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     _uiState.update { it.copy(
-                        usersError = e.message ?: "Fehler beim Aktualisieren"
+                        usersError = errorMessageMapper.getMessage(e)
                     )}
                 }
         }
@@ -204,7 +206,7 @@ class AdminViewModel @Inject constructor(
                     )}
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(usersError = e.message) }
+                    _uiState.update { it.copy(usersError = errorMessageMapper.getMessage(e)) }
                 }
         }
     }
@@ -220,7 +222,7 @@ class AdminViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     _uiState.update { it.copy(
-                        usersError = e.message ?: "Fehler beim Löschen"
+                        usersError = errorMessageMapper.getMessage(e)
                     )}
                 }
         }

@@ -7,6 +7,7 @@ import android.graphics.Matrix
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
+import com.kickpaws.hopspot.data.remote.error.ApiErrorParser
 import com.kickpaws.hopspot.domain.repository.PhotoRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -37,7 +38,7 @@ class PhotoRepositoryImpl @Inject constructor(
             file.delete()
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -46,7 +47,7 @@ class PhotoRepositoryImpl @Inject constructor(
             api.deletePhoto(photoId)
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 

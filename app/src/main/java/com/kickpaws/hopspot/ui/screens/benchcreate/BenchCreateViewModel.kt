@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kickpaws.hopspot.data.analytics.AnalyticsManager
+import com.kickpaws.hopspot.data.remote.error.ErrorMessageMapper
 import com.kickpaws.hopspot.domain.repository.BenchRepository
 import com.kickpaws.hopspot.domain.repository.PhotoRepository
 import com.google.android.gms.location.LocationServices
@@ -26,7 +27,8 @@ class BenchCreateViewModel @Inject constructor(
     private val benchRepository: BenchRepository,
     private val photoRepository: PhotoRepository,
     private val application: Application,
-    private val analyticsManager: AnalyticsManager
+    private val analyticsManager: AnalyticsManager,
+    private val errorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BenchCreateUiState())
@@ -186,7 +188,7 @@ class BenchCreateViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isSaving = false,
-                            errorMessage = exception.message ?: "Speichern fehlgeschlagen"
+                            errorMessage = errorMessageMapper.getMessage(exception)
                         )
                     }
                 }

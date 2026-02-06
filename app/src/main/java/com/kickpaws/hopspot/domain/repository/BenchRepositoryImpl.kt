@@ -3,6 +3,7 @@ package com.kickpaws.hopspot.data.repository
 import com.kickpaws.hopspot.data.remote.api.HopSpotApi
 import com.kickpaws.hopspot.data.remote.dto.CreateBenchRequest
 import com.kickpaws.hopspot.data.remote.dto.UpdateBenchRequest
+import com.kickpaws.hopspot.data.remote.error.ApiErrorParser
 import com.kickpaws.hopspot.data.remote.mapper.toDomain
 import com.kickpaws.hopspot.domain.model.Bench
 import com.kickpaws.hopspot.domain.repository.BenchFilter
@@ -47,7 +48,7 @@ class BenchRepositoryImpl @Inject constructor(
                 )
             )
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -56,7 +57,7 @@ class BenchRepositoryImpl @Inject constructor(
             val response = api.getBench(id)
             Result.success(response.data.toDomain())
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -65,7 +66,7 @@ class BenchRepositoryImpl @Inject constructor(
             val response = api.getRandomBench()
             Result.success(response.data.toDomain())
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -91,7 +92,7 @@ class BenchRepositoryImpl @Inject constructor(
             val response = api.createBench(request)
             Result.success(response.data.toDomain())
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -109,7 +110,7 @@ class BenchRepositoryImpl @Inject constructor(
             val response = api.updateBench(id, request)
             Result.success(response.data.toDomain())
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 
@@ -118,7 +119,7 @@ class BenchRepositoryImpl @Inject constructor(
             api.deleteBench(id)
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiErrorParser.parse(e))
         }
     }
 }
