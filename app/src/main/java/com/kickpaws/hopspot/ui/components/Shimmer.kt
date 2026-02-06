@@ -4,20 +4,20 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun shimmerBrush(): Brush {
     val shimmerColors = listOf(
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+        Color.LightGray.copy(alpha = 0.6f),
+        Color.White.copy(alpha = 0.4f),
+        Color.LightGray.copy(alpha = 0.6f),
     )
 
     val transition = rememberInfiniteTransition(label = "shimmer")
@@ -26,8 +26,8 @@ fun shimmerBrush(): Brush {
         targetValue = 1000f,
         animationSpec = infiniteRepeatable(
             animation = tween(
-                durationMillis = 1000,
-                easing = FastOutSlowInEasing
+                durationMillis = 1200,
+                easing = LinearEasing
             ),
             repeatMode = RepeatMode.Restart
         ),
@@ -36,8 +36,8 @@ fun shimmerBrush(): Brush {
 
     return Brush.linearGradient(
         colors = shimmerColors,
-        start = Offset.Zero,
-        end = Offset(x = translateAnimation.value, y = translateAnimation.value)
+        start = Offset(translateAnimation.value - 300f, 0f),
+        end = Offset(translateAnimation.value, 0f)
     )
 }
 
