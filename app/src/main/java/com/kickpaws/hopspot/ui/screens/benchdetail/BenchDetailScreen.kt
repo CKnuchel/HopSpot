@@ -97,6 +97,37 @@ fun BenchDetailScreen(
                 },
                 actions = {
                     if (uiState.bench != null) {
+                        // Favorite Button
+                        IconButton(
+                            onClick = { viewModel.toggleFavorite(benchId) },
+                            enabled = !uiState.isTogglingFavorite
+                        ) {
+                            if (uiState.isTogglingFavorite) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = if (uiState.isFavorite) {
+                                        Icons.Default.Favorite
+                                    } else {
+                                        Icons.Default.FavoriteBorder
+                                    },
+                                    contentDescription = if (uiState.isFavorite) {
+                                        "Aus Favoriten entfernen"
+                                    } else {
+                                        "Zu Favoriten hinzufügen"
+                                    },
+                                    tint = if (uiState.isFavorite) {
+                                        Color.Red
+                                    } else {
+                                        colorScheme.onSurface
+                                    }
+                                )
+                            }
+                        }
+                        // Edit Button
                         IconButton(onClick = { onEditClick(benchId) }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,

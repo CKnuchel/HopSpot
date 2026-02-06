@@ -21,6 +21,7 @@ fun BottomNavigationBar(
         add(BottomNavItem.Map)
         add(BottomNavItem.BenchList)
         add(BottomNavItem.Visits)
+        add(BottomNavItem.Favorites)
         add(BottomNavItem.Profile)
         if (isAdmin) {
             add(BottomNavItem.Admin)  // Nur für Admins!

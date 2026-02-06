@@ -41,6 +41,10 @@ sealed interface  Route {
         override val route = "visits"
     }
 
+    object Favorites : Route{
+        override val route = "favorites"
+    }
+
     object Profile : Route{
         override val route = "profile"
     }

@@ -32,7 +32,9 @@ data class BenchDetailUiState(
     val isLoadingWeather: Boolean = false,
     val isAddingVisit: Boolean = false,
     val errorMessage: String? = null,
-    val visitAdded: Boolean = false
+    val visitAdded: Boolean = false,
+    val isFavorite: Boolean = false,
+    val isTogglingFavorite: Boolean = false
 )
 
 @HiltViewModel
@@ -61,6 +63,7 @@ class BenchDetailViewModel @Inject constructor(
                 loadPhotos(benchId)
                 loadVisitCount(benchId)
                 loadWeather(bench.latitude, bench.longitude)
+                loadFavoriteStatus(benchId)
 
             } catch (e: Exception) {
                 _uiState.update {
@@ -122,6 +125,45 @@ class BenchDetailViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoadingWeather = false) }
+            }
+        }
+    }
+
+    private fun loadFavoriteStatus(benchId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = api.checkFavorite(benchId)
+                _uiState.update { it.copy(isFavorite = response["is_favorite"] == true) }
+            } catch (e: Exception) {
+                // Ignore - favorite status is optional
+            }
+        }
+    }
+
+    fun toggleFavorite(benchId: Int) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isTogglingFavorite = true) }
+
+            try {
+                val currentState = _uiState.value.isFavorite
+                if (currentState) {
+                    api.removeFavorite(benchId)
+                } else {
+                    api.addFavorite(benchId)
+                }
+                _uiState.update {
+                    it.copy(
+                        isFavorite = !currentState,
+                        isTogglingFavorite = false
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isTogglingFavorite = false,
+                        errorMessage = "Favorit konnte nicht geändert werden"
+                    )
+                }
             }
         }
     }

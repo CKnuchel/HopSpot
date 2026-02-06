@@ -15,6 +15,7 @@ import com.kickpaws.hopspot.ui.screens.benchcreate.BenchCreateScreen
 import com.kickpaws.hopspot.ui.screens.benchdetail.BenchDetailScreen
 import com.kickpaws.hopspot.ui.screens.benchedit.BenchEditScreen
 import com.kickpaws.hopspot.ui.screens.benchlist.BenchListScreen
+import com.kickpaws.hopspot.ui.screens.favorites.FavoritesScreen
 import com.kickpaws.hopspot.ui.screens.map.MapScreen
 import com.kickpaws.hopspot.ui.screens.profile.ProfileScreen
 import com.kickpaws.hopspot.ui.screens.splash.SplashScreen
@@ -144,6 +145,14 @@ fun HopSpotNavGraph(
 
         composable(route = Route.Visits.route) {
             VisitsScreen(
+                onBenchClick = { benchId ->
+                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+                }
+            )
+        }
+
+        composable(route = Route.Favorites.route) {
+            FavoritesScreen(
                 onBenchClick = { benchId ->
                     navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
                 }

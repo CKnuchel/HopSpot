@@ -67,6 +67,7 @@ class MainActivity : ComponentActivity() {
                     Route.Map.route,
                     Route.BenchList.route,
                     Route.Visits.route,
+                    Route.Favorites.route,
                     Route.Profile.route,
                     Route.Admin.route
                 )

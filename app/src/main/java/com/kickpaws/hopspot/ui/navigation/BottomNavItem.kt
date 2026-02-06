@@ -3,6 +3,7 @@ package com.kickpaws.hopspot.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AdminPanelSettings
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
@@ -29,6 +30,12 @@ sealed class BottomNavItem(
         route = Route.Visits.route,
         icon = Icons.Default.History,
         label = "Besuche"
+    )
+
+    object Favorites : BottomNavItem(
+        route = Route.Favorites.route,
+        icon = Icons.Default.Favorite,
+        label = "Favoriten"
     )
 
     object Profile : BottomNavItem(

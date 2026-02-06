@@ -72,6 +72,28 @@ interface HopSpotApi {
     @GET("api/v1/benches/random")
     suspend fun getRandomBench(): ApiResponse<BenchDto>
 
+    // Favorite Endpoints
+    @GET("api/v1/benches/{id}/favorite")
+    suspend fun checkFavorite(
+        @Path("id") benchId: Int
+    ): Map<String, Boolean>
+
+    @POST("api/v1/benches/{id}/favorite")
+    suspend fun addFavorite(
+        @Path("id") benchId: Int
+    ): Map<String, Boolean>
+
+    @DELETE("api/v1/benches/{id}/favorite")
+    suspend fun removeFavorite(
+        @Path("id") benchId: Int
+    ): Map<String, Boolean>
+
+    @GET("api/v1/favorites")
+    suspend fun getFavorites(
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 50
+    ): PaginatedFavoritesDto
+
     @POST("api/v1/benches")
     suspend fun createBench(
         @Body request: CreateBenchRequest
