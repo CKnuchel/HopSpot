@@ -302,4 +302,6 @@
     <string name="widget_no_location">Standort nicht verfügbar</string>
     <string name="widget_no_spots">Keine Spots in der Nähe</string>
     <string name="widget_away">entfernt</string>
+    <string name="widget_error">Fehler beim Laden</string>
+    <string name="widget_tap_refresh">Tippen zum Aktualisieren</string>
 </resources>

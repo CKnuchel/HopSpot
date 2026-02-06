@@ -302,4 +302,6 @@
     <string name="widget_no_location">Location unavailable</string>
     <string name="widget_no_spots">No spots nearby</string>
     <string name="widget_away">away</string>
+    <string name="widget_error">Error loading</string>
+    <string name="widget_tap_refresh">Tap to refresh</string>
 </resources>

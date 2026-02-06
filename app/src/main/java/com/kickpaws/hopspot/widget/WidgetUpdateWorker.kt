@@ -3,6 +3,7 @@ package com.kickpaws.hopspot.widget
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -32,7 +33,7 @@ class WidgetUpdateWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        val data = dataProvider.getNearestSpotWithWeather()
+        val result = dataProvider.getNearestSpotWithWeather()
 
         val glanceIds = GlanceAppWidgetManager(applicationContext)
             .getGlanceIds(NearestSpotWidget::class.java)
@@ -42,24 +43,41 @@ class WidgetUpdateWorker @AssistedInject constructor(
         }
 
         for (glanceId in glanceIds) {
-            if (data != null) {
-                // Load and cache bitmap
-                val imagePath = loadAndCacheBitmap(data.spotImageUrl)
+            when (result) {
+                is WidgetResult.Success -> {
+                    val data = result.data
+                    // Load and cache bitmap
+                    val imagePath = loadAndCacheBitmap(data.spotImageUrl)
 
-                updateAppWidgetState(applicationContext, glanceId) { prefs ->
-                    prefs[stringPreferencesKey("spot_name")] = data.spotName
-                    prefs[intPreferencesKey("spot_id")] = data.spotId
-                    prefs[intPreferencesKey("spot_rating")] = data.spotRating
-                    prefs[stringPreferencesKey("spot_distance")] = data.spotDistance
-                    prefs[stringPreferencesKey("spot_image_path")] = imagePath ?: ""
-                    prefs[stringPreferencesKey("weather_temp")] = data.weatherTemp
-                    prefs[stringPreferencesKey("weather_icon")] = data.weatherIcon
-                    prefs.remove(stringPreferencesKey("error_state"))
+                    updateAppWidgetState(applicationContext, glanceId) { prefs ->
+                        prefs[stringPreferencesKey("spot_name")] = data.spotName
+                        prefs[intPreferencesKey("spot_id")] = data.spotId
+                        prefs[intPreferencesKey("spot_rating")] = data.spotRating
+                        prefs[stringPreferencesKey("spot_distance")] = data.spotDistance
+                        prefs[stringPreferencesKey("spot_image_path")] = imagePath ?: ""
+                        prefs[stringPreferencesKey("weather_temp")] = data.weatherTemp
+                        prefs[stringPreferencesKey("weather_icon")] = data.weatherIcon
+                        prefs.remove(stringPreferencesKey("error_state"))
+                        prefs[booleanPreferencesKey("is_loading")] = false
+                    }
                 }
-            } else {
-                // Set error state
-                updateAppWidgetState(applicationContext, glanceId) { prefs ->
-                    prefs[stringPreferencesKey("error_state")] = "no_data"
+                is WidgetResult.NoLocation -> {
+                    updateAppWidgetState(applicationContext, glanceId) { prefs ->
+                        prefs[stringPreferencesKey("error_state")] = "no_location"
+                        prefs[booleanPreferencesKey("is_loading")] = false
+                    }
+                }
+                is WidgetResult.NoSpots -> {
+                    updateAppWidgetState(applicationContext, glanceId) { prefs ->
+                        prefs[stringPreferencesKey("error_state")] = "no_spots"
+                        prefs[booleanPreferencesKey("is_loading")] = false
+                    }
+                }
+                is WidgetResult.Error -> {
+                    updateAppWidgetState(applicationContext, glanceId) { prefs ->
+                        prefs[stringPreferencesKey("error_state")] = "error"
+                        prefs[booleanPreferencesKey("is_loading")] = false
+                    }
                 }
             }
 

@@ -30,9 +30,9 @@ class WidgetDataProvider @Inject constructor(
     private val networkMonitor: NetworkMonitor,
     @ApplicationContext private val context: Context
 ) {
-    suspend fun getNearestSpotWithWeather(): WidgetData? {
+    suspend fun getNearestSpotWithWeather(): WidgetResult {
         // 1. Get current location
-        val location = getCurrentLocation() ?: return null
+        val location = getCurrentLocation() ?: return WidgetResult.NoLocation
 
         // 2. Get nearest spot
         val spot = if (networkMonitor.isOnlineNow) {
@@ -53,7 +53,7 @@ class WidgetDataProvider @Inject constructor(
             getNearestLocalSpot(location)
         }
 
-        spot ?: return null
+        spot ?: return WidgetResult.NoSpots
 
         // 3. Get weather for spot
         val weather = try {
@@ -72,14 +72,16 @@ class WidgetDataProvider @Inject constructor(
             spot.latitude, spot.longitude
         )
 
-        return WidgetData(
-            spotId = spot.id,
-            spotName = spot.name,
-            spotRating = spot.rating ?: 0,
-            spotDistance = formatDistance(distance),
-            spotImageUrl = spot.mainPhotoUrl,
-            weatherTemp = weather?.currentWeather?.temperature?.let { "${it.toInt()}\u00B0C" } ?: "",
-            weatherIcon = weather?.currentWeather?.weathercode?.let { getWeatherEmoji(it) } ?: ""
+        return WidgetResult.Success(
+            WidgetData(
+                spotId = spot.id,
+                spotName = spot.name,
+                spotRating = spot.rating ?: 0,
+                spotDistance = formatDistance(distance),
+                spotImageUrl = spot.mainPhotoUrl,
+                weatherTemp = weather?.currentWeather?.temperature?.let { "${it.toInt()}\u00B0C" } ?: "",
+                weatherIcon = weather?.currentWeather?.weathercode?.let { getWeatherEmoji(it) } ?: ""
+            )
         )
     }
 
@@ -208,3 +210,10 @@ data class WidgetData(
     val weatherTemp: String,
     val weatherIcon: String
 )
+
+sealed class WidgetResult {
+    data class Success(val data: WidgetData) : WidgetResult()
+    data object NoLocation : WidgetResult()
+    data object NoSpots : WidgetResult()
+    data object Error : WidgetResult()
+}
