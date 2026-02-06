@@ -100,7 +100,7 @@ class WidgetDataProvider @Inject constructor(
         return if (meters < 1000) {
             "${meters.toInt()}m"
         } else {
-            String.format("%.1fkm", meters / 1000)
+            String.format(java.util.Locale.ROOT, "%.1fkm", meters / 1000)
         }
     }
 

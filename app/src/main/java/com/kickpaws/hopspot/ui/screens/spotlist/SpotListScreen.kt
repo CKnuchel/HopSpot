@@ -729,7 +729,7 @@ private fun FilterBottomSheet(
 private fun formatDistance(distanceMeters: Double): String {
     return when {
         distanceMeters < 1000 -> "${distanceMeters.toInt()}m"
-        else -> String.format("%.1fkm", distanceMeters / 1000)
+        else -> String.format(java.util.Locale.ROOT, "%.1fkm", distanceMeters / 1000)
     }
 }
 

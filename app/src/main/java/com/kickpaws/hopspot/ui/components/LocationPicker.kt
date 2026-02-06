@@ -233,7 +233,7 @@ fun LocationPickerCard(
                     onMapClick = { showFullscreenMap = true }
                 ) {
                     Marker(
-                        state = MarkerState(position = currentPosition)
+                        state = rememberMarkerState(position = currentPosition)
                     )
                 }
 

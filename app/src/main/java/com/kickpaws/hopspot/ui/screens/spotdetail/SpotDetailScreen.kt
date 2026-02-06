@@ -582,7 +582,7 @@ private fun LocationSection(
                 ),
                 properties = MapProperties(mapType = MapType.NORMAL)
             ) {
-                Marker(state = MarkerState(position = position), title = spotName)
+                Marker(state = rememberMarkerState(position = position), title = spotName)
             }
         }
 
