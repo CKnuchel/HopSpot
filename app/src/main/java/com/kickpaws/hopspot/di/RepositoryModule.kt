@@ -1,10 +1,12 @@
 package com.kickpaws.hopspot.di
 
+import com.kickpaws.hopspot.data.repository.ActivityRepositoryImpl
 import com.kickpaws.hopspot.data.repository.AdminRepositoryImpl
 import com.kickpaws.hopspot.data.repository.FavoriteRepositoryImpl
 import com.kickpaws.hopspot.data.repository.OfflineFirstBenchRepository
 import com.kickpaws.hopspot.data.repository.OfflineFirstVisitRepository
 import com.kickpaws.hopspot.data.repository.PhotoRepositoryImpl
+import com.kickpaws.hopspot.domain.repository.ActivityRepository
 import com.kickpaws.hopspot.domain.repository.AdminRepository
 import com.kickpaws.hopspot.domain.repository.AuthRepository
 import com.kickpaws.hopspot.domain.repository.AuthRepositoryImpl
@@ -65,4 +67,10 @@ abstract class RepositoryModule {
     abstract fun bindFavoriteRepository(
         favoriteRepositoryImpl: FavoriteRepositoryImpl
     ): FavoriteRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindActivityRepository(
+        activityRepositoryImpl: ActivityRepositoryImpl
+    ): ActivityRepository
 }

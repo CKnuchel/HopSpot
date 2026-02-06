@@ -171,6 +171,14 @@ interface HopSpotApi {
         @Query("lon") lon: Double
     ): WeatherDto
 
+    // Activity Endpoints
+    @GET("api/v1/activities")
+    suspend fun getActivities(
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 50,
+        @Query("action_type") actionType: String? = null
+    ): PaginatedActivitiesDto
+
     // Admin Endpoints
     @GET("api/v1/admin/users")
     suspend fun getUsers(

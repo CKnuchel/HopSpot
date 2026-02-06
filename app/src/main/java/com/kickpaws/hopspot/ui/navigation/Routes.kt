@@ -52,4 +52,8 @@ sealed interface  Route {
     object Admin : Route{
         override val route = "admin"
     }
+
+    object ActivityFeed : Route{
+        override val route = "activity_feed"
+    }
 }

@@ -48,6 +48,7 @@ import androidx.core.graphics.scale
 fun MapScreen(
     onBenchClick: (Int) -> Unit,
     onCreateBenchClick: () -> Unit,
+    onActivityFeedClick: () -> Unit,
     viewModel: MapViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -239,31 +240,50 @@ fun MapScreen(
             }
         }
 
-        // My Location Button
-        FilledIconButton(
-            onClick = {
-                scope.launch {
-                    val location = getCurrentLocation(context)
-                    if (location != null) {
-                        userLocation = LatLng(location.first, location.second)
-                        cameraPositionState.animate(
-                            CameraUpdateFactory.newLatLngZoom(userLocation!!, 14f)
-                        )
-                    }
-                }
-            },
+        // Top End Buttons (Activity Feed + My Location)
+        Column(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(16.dp),
-            colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = colorScheme.surface
-            )
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.MyLocation,
-                contentDescription = stringResource(R.string.cd_my_location),
-                tint = colorScheme.primary
-            )
+            // Activity Feed Button
+            FilledIconButton(
+                onClick = onActivityFeedClick,
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = colorScheme.surface
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Timeline,
+                    contentDescription = stringResource(R.string.cd_activity_feed),
+                    tint = colorScheme.primary
+                )
+            }
+
+            // My Location Button
+            FilledIconButton(
+                onClick = {
+                    scope.launch {
+                        val location = getCurrentLocation(context)
+                        if (location != null) {
+                            userLocation = LatLng(location.first, location.second)
+                            cameraPositionState.animate(
+                                CameraUpdateFactory.newLatLngZoom(userLocation!!, 14f)
+                            )
+                        }
+                    }
+                },
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = colorScheme.surface
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MyLocation,
+                    contentDescription = stringResource(R.string.cd_my_location),
+                    tint = colorScheme.primary
+                )
+            }
         }
 
         // FAB für neue Bank

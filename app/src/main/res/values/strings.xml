@@ -245,6 +245,12 @@
     <!-- Map Screen -->
     <string name="map_benches_count">%1$d Bänke</string>
 
+    <!-- Activity Feed Screen -->
+    <string name="activity_feed_title">Aktivitäten</string>
+    <string name="empty_activity_feed_title">Noch keine Aktivitäten</string>
+    <string name="empty_activity_feed_subtitle">Sobald jemand eine Bank hinzufügt oder besucht, erscheint es hier!</string>
+    <string name="cd_activity_feed">Aktivitäten</string>
+
     <!-- Offline Banner -->
     <string name="offline_banner_message">Offline-Modus - Änderungen werden synchronisiert</string>
 

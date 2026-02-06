@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.kickpaws.hopspot.ui.screens.activityfeed.ActivityFeedScreen
 import com.kickpaws.hopspot.ui.screens.admin.AdminScreen
 import com.kickpaws.hopspot.ui.screens.auth.LoginScreen
 import com.kickpaws.hopspot.ui.screens.auth.RegisterScreen
@@ -139,7 +140,19 @@ fun HopSpotNavGraph(
                 },
                 onCreateBenchClick = {
                     navController.navigate(Route.BenchCreate.route)
+                },
+                onActivityFeedClick = {
+                    navController.navigate(Route.ActivityFeed.route)
                 }
+            )
+        }
+
+        composable(route = Route.ActivityFeed.route) {
+            ActivityFeedScreen(
+                onBenchClick = { benchId ->
+                    navController.navigate(Route.BenchDetail.createRoute(benchId.toString()))
+                },
+                onBackClick = { navController.popBackStack() }
             )
         }
 
